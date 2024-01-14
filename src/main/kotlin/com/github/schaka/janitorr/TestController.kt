@@ -47,6 +47,14 @@ class TestController(
         jellyseerrService.cleanupRequests(toDeleteMovies)
         jellyfinService.cleanupMovies(toDeleteMovies)
 
-        return ResponseEntity(sonarrShows, HttpStatus.OK)
+
+
+        return ResponseEntity(
+                mapOf(
+                        "properties" to applicationProperties,
+                        "shows" to toDeleteShows,
+                        "movies" to toDeleteMovies
+                )
+        , HttpStatus.OK)
     }
 }

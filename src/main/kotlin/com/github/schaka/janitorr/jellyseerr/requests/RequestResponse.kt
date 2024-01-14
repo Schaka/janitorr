@@ -6,11 +6,12 @@ data class RequestResponse(
     val is4k: Boolean,
     val media: Media,
     val modifiedBy: ModifiedBy?,
-    val profileId: Int,
+    val profileId: Int?,
     val requestedBy: ModifiedBy,
-    val rootFolder: String,
-    val serverId: Int,
+    val rootFolder: String?,
+    val serverId: Int?,
     val status: Int,
     val updatedAt: String,
-    val seasons: List<RequestSeason>?
+    val seasons: List<RequestSeason>?,
+    val type: String?
 )

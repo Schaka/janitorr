@@ -23,7 +23,7 @@ class JellyseerrService(
     fun cleanupRequests(items: List<LibraryItem>) {
         val allRequests = getAllRequests()
         for (item: LibraryItem in items) {
-             var requests: List<RequestResponse> =
+            var requests: List<RequestResponse> =
                     // TV show
                     if (item.season != null) {
                         allRequests.filter { req -> mediaMatches(item, req) && req.seasons?.any { it.seasonNumber == item.season } ?: false }
@@ -52,12 +52,12 @@ class JellyseerrService(
 
     private fun mediaTypeMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
         // Found TV show, both request and potential media have seasons
-        if (item.season != null && candidate.seasons?.isNotEmpty() == true) {
+        if (item.season != null && (candidate.type == "tv" || candidate.seasons?.isNotEmpty() == true)) {
             return true
         }
 
         // No seasons? Found a movie
-        if (item.season == null && candidate.seasons.isNullOrEmpty()) {
+        if (item.season == null && (candidate.type == "movie" || candidate.seasons.isNullOrEmpty())) {
             return true
         }
 

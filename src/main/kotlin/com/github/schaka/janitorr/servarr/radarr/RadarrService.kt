@@ -38,7 +38,6 @@ class RadarrService(
         return radarrClient.getAllMovies().mapNotNull { movie ->
             radarrClient.getHistory(movie.id)
                     .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
-                    .sortedBy { LocalDateTime.parse(it.date.substring(0, it.date.length - 1)) }
                     .map {
                         LibraryItem(
                                 movie.id,
@@ -50,6 +49,7 @@ class RadarrService(
                                 imdbId = movie.imdbId
                         )
                     }
+                    .sortedWith ( byDate(upgradesAllowed) )
                     .firstOrNull()
         }
     }

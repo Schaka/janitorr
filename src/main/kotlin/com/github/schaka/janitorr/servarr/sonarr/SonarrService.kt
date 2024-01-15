@@ -42,7 +42,6 @@ class SonarrService(
                 sonarrClient.getHistory(series.id, season.seasonNumber)
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                         // TODO: If automatic upgrades are enabled, grab the most recent date, not the oldest
-                        .sortedBy { LocalDateTime.parse(it.date.substring(0, it.date.length - 1)) }
                         .map {
 
                             var seriesPath = series.path;
@@ -63,6 +62,7 @@ class SonarrService(
                                     imdbId = series.imdbId
                             )
                         }
+                        .sortedWith ( byDate(upgradesAllowed) )
                         .firstOrNull()
             }
         }.filterNotNull()
@@ -85,6 +85,9 @@ class SonarrService(
                 unmonitorSeason(item.id, item.season)
             }
         }
+
+        // TODO: Clean up entire show, if all seasons are unmonitored
+        // Also requires support for deletion in Jellyfin
     }
 
     private fun unmonitorSeason(seriesId: Int, seasonNumber: Int) {

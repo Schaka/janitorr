@@ -26,8 +26,8 @@ class JellyfinService(
     fun cleanupTvShows(items: List<LibraryItem>) {
         val parentFolders = jellyfinClient.getAllItems()
 
-        val jellyfinShows = parentFolders.Items.flatMap {
-            jellyfinClient.getAllTvShows( it.Id).Items.flatMap { show ->
+        val jellyfinShows = parentFolders.Items.flatMap { parent ->
+            jellyfinClient.getAllTvShows( parent.Id).Items.filter { it.IsSeries }.flatMap { show ->
                 val seasons = jellyfinClient.getAllSeasons(show.Id).Items
                 seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
                 seasons

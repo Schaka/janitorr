@@ -9,8 +9,8 @@ file-system:
 
 application:
   dry-run: true
-  movie-expiration: 90d # 3 months
-  season-expiration: 60d # 2 months
+  movie-expiration: 90d # 3 months - if a movie's files on your system are older than this, they will be deleted
+  season-expiration: 60d # 2 months - if a season's files on your system are older than this, they will be deleted
 
 clients:
   sonarr:

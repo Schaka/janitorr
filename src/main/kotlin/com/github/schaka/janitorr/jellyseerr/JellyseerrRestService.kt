@@ -1,26 +1,27 @@
 package com.github.schaka.janitorr.jellyseerr
 
 import com.github.schaka.janitorr.ApplicationProperties
-import com.github.schaka.janitorr.jellyfin.library.LibraryContent
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 
 @Service
-class JellyseerrService(
+@ConditionalOnProperty("clients.jellyseerr")
+class JellyseerrRestService(
 
         val jellyseerrClient: JellyseerrClient,
         val applicationProperties: ApplicationProperties
 
-) {
+) : JellyseerrService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
 
-    fun cleanupRequests(items: List<LibraryItem>) {
+    override fun cleanupRequests(items: List<LibraryItem>) {
         val allRequests = getAllRequests()
         for (item: LibraryItem in items) {
             var requests: List<RequestResponse> =

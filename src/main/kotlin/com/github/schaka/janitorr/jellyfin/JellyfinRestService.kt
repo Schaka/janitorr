@@ -6,24 +6,26 @@ import com.github.schaka.janitorr.jellyfin.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.jellyfin.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
 @Service
-class JellyfinService(
+@ConditionalOnProperty("clients.jellyfin")
+class JellyfinRestService(
 
         val jellyfinClient: JellyfinClient,
         val jellyfinProperties: JellyfinProperties,
         val applicationProperties: ApplicationProperties
 
-        ) {
+        ) : JellyfinService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
         private val seasonPattern = Regex("Season (?<season>\\d+)")
     }
 
-    fun cleanupTvShows(items: List<LibraryItem>) {
+    override fun cleanupTvShows(items: List<LibraryItem>) {
         val parentFolders = jellyfinClient.getAllItems()
 
         val jellyfinShows = parentFolders.Items.flatMap { parent ->
@@ -47,7 +49,7 @@ class JellyfinService(
         }
     }
 
-    fun cleanupMovies(items: List<LibraryItem>) {
+    override fun cleanupMovies(items: List<LibraryItem>) {
         val parentFolders = jellyfinClient.getAllItems()
 
         val jellyfinMovies = parentFolders.Items.flatMap {
@@ -141,7 +143,7 @@ class JellyfinService(
     }
 
 
-    fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
+    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
         // DO NOTHING
         // WAIT UNTIL https://forum.jellyfin.org/t-api-virtualfolders-missing-itemid is solved?
     }

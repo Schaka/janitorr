@@ -1,8 +1,8 @@
 package com.github.schaka.janitorr
 
-import com.github.schaka.janitorr.jellyfin.JellyfinService
+import com.github.schaka.janitorr.jellyfin.JellyfinRestService
 import com.github.schaka.janitorr.jellyfin.library.LibraryType
-import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.jellyseerr.JellyseerrRestService
 import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import org.slf4j.LoggerFactory
@@ -16,8 +16,8 @@ import java.time.LocalDateTime
 @Controller
 @RequestMapping("/hook")
 class TestController(
-        val jellyfinService: JellyfinService,
-        val jellyseerrService: JellyseerrService,
+        val jellyfinService: JellyfinRestService,
+        val jellyseerrService: JellyseerrRestService,
         val applicationProperties: ApplicationProperties,
         val sonarrService: SonarrService,
         val radarrService: RadarrService,

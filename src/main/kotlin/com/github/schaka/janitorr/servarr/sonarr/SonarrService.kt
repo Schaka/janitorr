@@ -41,7 +41,6 @@ class SonarrService(
             series.seasons.map { season ->
                 sonarrClient.getHistory(series.id, season.seasonNumber)
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
-                        // TODO: If automatic upgrades are enabled, grab the most recent date, not the oldest
                         .map {
 
                             var seriesPath = series.path;

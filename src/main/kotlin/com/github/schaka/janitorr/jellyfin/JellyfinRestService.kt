@@ -143,8 +143,8 @@ class JellyfinRestService(
                                 Files.createDirectories(targetSeasonFolder)
                                 val files = fileOrFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
                                 for (file in files) {
-                                    val source = itemPath.resolve(file)
-                                    val target = targetSeasonFolder.resolve(fileOrFolder)
+                                    val source = itemPath.resolve(fileOrFolder).resolve(file)
+                                    val target = targetFolder.resolve(targetSeasonFolder).resolve(fileOrFolder)
                                     log.info("Creating link from {} to {}", source, target)
                                     Files.createSymbolicLink(target, source)
                                 }

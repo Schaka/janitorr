@@ -30,6 +30,7 @@ class JellyfinRestService(
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
         private val seasonPattern = Regex("Season (?<season>\\d+)")
+        private val filePattern = Regex("^.*\\.(mkv|mp4|avi|webm|mts|m2ts|ts|wmv|mpg|mpeg|mp2|m2v|m4v)\$")
     }
 
     override fun cleanupTvShows(items: List<LibraryItem>) {
@@ -110,7 +111,7 @@ class JellyfinRestService(
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         if (goneSoonCollection == null) {
-            Files.createDirectories(path)
+            //Files.createDirectories(path)
             jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(path.toUri().path))
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
@@ -132,21 +133,21 @@ class JellyfinRestService(
                             log.info("Creating folder {}", itemFolder?.pathString)
 
                             val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
-                            Files.createDirectories(targetFolder) // create folder that link will be placed in
+                            //Files.createDirectories(targetFolder) // create folder that link will be placed in
 
                             // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
                             // For now, just assume season folders are always activated
 
-                            if (it.season != null && fileOrFolder!!.isDirectory()) {
+                            if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
                                 // TV Shows
-                                val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
+                                val targetSeasonFolder = targetFolder.resolve(fileOrFolder!!)
                                 Files.createDirectories(targetSeasonFolder)
                                 val files = fileOrFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
                                 for (file in files) {
                                     val source = itemPath.resolve(fileOrFolder).resolve(file)
                                     val target = targetSeasonFolder.resolve(fileOrFolder)
                                     log.info("Creating link from {} to {}", source, target)
-                                    Files.createSymbolicLink(target, source)
+                                    //Files.createSymbolicLink(target, source)
                                 }
                             }
                             else {
@@ -154,7 +155,7 @@ class JellyfinRestService(
                                 val source = itemPath.resolve(fileOrFolder)
                                 val target = targetFolder.resolve(fileOrFolder)
                                 log.info("Creating link from {} to {}", source, target)
-                                Files.createSymbolicLink(target, source)
+                                //Files.createSymbolicLink(target, source)
                             }
                         }
                     } catch (e: Exception) {

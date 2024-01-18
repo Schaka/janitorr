@@ -145,8 +145,9 @@ class JellyfinRestService(
                                 Files.createDirectories(targetSeasonFolder)
                                 val files = sourceSeasonFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
                                 for (file in files) {
-                                    val source = sourceSeasonFolder.resolve(file)
-                                    val target = targetSeasonFolder.resolve(fileOrFolder)
+                                    val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
+                                    val source = sourceSeasonFolder.resolve(fileName)
+                                    val target = targetSeasonFolder.resolve(fileName)
                                     log.info("Creating link from {} to {}", source, target)
                                     //Files.createSymbolicLink(target, source)
                                 }
@@ -160,7 +161,7 @@ class JellyfinRestService(
                             }
                         }
                     } catch (e: Exception) {
-                        log.error("Couldn't find path {}", it.fullPath)
+                        log.error("Couldn't find path {}", it.fullPath, e)
                     }
                 }
     }

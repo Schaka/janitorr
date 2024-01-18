@@ -7,7 +7,10 @@ data class LibraryItem(
         val date: LocalDateTime,
         val originalPath: String,
         val libraryPath: String,
-        val fullPath: String, // points to a season or a movie, rather than a single episode, trailer, etc
+
+        val fullPath: String, // points to tv show or a movie, rather than a single episode, trailer, etc: e.g. /data/media/tv/Seinfeld
+        val rootFolderPath: String, // points to root folder: e.g. /data/media/tv
+        val folderName: String, // points to the ACTUAL folder, e.g. a season, movie subfolder if necessary, etc
 
         val imdbId: String? = null,
         val tvdbId: Int? = null,

@@ -3,6 +3,7 @@ package com.github.schaka.janitorr
 import com.github.schaka.janitorr.jellyfin.JellyfinService
 import com.github.schaka.janitorr.jellyfin.library.LibraryType
 import com.github.schaka.janitorr.jellyseerr.JellyseerrRestService
+import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import org.springframework.scheduling.annotation.Scheduled
@@ -12,14 +13,14 @@ import java.time.LocalDateTime
 @Service
 class CleanupSchedule(
         val jellyfinService: JellyfinService,
-        val jellyseerrService: JellyseerrRestService,
+        val jellyseerrService: JellyseerrService,
         val applicationProperties: ApplicationProperties,
         val sonarrService: SonarrService,
         val radarrService: RadarrService,
 ) {
 
     // run every hour
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
+    //@Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedule() {
 
         var radarrMovies = radarrService.getEntries()

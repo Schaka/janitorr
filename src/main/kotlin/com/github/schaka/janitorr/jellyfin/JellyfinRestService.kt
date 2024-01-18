@@ -1,6 +1,7 @@
 package com.github.schaka.janitorr.jellyfin
 
 import com.github.schaka.janitorr.ApplicationProperties
+import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.jellyfin.library.*
 import com.github.schaka.janitorr.jellyfin.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.jellyfin.library.LibraryType.TV_SHOWS
@@ -8,15 +9,18 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
-import java.time.LocalDateTime
+import java.nio.file.Files
+import java.nio.file.Path
+import kotlin.io.path.pathString
 
 @Service
-@ConditionalOnProperty("clients.jellyfin")
+@ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
 class JellyfinRestService(
 
         val jellyfinClient: JellyfinClient,
         val jellyfinProperties: JellyfinProperties,
-        val applicationProperties: ApplicationProperties
+        val applicationProperties: ApplicationProperties,
+        val fileSystemProperties: FileSystemProperties
 
         ) : JellyfinService {
 
@@ -88,64 +92,78 @@ class JellyfinRestService(
         }
     }
 
-    fun updateGoneSoonB(type: LibraryType, items: List<LibraryItem>) {
+    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
+
+        // Only do this, if we can get access to the file system to create a link structure
+        if (!fileSystemProperties.access) {
+            return
+        }
 
         val result = jellyfinClient.listLibraries()
-        val collectionFilter = type.collectionType?.lowercase()
+        val collectionFilter = type.collectionType.lowercase()
+        val path = Path.of(fileSystemProperties.leavingSoonDir, type.folderName)
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
-        // They're also a lot harder (imho) to manage - so we abuse this structure and create our own BoxSet
+        // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
-
         if (goneSoonCollection == null) {
-            jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type?.collectionType ?: "INVALID", AddLibraryRequest())
+            Files.createDirectories(path)
+            jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(path.toUri().path))
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
-        val today = LocalDateTime.now()
         items
-                .filter { it.date.plusMonths(3) < today /*&& it.date.plusMonths(4) > today */}
-                .filter{ goneSoonCollection?.Locations?.contains(it.fullPath) == false }
-                //.distinctBy { it.jellyfinPath }
                 .forEach {
                     try {
-                        // TODO: don't use BoxSet, instead create collection, find items in existing jellyfin library, add to collection - at least for TV shows?
-                        //var collectionId = jellyfinClient.createCollection("${type.collectionName} (Deleted Soon)", goneSoonCollection!!.ItemId).Id
-                        jellyfinClient.addPathToLibrary(AddPathRequest("${type.collectionName} (Deleted Soon)", it.fullPath, PathInfo(it.fullPath)))
+
+                        val rootPath = Path.of(it.rootFolderPath)
+                        val itemPath = Path.of(it.fullPath)
+                        val itemFolder = itemPath.subtract(rootPath).firstOrNull()
+
+
+                        if (!applicationProperties.dryRun) {
+                            if (it.season == null) {
+                                val file = Path.of(it.libraryPath).subtract(itemPath).firstOrNull()
+
+                            }
+                            else {
+
+                            }
+                        }
+                        else {
+                            if (it.season == null) {
+                                val file = Path.of(it.libraryPath).subtract(itemPath).firstOrNull()
+
+                                log.info("Creating folder {}", itemFolder?.pathString)
+                                log.info("Creating symlink for file {}", file?.fileName)
+
+                                val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
+                                Files.createDirectories(targetFolder) // create folder that link will be placed in
+
+                                val source = itemPath.resolve(file)
+                                val target = targetFolder.resolve(file)
+                                log.info("From {} to {}", source, target)
+                                Files.createSymbolicLink(target, source)
+
+                            }
+                            else {
+                                val seasonFolder = Path.of(it.libraryPath).subtract(itemPath).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
+                                log.info("Creating folder {}", itemFolder?.pathString)
+                                log.info("Creating symlink for all files in folder {}", seasonFolder?.fileName)
+
+                                val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
+                                Files.createDirectories(targetFolder) // create folder that link will be placed in
+
+                                val source = itemPath.resolve(seasonFolder)
+                                val target = targetFolder.resolve(seasonFolder)
+                                log.info("From {} to {}", source, target)
+                                Files.createSymbolicLink(target, source)
+                            }
+                        }
                     } catch (e: Exception) {
                         log.error("Couldn't find path {}", it.fullPath)
                     }
                 }
-    }
-
-    fun updateGoneSoonC(type: LibraryType, items: List<LibraryItem>) {
-
-        val result = jellyfinClient.listLibraries()
-        var parentCollection = result.firstOrNull { it.CollectionType == "boxsets" && it.Name == "Leaving Soon - watch before they're gone" }
-        if (parentCollection == null) {
-            jellyfinClient.createLibrary("Leaving Soon - watch before they're gone", "boxsets", AddLibraryRequest(), listOf("/config/data/data/collections"))
-            parentCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == "boxsets" && it.Name == "Leaving Soon - watch before they're gone" }
-        }
-
-        jellyfinClient.createCollection("${type.collectionName} (Deleted Soon)", parentCollection?.ItemId)
-    }
-
-    fun updateGoneSoonE(type: LibraryType, items: List<LibraryItem>) {
-
-        val result = jellyfinClient.listLibraries()
-        var parentCollections = result.filter { it.CollectionType == type.collectionType?.lowercase() }
-        for (parentCollection in parentCollections) {
-            var exists = result.firstOrNull { it.CollectionType == "boxsets" && it.Name == "Leaving Soon - watch before they're gone" } != null
-            if (!exists) {
-                jellyfinClient.createCollection("Leaving Soon - watch before they're gone", parentCollection.ItemId)
-            }
-        }
-    }
-
-
-    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
-        // DO NOTHING
-        // WAIT UNTIL https://forum.jellyfin.org/t-api-virtualfolders-missing-itemid is solved?
     }
 
 }

@@ -8,7 +8,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 
 @Service
-@ConditionalOnProperty("clients.jellyseerr")
+@ConditionalOnProperty("clients.jellyseerr.enabled", havingValue = "true")
 class JellyseerrRestService(
 
         val jellyseerrClient: JellyseerrClient,

@@ -15,7 +15,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.web.client.RestTemplate
 
 @Configuration
-@ConditionalOnProperty("clients.jellyfin")
+@ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
 class JellyfinClientConfig {
 
     companion object {

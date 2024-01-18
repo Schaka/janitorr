@@ -8,6 +8,7 @@ import java.time.Duration
 @ConfigurationProperties(prefix = "application")
 data class ApplicationProperties(
     var dryRun: Boolean = false,
+    var leavingSoon: Duration = Duration.ofDays(14),
     var movieExpiration: Duration = Duration.ofDays(90),
     var seasonExpiration: Duration =Duration.ofDays(90),
 )

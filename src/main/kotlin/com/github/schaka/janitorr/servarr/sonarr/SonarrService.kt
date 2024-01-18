@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
-import java.util.*
 
 @Service
 class SonarrService(
@@ -43,11 +42,11 @@ class SonarrService(
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                         .map {
 
-                            var seriesPath = series.path;
+                            var seasonPath = series.path;
                             if (fileSystemProperties.access) {
                                 // if filesystem access is available, we create an entry for every season
                                 // TODO: use /config/naming endpoint to get season naming scheme
-                                seriesPath = series.path + "/Season " + season.seasonNumber.toString().padStart(2, '0')
+                                seasonPath = series.path + "/Season " + season.seasonNumber.toString().padStart(2, '0')
                             }
 
                             LibraryItem(
@@ -55,7 +54,9 @@ class SonarrService(
                                     LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
                                     it.data.droppedPath!!,
                                     it.data.importedPath!!,
-                                    seriesPath,
+                                    series.path,
+                                    series.rootFolderPath,
+                                    it.data.importedPath,
                                     season = season.seasonNumber,
                                     tvdbId = series.tvdbId,
                                     imdbId = series.imdbId

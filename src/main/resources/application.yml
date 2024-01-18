@@ -6,9 +6,11 @@ server:
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well
 file-system:
   access: true
+  leaving-soon-dir: "/data/media/leaving-soon" # A directory this container can write to and Jellyfin can find under the same path - this will contain new folders with SymLinks to files for Jellyfin's "Leaving Soon" collections
 
 application:
   dry-run: true
+  leaving-soon: 14d # 14 days before a movie is deleted, it gets added to a "Leaving Soon" type collection
   movie-expiration: 90d # 3 months - if a movie's files on your system are older than this, they will be deleted
   season-expiration: 60d # 2 months - if a season's files on your system are older than this, they will be deleted
 
@@ -20,9 +22,11 @@ clients:
     url: "http://localhost:7878"
     api-key: "cd0912f129d348c9b69bb20d49fcbe44"
   jellyfin:
+    enabled: true
     url: "http://localhost:8096"
     api-key: "4da8d93992804489ba2d1f0e31b8316c"
   jellyseerr:
+    enabled: true
     url: "http://localhost:5055"
     api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
 

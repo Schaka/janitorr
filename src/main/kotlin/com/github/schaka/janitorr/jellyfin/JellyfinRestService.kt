@@ -11,6 +11,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.isDirectory
+import kotlin.io.path.isRegularFile
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.pathString
 
 @Service
@@ -113,7 +116,7 @@ class JellyfinRestService(
         }
 
         items
-                .forEach {
+                .forEach { it ->
                     try {
 
                         val rootPath = Path.of(it.rootFolderPath)
@@ -122,41 +125,35 @@ class JellyfinRestService(
 
 
                         if (!applicationProperties.dryRun) {
-                            if (it.season == null) {
-                                val file = Path.of(it.libraryPath).subtract(itemPath).firstOrNull()
 
-                            }
-                            else {
-
-                            }
                         }
                         else {
-                            if (it.season == null) {
-                                val file = Path.of(it.libraryPath).subtract(itemPath).firstOrNull()
+                            val fileOrFolder = Path.of(it.libraryPath).subtract(itemPath).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
+                            log.info("Creating folder {}", itemFolder?.pathString)
 
-                                log.info("Creating folder {}", itemFolder?.pathString)
-                                log.info("Creating symlink for file {}", file?.fileName)
+                            val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
+                            Files.createDirectories(targetFolder) // create folder that link will be placed in
 
-                                val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
-                                Files.createDirectories(targetFolder) // create folder that link will be placed in
+                            // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
+                            // For now, just assume season folders are always activated
 
-                                val source = itemPath.resolve(file)
-                                val target = targetFolder.resolve(file)
-                                log.info("From {} to {}", source, target)
-                                Files.createSymbolicLink(target, source)
-
+                            if (it.season != null && fileOrFolder!!.isDirectory()) {
+                                // TV Shows
+                                val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
+                                Files.createDirectories(targetSeasonFolder)
+                                val files = fileOrFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
+                                for (file in files) {
+                                    val source = itemPath.resolve(file)
+                                    val target = targetSeasonFolder.resolve(fileOrFolder)
+                                    log.info("Creating link from {} to {}", source, target)
+                                    Files.createSymbolicLink(target, source)
+                                }
                             }
                             else {
-                                val seasonFolder = Path.of(it.libraryPath).subtract(itemPath).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
-                                log.info("Creating folder {}", itemFolder?.pathString)
-                                log.info("Creating symlink for all files in folder {}", seasonFolder?.fileName)
-
-                                val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
-                                Files.createDirectories(targetFolder) // create folder that link will be placed in
-
-                                val source = itemPath.resolve(seasonFolder)
-                                val target = targetFolder.resolve(seasonFolder)
-                                log.info("From {} to {}", source, target)
+                                // Movies
+                                val source = itemPath.resolve(fileOrFolder)
+                                val target = targetFolder.resolve(fileOrFolder)
+                                log.info("Creating link from {} to {}", source, target)
                                 Files.createSymbolicLink(target, source)
                             }
                         }

@@ -11,10 +11,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.isDirectory
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.listDirectoryEntries
-import kotlin.io.path.pathString
+import kotlin.io.path.*
 
 @Service
 @ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
@@ -141,24 +138,31 @@ class JellyfinRestService(
                                 // TV Shows
                                 val sourceSeasonFolder = itemPath.resolve(fileOrFolder)
                                 val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
-                                Files.createDirectories(targetSeasonFolder)
 
-                                val files = sourceSeasonFolder.listDirectoryEntries().filter { f ->  filePattern.matches(f.toString()) }
-                                for (file in files) {
-                                    val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
+                                if (sourceSeasonFolder.exists()) {
+                                    Files.createDirectories(targetSeasonFolder)
 
-                                    val source = sourceSeasonFolder.resolve(fileName)
-                                    val target = targetSeasonFolder.resolve(fileName)
-                                    log.info("Creating episode link from {} to {}", source, target)
-                                    Files.createSymbolicLink(target, source)
+                                    val files = sourceSeasonFolder.listDirectoryEntries().filter { f ->  filePattern.matches(f.toString()) }
+                                    for (file in files) {
+                                        val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
+
+                                        val source = sourceSeasonFolder.resolve(fileName)
+                                        val target = targetSeasonFolder.resolve(fileName)
+                                        log.info("Creating episode link from {} to {}", source, target)
+                                        Files.createSymbolicLink(target, source)
+                                    }
                                 }
                             }
                             else {
                                 // Movies
                                 val source = itemPath.resolve(fileOrFolder)
-                                val target = targetFolder.resolve(fileOrFolder)
-                                log.info("Creating movie link from {} to {}", source, target)
-                                Files.createSymbolicLink(target, source)
+
+                                if (source.exists()) {
+                                    val target = targetFolder.resolve(fileOrFolder)
+                                    Files.createDirectories(targetFolder)
+                                    log.info("Creating movie link from {} to {}", source, target)
+                                    Files.createSymbolicLink(target, source)
+                                }
                             }
                         }
                     } catch (e: Exception) {

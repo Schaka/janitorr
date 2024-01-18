@@ -140,11 +140,12 @@ class JellyfinRestService(
 
                             if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
                                 // TV Shows
-                                val targetSeasonFolder = targetFolder.resolve(fileOrFolder!!)
+                                val sourceSeasonFolder = itemPath.resolve(fileOrFolder!!)
+                                val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
                                 Files.createDirectories(targetSeasonFolder)
-                                val files = fileOrFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
+                                val files = sourceSeasonFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
                                 for (file in files) {
-                                    val source = itemPath.resolve(fileOrFolder).resolve(file)
+                                    val source = sourceSeasonFolder.resolve(file)
                                     val target = targetSeasonFolder.resolve(fileOrFolder)
                                     log.info("Creating link from {} to {}", source, target)
                                     //Files.createSymbolicLink(target, source)

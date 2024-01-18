@@ -111,7 +111,7 @@ class JellyfinRestService(
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         if (goneSoonCollection == null) {
-            //Files.createDirectories(path)
+            Files.createDirectories(path)
             jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(path.toUri().path))
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
@@ -133,35 +133,36 @@ class JellyfinRestService(
                             log.info("Creating folder {}", itemFolder?.pathString)
 
                             val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
-                            //Files.createDirectories(targetFolder) // create folder that link will be placed in
 
                             // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
                             // For now, just assume season folders are always activated
 
                             if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
                                 // TV Shows
-                                val sourceSeasonFolder = itemPath.resolve(fileOrFolder!!)
+                                val sourceSeasonFolder = itemPath.resolve(fileOrFolder)
                                 val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
                                 Files.createDirectories(targetSeasonFolder)
-                                val files = sourceSeasonFolder.listDirectoryEntries().filter { dir ->  !dir.isDirectory() }
+
+                                val files = sourceSeasonFolder.listDirectoryEntries().filter { f ->  filePattern.matches(f.toString()) }
                                 for (file in files) {
                                     val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
+
                                     val source = sourceSeasonFolder.resolve(fileName)
                                     val target = targetSeasonFolder.resolve(fileName)
-                                    log.info("Creating link from {} to {}", source, target)
-                                    //Files.createSymbolicLink(target, source)
+                                    log.info("Creating episode link from {} to {}", source, target)
+                                    Files.createSymbolicLink(target, source)
                                 }
                             }
                             else {
                                 // Movies
                                 val source = itemPath.resolve(fileOrFolder)
                                 val target = targetFolder.resolve(fileOrFolder)
-                                log.info("Creating link from {} to {}", source, target)
-                                //Files.createSymbolicLink(target, source)
+                                log.info("Creating movie link from {} to {}", source, target)
+                                Files.createSymbolicLink(target, source)
                             }
                         }
                     } catch (e: Exception) {
-                        log.error("Couldn't find path {}", it.fullPath, e)
+                        log.error("Couldn't find path {}", it.fullPath)
                     }
                 }
     }

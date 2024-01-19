@@ -7,4 +7,8 @@ data class EpisodeResponse(
         val episodeFileId: Int?,
         val seasonNumber: Int,
         val episodeNumber: Int,
+        val folder: String?,
+        val episodeFile: EpisodeFile?,
+        val path: String?,
+        val hasFile: Boolean
 )

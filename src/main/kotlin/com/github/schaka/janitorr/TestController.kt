@@ -56,13 +56,11 @@ class TestController(
         jellyfinService.cleanupMovies(toDeleteMovies)
 
 
-
         return ResponseEntity(
                 mapOf(
                         "properties" to applicationProperties,
                         "shows" to toDeleteShows,
                         "movies" to toDeleteMovies
-                )
-        , HttpStatus.OK)
+                ), HttpStatus.OK)
     }
 }

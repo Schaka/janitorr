@@ -22,7 +22,7 @@ class JellyfinRestService(
         val applicationProperties: ApplicationProperties,
         val fileSystemProperties: FileSystemProperties
 
-        ) : JellyfinService {
+) : JellyfinService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -34,7 +34,7 @@ class JellyfinRestService(
         val parentFolders = jellyfinClient.getAllItems()
 
         val jellyfinShows = parentFolders.Items.flatMap { parent ->
-            jellyfinClient.getAllTvShows( parent.Id).Items.filter { it.IsSeries }.flatMap { show ->
+            jellyfinClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries }.flatMap { show ->
                 val seasons = jellyfinClient.getAllSeasons(show.Id).Items
                 seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
                 seasons
@@ -42,12 +42,11 @@ class JellyfinRestService(
         }
 
         for (show: LibraryItem in items) {
-            jellyfinShows.firstOrNull{ tvShowMatches(show, it) }
-                    ?.let {jellyfinContent ->
+            jellyfinShows.firstOrNull { tvShowMatches(show, it) }
+                    ?.let { jellyfinContent ->
                         if (!applicationProperties.dryRun) {
                             jellyfinClient.deleteItemAndFiles(jellyfinContent.Id)
-                        }
-                        else {
+                        } else {
                             log.info("Found {} {} on Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
                         }
                     }
@@ -58,16 +57,15 @@ class JellyfinRestService(
         val parentFolders = jellyfinClient.getAllItems()
 
         val jellyfinMovies = parentFolders.Items.flatMap {
-            jellyfinClient.getAllMovies( it.Id).Items
+            jellyfinClient.getAllMovies(it.Id).Items
         }
 
         for (movie: LibraryItem in items) {
-            jellyfinMovies.firstOrNull{ mediaMatches(MOVIES, movie, it) }
-                    ?.let {jellyfinContent ->
+            jellyfinMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
+                    ?.let { jellyfinContent ->
                         if (!applicationProperties.dryRun) {
                             jellyfinClient.deleteItemAndFiles(jellyfinContent.Id)
-                        }
-                        else {
+                        } else {
                             log.info("Found {} on Jellyfin", jellyfinContent.Name)
                         }
                     }
@@ -113,62 +111,53 @@ class JellyfinRestService(
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
-        items
-                .forEach { it ->
-                    try {
+        items.forEach { it ->
+            try {
 
-                        val rootPath = Path.of(it.rootFolderPath)
-                        val itemPath = Path.of(it.fullPath)
-                        val itemFolder = itemPath.subtract(rootPath).firstOrNull()
+                val rootPath = Path.of(it.rootFolderPath)
+                val itemPath = Path.of(it.parentPath)
+                val itemFolder = itemPath.subtract(rootPath).firstOrNull()
 
+                val fileOrFolder = Path.of(it.libraryPath).subtract(itemPath).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
 
-                        if (!applicationProperties.dryRun) {
+                val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
 
+                // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
+                // For now, just assume season folders are always activated
+
+                if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
+                    // TV Shows
+                    val sourceSeasonFolder = itemPath.resolve(fileOrFolder)
+                    val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
+
+                    if (sourceSeasonFolder.exists()) {
+                        Files.createDirectories(targetSeasonFolder)
+
+                        val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> filePattern.matches(f.toString()) }
+                        for (file in files) {
+                            val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
+
+                            val source = sourceSeasonFolder.resolve(fileName)
+                            val target = targetSeasonFolder.resolve(fileName)
+                            log.info("Creating episode link from {} to {}", source, target)
+                            Files.createSymbolicLink(target, source)
                         }
-                        else {
-                            val fileOrFolder = Path.of(it.libraryPath).subtract(itemPath).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
-                            log.info("Creating folder {}", itemFolder?.pathString)
+                    }
+                } else {
+                    // Movies
+                    val source = itemPath.resolve(fileOrFolder)
 
-                            val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
-
-                            // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
-                            // For now, just assume season folders are always activated
-
-                            if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
-                                // TV Shows
-                                val sourceSeasonFolder = itemPath.resolve(fileOrFolder)
-                                val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
-
-                                if (sourceSeasonFolder.exists()) {
-                                    Files.createDirectories(targetSeasonFolder)
-
-                                    val files = sourceSeasonFolder.listDirectoryEntries().filter { f ->  filePattern.matches(f.toString()) }
-                                    for (file in files) {
-                                        val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
-
-                                        val source = sourceSeasonFolder.resolve(fileName)
-                                        val target = targetSeasonFolder.resolve(fileName)
-                                        log.info("Creating episode link from {} to {}", source, target)
-                                        Files.createSymbolicLink(target, source)
-                                    }
-                                }
-                            }
-                            else {
-                                // Movies
-                                val source = itemPath.resolve(fileOrFolder)
-
-                                if (source.exists()) {
-                                    val target = targetFolder.resolve(fileOrFolder)
-                                    Files.createDirectories(targetFolder)
-                                    log.info("Creating movie link from {} to {}", source, target)
-                                    Files.createSymbolicLink(target, source)
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        log.error("Couldn't find path {}", it.fullPath)
+                    if (source.exists()) {
+                        val target = targetFolder.resolve(fileOrFolder)
+                        Files.createDirectories(targetFolder)
+                        log.info("Creating movie link from {} to {}", source, target)
+                        Files.createSymbolicLink(target, source)
                     }
                 }
+            } catch (e: Exception) {
+                log.error("Couldn't find path {}", it.parentPath)
+            }
+        }
     }
 
 }

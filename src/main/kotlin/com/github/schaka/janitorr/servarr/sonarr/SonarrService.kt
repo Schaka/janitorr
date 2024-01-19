@@ -36,19 +36,11 @@ class SonarrService(
     }
 
     override fun getEntries(): List<LibraryItem> {
-        return sonarrClient.getAllSeries().flatMap { series ->
+        val history = sonarrClient.getAllSeries().flatMap { series ->
             series.seasons.map { season ->
                 sonarrClient.getHistory(series.id, season.seasonNumber)
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                         .map {
-
-                            var seasonPath = series.path;
-                            if (fileSystemProperties.access) {
-                                // if filesystem access is available, we create an entry for every season
-                                // TODO: use /config/naming endpoint to get season naming scheme
-                                seasonPath = series.path + "/Season " + season.seasonNumber.toString().padStart(2, '0')
-                            }
-
                             LibraryItem(
                                     series.id,
                                     LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
@@ -56,16 +48,28 @@ class SonarrService(
                                     it.data.importedPath!!,
                                     series.path,
                                     series.rootFolderPath,
-                                    it.data.importedPath,
+                                    it.data.importedPath, //points to the file
                                     season = season.seasonNumber,
                                     tvdbId = series.tvdbId,
                                     imdbId = series.imdbId
                             )
                         }
-                        .sortedWith ( byDate(upgradesAllowed) )
+                        .sortedWith(byDate(upgradesAllowed))
                         .firstOrNull()
             }
         }.filterNotNull()
+
+        // history may be outdated, we need to find the current path, as it currently stands in the library
+        return history.map {
+            val episodeResponse = sonarrClient.getAllEpisodes(it.id, it.season!!).firstOrNull { ep -> ep.hasFile && ep.episodeFileId != null }
+            if (episodeResponse == null) {
+                return@map it
+            }
+
+            val fileResponse = sonarrClient.getEpisodeFile(episodeResponse.episodeFileId!!)
+
+            it.copy(filePath = fileResponse.path!!)
+        }
     }
 
     override fun removeEntries(items: List<LibraryItem>) {
@@ -77,7 +81,7 @@ class SonarrService(
                     if (!applicationProperties.dryRun) {
                         sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                     } else {
-                        log.info("Deleting {} - episode {} ({}) from item {}", item.fullPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
+                        log.info("Deleting {} - episode {} ({}) from item {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                     }
                 }
             }

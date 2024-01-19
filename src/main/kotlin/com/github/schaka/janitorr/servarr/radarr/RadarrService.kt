@@ -3,8 +3,6 @@ package com.github.schaka.janitorr.servarr.radarr
 import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
-import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
-import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -62,7 +60,7 @@ class RadarrService(
                 unmonitorMovie(movie.id)
                 radarrClient.deleteMovie(movie.id)
             } else {
-                log.info("Deleting movie ({}), id: {}, imdb: {}", movie.fullPath, movie.id, movie.imdbId)
+                log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             }
         }
     }

@@ -111,14 +111,14 @@ class JellyfinRestService(
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
-        items.forEach { it ->
+        items.forEach {
             try {
 
                 val rootPath = Path.of(it.rootFolderPath)
-                val itemPath = Path.of(it.parentPath)
+                val itemPath = Path.of(it.filePath)
                 val itemFolder = itemPath.subtract(rootPath).firstOrNull()
 
-                val fileOrFolder = Path.of(it.libraryPath).subtract(itemPath).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
+                val fileOrFolder = itemPath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
 
                 val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
 
@@ -127,7 +127,7 @@ class JellyfinRestService(
 
                 if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
                     // TV Shows
-                    val sourceSeasonFolder = itemPath.resolve(fileOrFolder)
+                    val sourceSeasonFolder = rootPath.resolve(itemFolder).resolve(fileOrFolder)
                     val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
 
                     if (sourceSeasonFolder.exists()) {
@@ -147,7 +147,6 @@ class JellyfinRestService(
                 } else {
                     // Movies
                     val source = itemPath.resolve(fileOrFolder)
-
                     if (source.exists()) {
                         val target = targetFolder.resolve(fileOrFolder)
                         Files.createDirectories(targetFolder)

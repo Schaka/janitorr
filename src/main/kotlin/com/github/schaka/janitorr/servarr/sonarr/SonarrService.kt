@@ -81,7 +81,7 @@ class SonarrService(
                     if (!applicationProperties.dryRun) {
                         sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                     } else {
-                        log.info("Deleting {} - episode {} ({}) from item {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
+                        log.info("Deleting {} - episode {} ({}) of season {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                     }
                 }
             }

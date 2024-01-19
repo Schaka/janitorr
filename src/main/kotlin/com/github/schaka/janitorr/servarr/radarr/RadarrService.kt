@@ -44,7 +44,7 @@ class RadarrService(
                                 it.data.importedPath!!,
                                 movie.path,
                                 movie.rootFolderPath!!,
-                                movie.folderName!!,
+                                movie.movieFile?.path!!,
                                 tmdbId = movie.tmdbId,
                                 imdbId = movie.imdbId
                         )

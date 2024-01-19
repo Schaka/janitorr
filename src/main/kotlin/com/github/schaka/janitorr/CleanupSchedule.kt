@@ -20,22 +20,28 @@ class CleanupSchedule(
 ) {
 
     // run every hour
-    //@Scheduled(fixedDelay = 1000 * 60 * 60)
+    @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedule() {
 
-        var radarrMovies = radarrService.getEntries()
-        jellyfinService.updateGoneSoon(LibraryType.MOVIES, radarrMovies)
-
-        var sonarrShows = sonarrService.getEntries()
-        jellyfinService.updateGoneSoon(LibraryType.TV_SHOWS, sonarrShows)
-
         val today = LocalDateTime.now()
-        val toDeleteShows = sonarrShows.filter { it.date.plusDays(applicationProperties.seasonExpiration.toDays()) < today }
+        val seasonExpiration = applicationProperties.seasonExpiration.toDays()
+        val movieExpiration = applicationProperties.movieExpiration.toDays()
+        val leavingSoonExpiration = applicationProperties.leavingSoon.toDays()
+
+        val radarrMovies = radarrService.getEntries()
+        val leavingSoonMovies = radarrMovies.filter { it.date.plusDays(movieExpiration - leavingSoonExpiration) < today && it.date.plusDays(movieExpiration) >= today }
+        jellyfinService.updateGoneSoon(LibraryType.MOVIES, leavingSoonMovies)
+
+        val sonarrShows = sonarrService.getEntries()
+        val leavingShows = sonarrShows.filter { it.date.plusDays(seasonExpiration - leavingSoonExpiration) < today && it.date.plusDays(seasonExpiration) >= today }
+        jellyfinService.updateGoneSoon(LibraryType.TV_SHOWS, leavingShows)
+
+        val toDeleteShows = sonarrShows.filter { it.date.plusDays(seasonExpiration) < today }
         sonarrService.removeEntries(toDeleteShows)
         jellyseerrService.cleanupRequests(toDeleteShows)
         jellyfinService.cleanupTvShows(toDeleteShows)
 
-        val toDeleteMovies = radarrMovies.filter { it.date.plusDays(applicationProperties.movieExpiration.toDays()) < today }
+        val toDeleteMovies = radarrMovies.filter { it.date.plusDays(movieExpiration) < today }
         radarrService.removeEntries(toDeleteMovies)
         jellyseerrService.cleanupRequests(toDeleteMovies)
         jellyfinService.cleanupMovies(toDeleteMovies)

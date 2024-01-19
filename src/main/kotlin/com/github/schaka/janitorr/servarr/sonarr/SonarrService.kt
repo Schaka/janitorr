@@ -90,8 +90,7 @@ class SonarrService(
             }
         }
 
-        // TODO: Clean up entire show, if all seasons are unmonitored
-        // Also requires support for deletion in Jellyfin
+        // TODO: Clean up entire show, if all seasons are unmonitored AND no files are available
     }
 
     private fun unmonitorSeason(seriesId: Int, seasonNumber: Int) {

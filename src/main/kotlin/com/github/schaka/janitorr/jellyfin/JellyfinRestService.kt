@@ -123,6 +123,7 @@ class JellyfinRestService(
                 val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
 
                 // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
+                // Idea: If we did have an item for every episode in a season, this might work
                 // For now, just assume season folders are always activated
 
                 if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {

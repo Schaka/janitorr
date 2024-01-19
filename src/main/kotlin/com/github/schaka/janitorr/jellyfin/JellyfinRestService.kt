@@ -142,7 +142,7 @@ class JellyfinRestService(
                             createSymLink(source, target, "episode")
                         }
                     } else {
-                        log.info("Can't find folder - no links to create {}", path)
+                        log.info("Can't find folder - no links to create {}", sourceSeasonFolder)
                     }
                 } else {
                     // Movies

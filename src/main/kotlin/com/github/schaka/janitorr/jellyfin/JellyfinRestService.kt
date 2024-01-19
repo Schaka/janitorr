@@ -139,9 +139,10 @@ class JellyfinRestService(
 
                             val source = sourceSeasonFolder.resolve(fileName)
                             val target = targetSeasonFolder.resolve(fileName)
-                            log.info("Creating episode link from {} to {}", source, target)
-                            Files.createSymbolicLink(target, source)
+                            createSymLink(source, target, "episode")
                         }
+                    } else {
+                        log.info("Can't find folder - no links to create {}", path)
                     }
                 } else {
                     // Movies
@@ -150,13 +151,21 @@ class JellyfinRestService(
                     if (source.exists()) {
                         val target = targetFolder.resolve(fileOrFolder)
                         Files.createDirectories(targetFolder)
-                        log.info("Creating movie link from {} to {}", source, target)
-                        Files.createSymbolicLink(target, source)
+                        createSymLink(source, target, "movie")
                     }
                 }
             } catch (e: Exception) {
                 log.error("Couldn't find path {}", it.parentPath)
             }
+        }
+    }
+
+    private fun createSymLink(source: Path, target: Path, type: String) {
+        if (!Files.exists(target)) {
+            log.info("Creating {} link from {} to {}", type, source, target)
+            Files.createSymbolicLink(target, source)
+        } else {
+            log.info("{} link already exists from {} to {}", type, source, target)
         }
     }
 

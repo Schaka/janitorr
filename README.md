@@ -35,7 +35,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Jellyfin does NOT provide viewing stats like Jellyfin, so we go by file age
 - Jellyfin and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders, metadata, etc
 - To disable Jellyfin/Jellyseerr, you need to entirely delete their client info from the config file or disable them via properties
-- **It does NOT YET check whether certain media is still seeding before deleting it**
+- **If file system access isn't given, files currently still seeding may be deleted**
 
 ## Setup
 Currently, the code is only published as a docker image to [DockerHub](https://hub.docker.com/repository/docker/schaka/janitorr/general). If you cannot use Docker, you're out of luck for now.

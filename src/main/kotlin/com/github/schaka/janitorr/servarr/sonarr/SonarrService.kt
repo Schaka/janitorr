@@ -4,11 +4,14 @@ import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
+import java.nio.file.Path
 import java.time.LocalDateTime
+import kotlin.io.path.exists
 
 @Service
 class SonarrService(
@@ -75,6 +78,12 @@ class SonarrService(
     override fun removeEntries(items: List<LibraryItem>) {
         // we are always treating seasons as a whole, even if technically episodes could be handled individually
         for (item in items) {
+
+            if (fileSystemProperties.access && Path.of(item.originalPath).exists()) {
+                log.info("Can't delete season [still seeding - file exists] ({}), id: {}, imdb: {}", item.originalPath, item.id, item.imdbId)
+                continue
+            }
+
             val episodes = sonarrClient.getAllEpisodes(item.id, item.season!!)
             for (episode in episodes) {
                 if (episode.episodeFileId != null) {
@@ -85,6 +94,7 @@ class SonarrService(
                     }
                 }
             }
+
             if (!applicationProperties.dryRun) {
                 unmonitorSeason(item.id, item.season)
             }

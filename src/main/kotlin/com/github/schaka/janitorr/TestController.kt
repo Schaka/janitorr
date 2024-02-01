@@ -18,11 +18,7 @@ import java.time.LocalDateTime
 @Controller
 @RequestMapping("/hook")
 class TestController(
-        val jellyfinService: JellyfinService,
-        val jellyseerrService: JellyseerrService,
-        val applicationProperties: ApplicationProperties,
-        val sonarrService: SonarrService,
-        val radarrService: RadarrService,
+        val schedule: CleanupSchedule
 ) {
 
     companion object {
@@ -31,36 +27,7 @@ class TestController(
 
     @GetMapping("/test")
     fun sonarr(): ResponseEntity<Any> {
-
-        val today = LocalDateTime.now()
-        val seasonExpiration = applicationProperties.seasonExpiration.toDays()
-        val movieExpiration = applicationProperties.movieExpiration.toDays()
-        val leavingSoonExpiration = applicationProperties.leavingSoon.toDays()
-
-        val radarrMovies = radarrService.getEntries()
-        val leavingSoonMovies = radarrMovies.filter { it.date.plusDays(movieExpiration - leavingSoonExpiration) < today && it.date.plusDays(movieExpiration) >= today }
-        jellyfinService.updateGoneSoon(LibraryType.MOVIES, leavingSoonMovies)
-
-        val sonarrShows = sonarrService.getEntries()
-        val leavingShows = sonarrShows.filter { it.date.plusDays(seasonExpiration - leavingSoonExpiration) < today && it.date.plusDays(seasonExpiration) >= today }
-        jellyfinService.updateGoneSoon(LibraryType.TV_SHOWS, leavingShows)
-
-        val toDeleteShows = sonarrShows.filter { it.date.plusDays(seasonExpiration) < today }
-        sonarrService.removeEntries(toDeleteShows)
-        jellyseerrService.cleanupRequests(toDeleteShows)
-        jellyfinService.cleanupTvShows(toDeleteShows)
-
-        val toDeleteMovies = radarrMovies.filter { it.date.plusDays(movieExpiration) < today }
-        radarrService.removeEntries(toDeleteMovies)
-        jellyseerrService.cleanupRequests(toDeleteMovies)
-        jellyfinService.cleanupMovies(toDeleteMovies)
-
-
-        return ResponseEntity(
-                mapOf(
-                        "properties" to applicationProperties,
-                        "shows" to toDeleteShows,
-                        "movies" to toDeleteMovies
-                ), HttpStatus.OK)
+        schedule.runSchedule()
+        return ResponseEntity.noContent().build()
     }
 }

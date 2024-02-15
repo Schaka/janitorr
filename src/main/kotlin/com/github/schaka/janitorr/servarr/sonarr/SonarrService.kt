@@ -86,7 +86,7 @@ class SonarrService(
 
             val episodes = sonarrClient.getAllEpisodes(item.id, item.season!!)
             for (episode in episodes) {
-                if (episode.episodeFileId != null) {
+                if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                     if (!applicationProperties.dryRun) {
                         sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                     } else {

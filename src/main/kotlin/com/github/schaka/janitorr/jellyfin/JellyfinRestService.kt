@@ -97,7 +97,7 @@ class JellyfinRestService(
         }
     }
 
-    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
+    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
 
         // Only do this, if we can get access to the file system to create a link structure
         if (!fileSystemProperties.access || fileSystemProperties.leavingSoonDir == null) {
@@ -118,8 +118,7 @@ class JellyfinRestService(
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
-        // TODO: Might make sense to run this BEFORE deleting any data
-        if (fileSystemProperties.fromScratch) {
+        if (fileSystemProperties.fromScratch && !onlyAddLinks) {
             FileSystemUtils.deleteRecursively(Path.of(fileSystemProperties.leavingSoonDir))
         }
 

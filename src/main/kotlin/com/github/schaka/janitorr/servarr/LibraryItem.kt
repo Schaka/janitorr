@@ -19,4 +19,6 @@ data class LibraryItem(
         val tmdbId: Int? = null,
         val season: Int? = null,
 
+        var seeding: Boolean = false,
+
         )

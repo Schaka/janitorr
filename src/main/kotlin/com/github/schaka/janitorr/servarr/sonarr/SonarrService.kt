@@ -81,6 +81,7 @@ class SonarrService(
 
             if (fileSystemProperties.access && Path.of(item.originalPath).exists()) {
                 log.info("Can't delete season [still seeding - file exists] ({}), id: {}, imdb: {}", item.originalPath, item.id, item.imdbId)
+                item.seeding = true
                 continue
             }
 

@@ -25,7 +25,7 @@ class JellyfinNoOpService : JellyfinService {
         log.info("Jellyfin not implemented. No movies deleted.")
     }
 
-    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
+    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
         log.info("Jellyfin not implemented. No 'Gone Soon' library created.")
     }
 }

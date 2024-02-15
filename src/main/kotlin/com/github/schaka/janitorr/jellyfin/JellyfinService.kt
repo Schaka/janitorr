@@ -8,5 +8,5 @@ interface JellyfinService {
 
     fun cleanupMovies(items: List<LibraryItem>)
 
-    fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>)
+    fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 }

@@ -8,4 +8,5 @@ import org.springframework.stereotype.Component
 data class FileSystemProperties(
     var leavingSoonDir: String?,
     var access: Boolean = false,
+    var fromScratch: Boolean = true
 )

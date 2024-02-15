@@ -9,6 +9,7 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
+import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.*
@@ -53,6 +54,8 @@ class JellyfinRestService(
                         }
                     }
         }
+
+        // TODO: Remove TV shows if all seasons gone
     }
 
     override fun cleanupMovies(items: List<LibraryItem>) {
@@ -97,7 +100,7 @@ class JellyfinRestService(
     override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>) {
 
         // Only do this, if we can get access to the file system to create a link structure
-        if (!fileSystemProperties.access) {
+        if (!fileSystemProperties.access || fileSystemProperties.leavingSoonDir == null) {
             return
         }
 
@@ -112,6 +115,12 @@ class JellyfinRestService(
             Files.createDirectories(path)
             jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(path.toUri().path))
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+        }
+
+        // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
+        // TODO: Might make sense to run this BEFORE deleting any data
+        if (fileSystemProperties.fromScratch) {
+            FileSystemUtils.deleteRecursively(Path.of(fileSystemProperties.leavingSoonDir))
         }
 
         items.forEach {

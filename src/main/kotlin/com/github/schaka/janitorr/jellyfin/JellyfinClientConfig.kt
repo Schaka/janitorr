@@ -1,6 +1,7 @@
 package com.github.schaka.janitorr.jellyfin
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.schaka.janitorr.jellyfin.api.User
 import feign.Feign
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
@@ -9,9 +10,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpEntity
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.ResponseEntity
+import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 
 @Configuration
@@ -44,17 +49,12 @@ class JellyfinClientConfig {
     }
 
     @Bean
-    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper, builder: RestTemplateBuilder): JellyfinUserClient {
-        val rest = builder
-            .rootUri("${properties.url}/")
-            .build()
+    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper, jellyfin: JellyfinClient): JellyfinUserClient {
 
-        // TODO: Do this via interceptor, if we ever get logged out?
-        val userInfo = rest.postForEntity("/Users/AuthenticateByName", object {
-            val Username = properties.username
-            val Pw = properties.password
-        }, Map::class.java)
+        val user = jellyfin.listUsers().filter { it.Name.lowercase() == properties.username.lowercase() }.firstOrNull()
+            ?: throw IllegalArgumentException("User ${properties.username} not found")
 
+        val userInfo = getUserInfo(properties, user)
         val accessToken = userInfo.body?.get("AccessToken")
 
         log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
@@ -67,6 +67,14 @@ class JellyfinClientConfig {
                 it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             }
             .target(JellyfinUserClient::class.java, properties.url)
+    }
+
+    private fun getUserInfo(properties: JellyfinProperties, user: User): ResponseEntity<Map<*, *>> {
+        val login = RestTemplate()
+        val map = LinkedMultiValueMap<String, Any>()
+        val headers = HttpHeaders()
+        headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+        return login.postForEntity("${properties.url}/Users/${user.Id}/Authenticate?pw={password}", HttpEntity(map, headers), Map::class.java, properties.password)
     }
 
 }

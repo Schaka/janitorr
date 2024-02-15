@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.jellyfin
 
+import com.github.schaka.janitorr.jellyfin.api.User
 import com.github.schaka.janitorr.jellyfin.library.*
 import com.github.schaka.janitorr.jellyfin.library.items.ItemPage
 import com.github.schaka.janitorr.jellyfin.library.items.MediaFolderItem
@@ -7,6 +8,9 @@ import feign.Param
 import feign.RequestLine
 
 interface JellyfinClient {
+
+    @RequestLine("GET /Users")
+    fun listUsers(): List<User>
 
     @RequestLine("GET /Library/VirtualFolders")
     fun listLibraries(): List<VirtualFolderResponse>

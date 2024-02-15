@@ -47,6 +47,7 @@ class JellyfinRestService(
                     ?.let { jellyfinContent ->
                         if (!applicationProperties.dryRun) {
                             jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
+                            log.info("Deleting {} {} from Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
                         } else {
                             log.info("Found {} {} on Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
                         }
@@ -66,6 +67,7 @@ class JellyfinRestService(
                     ?.let { jellyfinContent ->
                         if (!applicationProperties.dryRun) {
                             jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
+                            log.info("Deleting {} from Jellyfin", jellyfinContent.Name)
                         } else {
                             log.info("Found {} on Jellyfin", jellyfinContent.Name)
                         }

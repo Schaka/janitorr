@@ -89,6 +89,7 @@ class SonarrService(
                 if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                     if (!applicationProperties.dryRun) {
                         sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                        log.info("Deleting {} - episode {} ({}) of season {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                     } else {
                         log.info("Deleting {} - episode {} ({}) of season {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                     }
@@ -108,5 +109,6 @@ class SonarrService(
         val seasonToEdit = series.seasons.firstOrNull { it.seasonNumber == seasonNumber }
         seasonToEdit?.monitored = false
         sonarrClient.updateSeries(seriesId, series)
+        log.info("Unmonitoring {} - season {}", series.title, seasonToEdit?.seasonNumber)
     }
 }

@@ -67,6 +67,7 @@ class RadarrService(
             if (!applicationProperties.dryRun) {
                 unmonitorMovie(movie.id)
                 radarrClient.deleteMovie(movie.id)
+                log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             } else {
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             }

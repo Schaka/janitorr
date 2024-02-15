@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -77,7 +78,12 @@ class RadarrService(
 
     private fun unmonitorMovie(movieId: Int) {
         val movie = radarrClient.getMovie(movieId)
+        val isMonitored = movie.monitored
         movie.monitored = false
         radarrClient.updateMovie(movieId, movie)
+
+        if (isMonitored) {
+            log.info("Unmonitoring {}", movie.title)
+        }
     }
 }

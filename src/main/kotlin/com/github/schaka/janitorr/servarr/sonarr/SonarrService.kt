@@ -108,8 +108,12 @@ class SonarrService(
     private fun unmonitorSeason(seriesId: Int, seasonNumber: Int) {
         val series = sonarrClient.getSeries(seriesId)
         val seasonToEdit = series.seasons.firstOrNull { it.seasonNumber == seasonNumber }
+        val isMonitored = seasonToEdit?.monitored
         seasonToEdit?.monitored = false
         sonarrClient.updateSeries(seriesId, series)
-        log.info("Unmonitoring {} - season {}", series.title, seasonToEdit?.seasonNumber)
+
+        if (isMonitored == true) {
+            log.info("Unmonitoring {} - season {}", series.title, seasonToEdit.seasonNumber)
+        }
     }
 }

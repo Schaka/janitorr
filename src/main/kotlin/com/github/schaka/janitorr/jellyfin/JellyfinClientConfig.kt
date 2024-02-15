@@ -41,7 +41,7 @@ class JellyfinClientConfig {
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
                 .requestInterceptor {
-                    it.header(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", Client=\"Janitorr\", Version=\"1.0\"")
+                    it.header(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\"")
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
                 .target(JellyfinClient::class.java, properties.url)
@@ -58,7 +58,7 @@ class JellyfinClientConfig {
             .decoder(JacksonDecoder(mapper))
             .encoder(JacksonEncoder(mapper))
             .requestInterceptor {
-                it.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", Client=\"Janitorr\", Version=\"1.0\"")
+                it.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\"")
                 it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             }
             .target(JellyfinUserClient::class.java, properties.url)
@@ -67,7 +67,7 @@ class JellyfinClientConfig {
     private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
         val login = RestTemplate()
         val headers = HttpHeaders()
-        headers.set("X-Emby-Authorization", "MediaBrowser Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\"")
+        headers.set(AUTHORIZATION, "MediaBrowser Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\"")
         headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
         val content = object {
             val Username = properties.username

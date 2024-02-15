@@ -1,7 +1,6 @@
 package com.github.schaka.janitorr.jellyfin
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.schaka.janitorr.jellyfin.api.User
 import feign.Feign
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
@@ -49,12 +48,8 @@ class JellyfinClientConfig {
     }
 
     @Bean
-    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper, jellyfin: JellyfinClient): JellyfinUserClient {
-
-        val user = jellyfin.listUsers().filter { it.Name.lowercase() == properties.username.lowercase() }.firstOrNull()
-            ?: throw IllegalArgumentException("User ${properties.username} not found")
-
-        val userInfo = getUserInfo(properties, user)
+    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): JellyfinUserClient {
+        val userInfo = getUserInfo(properties)
         val accessToken = userInfo.body?.get("AccessToken")
 
         log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
@@ -69,12 +64,15 @@ class JellyfinClientConfig {
             .target(JellyfinUserClient::class.java, properties.url)
     }
 
-    private fun getUserInfo(properties: JellyfinProperties, user: User): ResponseEntity<Map<*, *>> {
+    private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
         val login = RestTemplate()
         val map = LinkedMultiValueMap<String, Any>()
+        map.add("Username", properties.username)
+        map.add("Pw", properties.password)
         val headers = HttpHeaders()
+        headers.set("X-Emby-Authorization", "MediaBrowser Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\"")
         headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-        return login.postForEntity("${properties.url}/Users/${user.Id}/Authenticate?pw={password}", HttpEntity(map, headers), Map::class.java, properties.password)
+        return login.postForEntity("${properties.url}/Users/AuthenticateByName", HttpEntity(map, headers), Map::class.java)
     }
 
 }

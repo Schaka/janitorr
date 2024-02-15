@@ -36,15 +36,24 @@ class JellyseerrRestService(
 
             for (request: RequestResponse in requests) {
                 if (!applicationProperties.dryRun) {
+                    log.info("Deleting request: {} for {} | IMDB: {}", request, item.filePath, item.imdbId)
                     jellyseerrClient.deleteRequest(request.id)
                 } else {
-                    log.info("Found request: {}", request)
+                    log.info("Found request: {} for {} | IMDB: {}", request, item.filePath, item.imdbId)
                 }
             }
         }
     }
 
     private fun mediaMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
+
+        // Match between Radarr ID or Sonarr ID and the ID Jellyseerr stores for Radarr/Sonarr
+        // TODO: Maybe grab the Jellyfin ID here to make deletion in Jellyfin easier down the line?
+        if (item.id == candidate.media.externalServiceSlug) {
+            return true
+        }
+
+        // Fallback, match by meta data
         val imdbMatches = candidate.media.imdbId != null && (candidate.media.imdbId == item.imdbId)
         val tmdbMatches = candidate.media.tmdbId != null && mediaTypeMatches(item, candidate) && (candidate.media.tmdbId == item.tmdbId)
         val tvdbMatches = candidate.media.tvdbId != null && mediaTypeMatches(item, candidate) && (candidate.media.tvdbId == item.tvdbId)

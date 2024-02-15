@@ -20,8 +20,8 @@ interface RadarrClient {
     @RequestLine("PUT /movie/{id}")
     fun updateMovie(@Param("id") id: Int, payload: MoviePayload)
 
-    @RequestLine("DELETE /movie/{id}")
-    fun deleteMovie(@Param("id") id: Int)
+    @RequestLine("DELETE /movie/{id}?deleteFiles={deleteFiles}")
+    fun deleteMovie(@Param("id") id: Int, @Param("deleteFiles") deleteFiles: Boolean = true)
 
     @RequestLine("GET /qualityprofile")
     fun getAllQualityProfiles(): List<QualityProfile>

@@ -66,13 +66,14 @@ class JellyfinClientConfig {
 
     private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
         val login = RestTemplate()
-        val map = LinkedMultiValueMap<String, Any>()
-        map.add("Username", properties.username)
-        map.add("Pw", properties.password)
         val headers = HttpHeaders()
         headers.set("X-Emby-Authorization", "MediaBrowser Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\"")
         headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-        return login.postForEntity("${properties.url}/Users/AuthenticateByName", HttpEntity(map, headers), Map::class.java)
+        val content = object {
+            val Username = properties.username
+            val Pw = properties.password
+        }
+        return login.postForEntity("${properties.url}/Users/AuthenticateByName", HttpEntity(content, headers), Map::class.java)
     }
 
 }

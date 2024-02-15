@@ -8,7 +8,7 @@ data class Media(
     val imdbId: String?,
     val tmdbId: Int?,
     val tvdbId: Int?,
-    val externalServiceSlug: Int?,
+    val externalServiceId: Int?,
     val jellyfinMediaId: String?,
     val updatedAt: String
 )

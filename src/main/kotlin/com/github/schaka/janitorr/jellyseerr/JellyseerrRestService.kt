@@ -49,7 +49,7 @@ class JellyseerrRestService(
 
         // Match between Radarr ID or Sonarr ID and the ID Jellyseerr stores for Radarr/Sonarr
         // TODO: Maybe grab the Jellyfin ID here to make deletion in Jellyfin easier down the line?
-        if (item.id == candidate.media.externalServiceSlug) {
+        if (item.id == candidate.media.externalServiceId) {
             return true
         }
 

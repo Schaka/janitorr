@@ -32,6 +32,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ### Disclaimer
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
+- Jellyfin requires user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
 - Jellyfin does NOT provide viewing stats like Jellyfin, so we go by file age
 - Jellyfin and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders, metadata, etc
 - To disable Jellyfin/Jellyseerr, you need to entirely delete their client info from the config file or disable them via properties

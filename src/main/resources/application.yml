@@ -25,6 +25,8 @@ clients:
     enabled: true
     url: "http://localhost:8096"
     api-key: "4da8d93992804489ba2d1f0e31b8316c"
+    username: Janitorr
+    password: janitorr
   jellyseerr:
     enabled: true
     url: "http://localhost:5055"

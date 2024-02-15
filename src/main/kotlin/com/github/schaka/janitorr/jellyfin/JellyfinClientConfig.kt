@@ -43,4 +43,30 @@ class JellyfinClientConfig {
                 .target(JellyfinClient::class.java, properties.url)
     }
 
+    @Bean
+    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper, builder: RestTemplateBuilder): JellyfinUserClient {
+        val rest = builder
+            .rootUri("${properties.url}/")
+            .build()
+
+        // TODO: Do this via interceptor, if we ever get logged out?
+        val userInfo = rest.postForEntity("/Users/AuthenticateByName", object {
+            val Username = properties.username
+            val Pw = properties.password
+        }, Map::class.java)
+
+        val accessToken = userInfo.body?.get("AccessToken")
+
+        log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
+
+        return Feign.builder()
+            .decoder(JacksonDecoder(mapper))
+            .encoder(JacksonEncoder(mapper))
+            .requestInterceptor {
+                it.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", Client=\"Janitorr\", Version=\"1.0\"")
+                it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            }
+            .target(JellyfinUserClient::class.java, properties.url)
+    }
+
 }

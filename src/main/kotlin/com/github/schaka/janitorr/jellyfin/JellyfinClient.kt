@@ -26,9 +26,6 @@ interface JellyfinClient {
     @RequestLine("POST /Collections/{id}/Items?ids={itemIds}")
     fun addItemToCollection(@Param("id") id: String, itemIds: List<String>)
 
-    @RequestLine("DELETE /Items/{id}")
-    fun deleteItemAndFiles(@Param("id") itemId: String)
-
     @RequestLine("GET /Library/MediaFolders")
     fun getAllItems(): ItemPage<MediaFolderItem>
 

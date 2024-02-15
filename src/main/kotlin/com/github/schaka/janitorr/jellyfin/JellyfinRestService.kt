@@ -18,6 +18,7 @@ import kotlin.io.path.*
 class JellyfinRestService(
 
         val jellyfinClient: JellyfinClient,
+        val jellyfinUserClient: JellyfinUserClient,
         val jellyfinProperties: JellyfinProperties,
         val applicationProperties: ApplicationProperties,
         val fileSystemProperties: FileSystemProperties
@@ -45,7 +46,7 @@ class JellyfinRestService(
             jellyfinShows.firstOrNull { tvShowMatches(show, it) }
                     ?.let { jellyfinContent ->
                         if (!applicationProperties.dryRun) {
-                            jellyfinClient.deleteItemAndFiles(jellyfinContent.Id)
+                            jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
                         } else {
                             log.info("Found {} {} on Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
                         }
@@ -64,7 +65,7 @@ class JellyfinRestService(
             jellyfinMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
                     ?.let { jellyfinContent ->
                         if (!applicationProperties.dryRun) {
-                            jellyfinClient.deleteItemAndFiles(jellyfinContent.Id)
+                            jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
                         } else {
                             log.info("Found {} on Jellyfin", jellyfinContent.Name)
                         }

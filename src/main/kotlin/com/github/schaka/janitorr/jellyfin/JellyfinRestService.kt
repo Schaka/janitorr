@@ -119,7 +119,8 @@ class JellyfinRestService(
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
         if (fileSystemProperties.fromScratch && !onlyAddLinks) {
-            FileSystemUtils.deleteRecursively(Path.of(fileSystemProperties.leavingSoonDir))
+            FileSystemUtils.deleteRecursively(path)
+            Files.createDirectories(path)
         }
 
         items.forEach {

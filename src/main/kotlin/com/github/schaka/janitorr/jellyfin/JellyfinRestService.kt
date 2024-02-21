@@ -134,7 +134,7 @@ class JellyfinRestService(
 
                 val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
 
-                // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated
+                // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated in Sonarr
                 // Idea: If we did have an item for every episode in a season, this might work
                 // For now, just assume season folders are always activated
 
@@ -174,10 +174,10 @@ class JellyfinRestService(
 
     private fun createSymLink(source: Path, target: Path, type: String) {
         if (!Files.exists(target)) {
-            log.info("Creating {} link from {} to {}", type, source, target)
+            log.debug("Creating {} link from {} to {}", type, source, target)
             Files.createSymbolicLink(target, source)
         } else {
-            log.info("{} link already exists from {} to {}", type, source, target)
+            log.debug("{} link already exists from {} to {}", type, source, target)
         }
     }
 

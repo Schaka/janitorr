@@ -2,6 +2,8 @@ package com.github.schaka.janitorr.jellyfin
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import feign.Feign
+import feign.RequestInterceptor
+import feign.RequestTemplate
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
@@ -17,6 +19,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
+import java.time.LocalDateTime
 
 @Configuration
 @ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
@@ -50,31 +53,45 @@ class JellyfinClientConfig {
 
     @Bean
     fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): JellyfinUserClient {
-        val userInfo = getUserInfo(properties)
-        val accessToken = userInfo.body?.get("AccessToken")
-
-        log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
-
         return Feign.builder()
             .decoder(JacksonDecoder(mapper))
             .encoder(JacksonEncoder(mapper))
-            .requestInterceptor {
-                it.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", $janitorrClientString")
-                it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            }
+            .requestInterceptor(JellyfinUserInterceptor(properties))
             .target(JellyfinUserClient::class.java, properties.url)
     }
 
-    private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
-        val login = RestTemplate()
-        val headers = HttpHeaders()
-        headers.set(AUTHORIZATION, "MediaBrowser , $janitorrClientString")
-        headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-        val content = object {
-            val Username = properties.username
-            val Pw = properties.password
+    private class JellyfinUserInterceptor(
+        val properties: JellyfinProperties
+    ) : RequestInterceptor {
+
+        var lastUpdate: LocalDateTime = LocalDateTime.MIN
+        var accessToken: String = "invalid-token"
+
+        override fun apply(template: RequestTemplate) {
+
+            if (lastUpdate.plusMinutes(30).isBefore(LocalDateTime.now())) {
+                val userInfo = getUserInfo(properties)
+                accessToken = userInfo.body?.get("AccessToken").toString()
+                lastUpdate = LocalDateTime.now()
+                log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
+            }
+
+            template.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", $janitorrClientString")
+            template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
         }
-        return login.postForEntity("${properties.url}/Users/AuthenticateByName", HttpEntity(content, headers), Map::class.java)
+
+        private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
+            val login = RestTemplate()
+            val headers = HttpHeaders()
+            headers.set(AUTHORIZATION, "MediaBrowser , $janitorrClientString")
+            headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+            val content = object {
+                val Username = properties.username
+                val Pw = properties.password
+            }
+            return login.postForEntity("${properties.url}/Users/AuthenticateByName", HttpEntity(content, headers), Map::class.java)
+        }
+
     }
 
 }

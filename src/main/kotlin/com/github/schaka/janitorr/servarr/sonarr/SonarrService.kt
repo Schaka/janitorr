@@ -5,6 +5,7 @@ import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.RadarrService
+import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
@@ -102,7 +103,10 @@ class SonarrService(
             }
         }
 
-        // TODO: Clean up entire show, if all seasons are unmonitored AND no files are available
+        // We could be more efficient and do this when grabbing the series in unmonitorSeason anyway, but more clear cut code should be better here
+        val affectedShows = items.map { it.id }.distinct().map { sonarrClient.getSeries(it) }
+        deleteEmptyShows(affectedShows)
+
     }
 
     private fun unmonitorSeason(seriesId: Int, seasonNumber: Int) {
@@ -114,6 +118,32 @@ class SonarrService(
 
         if (isMonitored == true) {
             log.info("Unmonitoring {} - season {}", series.title, seasonToEdit.seasonNumber)
+        }
+    }
+
+    // If all seasons are unmonitored or don't have any files, we delete them
+    // If the latest season is monitored, we have to assume the intention is to grab future episodes on release and not delete anything
+    private fun deleteEmptyShows(affectedShows: List<SeriesPayload>) {
+
+        for (show in affectedShows) {
+            val latestSeason = show.seasons.maxBy { it.seasonNumber }
+            if (latestSeason.monitored) {
+                continue
+            }
+
+            val allUnmonitored = show.seasons.all { !it.monitored }
+            if (!allUnmonitored) {
+                continue
+            }
+
+            val noFiles = show.seasons.all {
+                val filesForSeason = sonarrClient.getAllEpisodes(show.id, it.seasonNumber)
+                filesForSeason.none { ep -> ep.hasFile }
+            }
+
+            if (noFiles) {
+                sonarrClient.deleteSeries(show.id, true)
+            }
         }
     }
 }

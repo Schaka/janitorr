@@ -143,6 +143,7 @@ class SonarrService(
 
             if (noFiles) {
                 sonarrClient.deleteSeries(show.id, true)
+                log.info("Deleting {} [{}] - All seasons were unused", show.title, show.id)
             }
         }
     }

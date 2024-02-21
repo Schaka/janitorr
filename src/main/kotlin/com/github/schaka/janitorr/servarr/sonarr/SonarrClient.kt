@@ -22,7 +22,7 @@ interface SonarrClient {
     @RequestLine("GET /series")
     fun getAllSeries(): List<SeriesPayload>
 
-    @RequestLine("DELETE /series?id={id}&deleteFiles={files}&addImportListExclusion={blacklist}")
+    @RequestLine("DELETE /series/{id}?deleteFiles={files}&addImportListExclusion={blacklist}")
     fun deleteSeries(@Param("id") id: Int, @Param("files") files: Boolean = false, @Param("blacklist") blacklist: Boolean = false)
 
     @RequestLine("GET /episode?seriesId={seriesId}&seasonNumber={seasonNumber}&episodeIds={ids}")

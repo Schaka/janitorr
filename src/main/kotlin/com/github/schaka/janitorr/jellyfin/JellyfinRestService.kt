@@ -155,7 +155,7 @@ class JellyfinRestService(
                             createSymLink(source, target, "episode")
                         }
                     } else {
-                        log.info("Can't find folder - no links to create {}", sourceSeasonFolder)
+                        log.info("Can't find original season folder - no links to create {}", sourceSeasonFolder)
                     }
                 } else {
                     // Movies
@@ -164,6 +164,9 @@ class JellyfinRestService(
                         val target = targetFolder.resolve(fileOrFolder)
                         Files.createDirectories(targetFolder)
                         createSymLink(source, target, "movie")
+                    }
+                    else {
+                        log.info("Can't find original movie folder - no links to create {}", source)
                     }
                 }
             } catch (e: Exception) {

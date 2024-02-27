@@ -12,6 +12,13 @@ Unless you disable dry-run mode, nothing will be deleted.
 You may check the container logs for Janitorr to observe what the application would do, were you to turn off dry-run mode.
 If you don't manage your container via a GUI like portainer, try `docker logs janitorr`
 
+To enable debug logging, add the following lines at the top of your `application.yml`:
+```yml
+logging:
+  level:
+    com.github.schaka: TRACE
+```
+
 ### Introduction
 **Janitorr** manages your media and cleans up after you.
 
@@ -59,7 +66,7 @@ The application requires it. You need to supply it, or Janitorr will not start c
 You don't have to publish ANY ports on the host machine.
 
 An example of a `docker-compose.yml` may look like this:
-```
+```yml
 version: '3'
 
 services:

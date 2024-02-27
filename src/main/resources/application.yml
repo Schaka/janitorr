@@ -1,17 +1,17 @@
 server:
   port: 8978
 
-# File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to delete seasons by season and create "Leaving Soon" collections in Jellyfin
-# Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary hardlinks
+# File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to delete TV shows by season and create "Leaving Soon" collections in Jellyfin
+# Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well
 file-system:
   access: true
-  leaving-soon-dir: "/data/media/leaving-soon" # A directory this container can write to and Jellyfin can find under the same path - this will contain new folders with SymLinks to files for Jellyfin's "Leaving Soon" collections
+  leaving-soon-dir: "/data/media/leaving-soon" # A directory this container can write to and Jellyfin can find under the same path - this will contain new folders with symlinks to files for Jellyfin's "Leaving Soon" collections
   from-scratch: true # Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data - turning this off can save resources (less writes to drive)
 
 application:
   dry-run: true
-  leaving-soon: 14d # 14 days before a movie is deleted, it gets added to a "Leaving Soon" type collection
+  leaving-soon: 14d # 14 days before a movie is deleted, it gets added to a "Leaving Soon" type collection (i.e. movies that are 76 to 89 days old)
   movie-expiration: 90d # 3 months - if a movie's files on your system are older than this, they will be deleted
   season-expiration: 60d # 2 months - if a season's files on your system are older than this, they will be deleted
 

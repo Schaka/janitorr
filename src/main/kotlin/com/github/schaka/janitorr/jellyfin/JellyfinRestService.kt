@@ -133,7 +133,7 @@ class JellyfinRestService(
                 // For now, just assume season folders are always activated
                 val structure = pathStructure(it, path)
 
-                if (type == TV_SHOWS && it.season != null && !isMediaFile(structure)) {
+                if (type == TV_SHOWS && it.season != null && !isMediaFile(structure.sourceFile.toString())) {
                     // TV Shows
                     val sourceSeasonFolder = structure.sourceFile
                     val targetSeasonFolder = structure.targetFile
@@ -143,7 +143,7 @@ class JellyfinRestService(
                         log.trace("Creating season folder", targetSeasonFolder)
                         Files.createDirectories(targetSeasonFolder)
 
-                        val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> filePattern.matches(f.toString()) }
+                        val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> isMediaFile(f.toString()) }
                         for (file in files) {
                             val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
 
@@ -174,8 +174,8 @@ class JellyfinRestService(
         }
     }
 
-    private fun isMediaFile(structure: PathStructure) =
-        filePattern.matches(structure.sourceFile.toString())
+    private fun isMediaFile(path: String) =
+        filePattern.matches(path)
 
     private fun createSymLink(source: Path, target: Path, type: String) {
         if (!Files.exists(target)) {

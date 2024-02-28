@@ -13,6 +13,8 @@ on:
   push:
     tags:
       - '**'
+    branches:
+      - 'develop'
 
 jobs:
   build:

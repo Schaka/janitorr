@@ -34,7 +34,11 @@ dependencies {
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation(kotlin("test"))
+    testImplementation("io.mockk:mockk:1.13.9")
+    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+        exclude(module = "mockito-core")
+    }
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }

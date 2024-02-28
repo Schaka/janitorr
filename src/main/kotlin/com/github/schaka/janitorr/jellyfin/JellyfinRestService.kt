@@ -2,6 +2,7 @@ package com.github.schaka.janitorr.jellyfin
 
 import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
+import com.github.schaka.janitorr.jellyfin.filesystem.PathStructure
 import com.github.schaka.janitorr.jellyfin.library.*
 import com.github.schaka.janitorr.jellyfin.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.jellyfin.library.LibraryType.TV_SHOWS
@@ -127,21 +128,15 @@ class JellyfinRestService(
         items.forEach {
             try {
 
-                val rootPath = Path.of(it.rootFolderPath)
-                val itemFilePath = Path.of(it.filePath)
-                val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
-
-                val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
-                val targetFolder = path.resolve(itemFolderName)
-
                 // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated in Sonarr
                 // Idea: If we did have an item for every episode in a season, this might work
                 // For now, just assume season folders are always activated
+                val structure = pathStructure(it, path)
 
-                if (type == TV_SHOWS && it.season != null && !filePattern.matches(fileOrFolder.toString())) {
+                if (type == TV_SHOWS && it.season != null && !isMediaFile(structure)) {
                     // TV Shows
-                    val sourceSeasonFolder = rootPath.resolve(itemFolderName).resolve(fileOrFolder)
-                    val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
+                    val sourceSeasonFolder = structure.sourceFile
+                    val targetSeasonFolder = structure.targetFile
                     log.trace("Season folder - Source: {}, Target: {}", sourceSeasonFolder, targetSeasonFolder)
 
                     if (sourceSeasonFolder.exists()) {
@@ -159,14 +154,14 @@ class JellyfinRestService(
                     } else {
                         log.info("Can't find original season folder - no links to create {}", sourceSeasonFolder)
                     }
-                } else if(type == MOVIES) {
+                } else if (type == MOVIES) {
                     // Movies
-                    val source = itemFilePath
-                    log.trace("Movie folder - Source: {}, Target: {}", source, targetFolder)
+                    val source = structure.sourceFile
+                    log.trace("Movie folder - {}", structure)
 
                     if (source.exists()) {
-                        val target = targetFolder.resolve(fileOrFolder)
-                        Files.createDirectories(targetFolder)
+                        val target = structure.targetFile
+                        Files.createDirectories(structure.targetFolder)
                         createSymLink(source, target, "movie")
                     }
                     else {
@@ -179,6 +174,9 @@ class JellyfinRestService(
         }
     }
 
+    private fun isMediaFile(structure: PathStructure) =
+        filePattern.matches(structure.sourceFile.toString())
+
     private fun createSymLink(source: Path, target: Path, type: String) {
         if (!Files.exists(target)) {
             log.debug("Creating {} link from {} to {}", type, source, target)
@@ -186,6 +184,22 @@ class JellyfinRestService(
         } else {
             log.debug("{} link already exists from {} to {}", type, source, target)
         }
+    }
+
+    fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
+        val rootPath = Path.of(it.rootFolderPath)
+        val itemFilePath = Path.of(it.filePath)
+        val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
+
+        val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
+
+        val sourceFolder = rootPath.resolve(itemFolderName)
+        val sourceFile = sourceFolder.resolve(fileOrFolder)
+
+        val targetFolder = leavingSoonParentPath.resolve(itemFolderName)
+        val targetFile = targetFolder.resolve(fileOrFolder)
+
+        return PathStructure(sourceFolder, sourceFile, targetFolder, targetFile)
     }
 
 }

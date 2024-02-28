@@ -106,6 +106,7 @@ class JellyfinRestService(
 
         val result = jellyfinClient.listLibraries()
         val collectionFilter = type.collectionType.lowercase()
+        // subdirectory (i.e. /leaving-soon/tv
         val path = Path.of(fileSystemProperties.leavingSoonDir, type.folderName)
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
@@ -128,11 +129,10 @@ class JellyfinRestService(
 
                 val rootPath = Path.of(it.rootFolderPath)
                 val itemPath = Path.of(it.filePath)
-                val itemFolder = itemPath.subtract(rootPath).firstOrNull()
+                val itemFolderName = itemPath.subtract(rootPath).firstOrNull()
 
                 val fileOrFolder = itemPath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
-
-                val targetFolder = Path.of(fileSystemProperties.leavingSoonDir).resolve(Path.of(type.folderName)).resolve(itemFolder)
+                val targetFolder = path.resolve(itemFolderName)
 
                 // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated in Sonarr
                 // Idea: If we did have an item for every episode in a season, this might work
@@ -140,10 +140,12 @@ class JellyfinRestService(
 
                 if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
                     // TV Shows
-                    val sourceSeasonFolder = rootPath.resolve(itemFolder).resolve(fileOrFolder)
+                    val sourceSeasonFolder = rootPath.resolve(itemFolderName).resolve(fileOrFolder)
                     val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
+                    log.trace("Season folder - Source: {}, Target: {}", sourceSeasonFolder, targetSeasonFolder)
 
                     if (sourceSeasonFolder.exists()) {
+                        log.trace("Creating season folder", targetSeasonFolder)
                         Files.createDirectories(targetSeasonFolder)
 
                         val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> filePattern.matches(f.toString()) }
@@ -160,6 +162,8 @@ class JellyfinRestService(
                 } else {
                     // Movies
                     val source = itemPath.resolve(fileOrFolder)
+                    log.trace("Movie folder - Source: {}, Target: {}", source, targetFolder)
+
                     if (source.exists()) {
                         val target = targetFolder.resolve(fileOrFolder)
                         Files.createDirectories(targetFolder)

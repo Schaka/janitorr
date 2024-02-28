@@ -36,10 +36,10 @@ class JellyseerrRestService(
 
             for (request: RequestResponse in requests) {
                 if (!applicationProperties.dryRun) {
-                    log.info("Deleting request: {} for {} | IMDB: {}", request, item.filePath, item.imdbId)
+                    log.info("Deleting request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
                     jellyseerrClient.deleteRequest(request.id)
                 } else {
-                    log.info("Found request: {} for {} | IMDB: {}", request, item.filePath, item.imdbId)
+                    log.info("Found request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
                 }
             }
         }

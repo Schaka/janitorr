@@ -128,17 +128,17 @@ class JellyfinRestService(
             try {
 
                 val rootPath = Path.of(it.rootFolderPath)
-                val itemPath = Path.of(it.filePath)
-                val itemFolderName = itemPath.subtract(rootPath).firstOrNull()
+                val itemFilePath = Path.of(it.filePath)
+                val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
 
-                val fileOrFolder = itemPath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv)
+                val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
                 val targetFolder = path.resolve(itemFolderName)
 
                 // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated in Sonarr
                 // Idea: If we did have an item for every episode in a season, this might work
                 // For now, just assume season folders are always activated
 
-                if (it.season != null && !filePattern.matches(fileOrFolder.toString())) {
+                if (type == TV_SHOWS && it.season != null && !filePattern.matches(fileOrFolder.toString())) {
                     // TV Shows
                     val sourceSeasonFolder = rootPath.resolve(itemFolderName).resolve(fileOrFolder)
                     val targetSeasonFolder = targetFolder.resolve(fileOrFolder)
@@ -159,9 +159,9 @@ class JellyfinRestService(
                     } else {
                         log.info("Can't find original season folder - no links to create {}", sourceSeasonFolder)
                     }
-                } else {
+                } else if(type == MOVIES) {
                     // Movies
-                    val source = itemPath.resolve(fileOrFolder)
+                    val source = itemFilePath
                     log.trace("Movie folder - Source: {}, Target: {}", source, targetFolder)
 
                     if (source.exists()) {

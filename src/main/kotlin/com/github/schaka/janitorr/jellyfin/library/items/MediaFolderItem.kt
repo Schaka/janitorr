@@ -4,7 +4,7 @@ import com.github.schaka.janitorr.jellyfin.library.ProviderIds
 
 data class MediaFolderItem(
         val ChildCount: Int,
-        val CollectionType: String,
+        val CollectionType: String?,
         val Container: String?,
         val DateCreated: String,
         val DateLastMediaAdded: String?,

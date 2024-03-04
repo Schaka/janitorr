@@ -97,7 +97,7 @@ extra {
     project.extra["build.branch"] = branch
     project.extra["build.user"] = build.userName()
 
-    val containerImageName = "schaka/${project.name}"
+    val containerImageName = "coltondick/${project.name}"
     val containerImageTags = mutableSetOf(shortCommit, branch)
     if (branch == "main") {
         containerImageTags.add("latest")

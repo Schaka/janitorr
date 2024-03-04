@@ -8,7 +8,7 @@ data class MovieFile(
     val id: Int,
     val indexerFlags: Int,
     val languages: List<Language>,
-    val mediaInfo: MediaInfo,
+    val mediaInfo: MediaInfo?,
     val movieId: Int,
     val originalFilePath: String?,
     val path: String,

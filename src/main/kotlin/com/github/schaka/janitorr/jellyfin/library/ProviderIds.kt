@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonAnyGetter
 import com.fasterxml.jackson.annotation.JsonAnySetter
 
 data class ProviderIds(
-    val Tvdb: Int?,
+    val Tvdb: String?,
     val Imdb: String?,
-    val Tmdb: Int?,
+    val Tmdb: String?,
     @JsonAnySetter
     @get:JsonAnyGetter
     val otherFields: Map<String, Any> = hashMapOf()

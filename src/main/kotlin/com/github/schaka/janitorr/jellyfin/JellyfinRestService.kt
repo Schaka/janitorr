@@ -31,6 +31,7 @@ class JellyfinRestService(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
         private val seasonPattern = Regex("Season (?<season>\\d+)")
         private val filePattern = Regex("^.*\\.(mkv|mp4|avi|webm|mts|m2ts|ts|wmv|mpg|mpeg|mp2|m2v|m4v)\$")
+        private val numberPattern = Regex("[0-9]+")
     }
 
     override fun cleanupTvShows(items: List<LibraryItem>) {
@@ -85,9 +86,17 @@ class JellyfinRestService(
     }
 
     private fun mediaMatches(type: LibraryType, item: LibraryItem, candidate: LibraryContent): Boolean {
-        val imdbMatches = candidate.ProviderIds?.Imdb != null && (candidate.ProviderIds?.Imdb == item.imdbId)
-        val tmdbMatches = candidate.ProviderIds?.Tmdb != null && mediaTypeMatches(type, candidate) && (candidate.ProviderIds?.Tmdb == item.tmdbId)
-        val tvdbMatches = candidate.ProviderIds?.Tvdb != null && mediaTypeMatches(type, candidate) && (candidate.ProviderIds?.Tvdb == item.tvdbId)
+        // Check if the media type is the same before checking anything else
+        if (!mediaTypeMatches(type, candidate)) {
+            return false
+        }
+
+        val tmdbId = parseMetadataId(candidate.ProviderIds?.Tmdb)
+        val tvdbId = parseMetadataId(candidate.ProviderIds?.Tvdb)
+
+        val imdbMatches = candidate.ProviderIds?.Imdb != null && candidate.ProviderIds?.Imdb == item.imdbId
+        val tmdbMatches = candidate.ProviderIds?.Tmdb != null && tmdbId == item.tmdbId
+        val tvdbMatches = candidate.ProviderIds?.Tvdb != null && tvdbId == item.tvdbId
         return imdbMatches || tmdbMatches || tvdbMatches
     }
 
@@ -95,6 +104,15 @@ class JellyfinRestService(
         return when (type) {
             MOVIES -> content.IsMovie
             TV_SHOWS -> content.IsSeries
+        }
+    }
+
+    private fun parseMetadataId(value: String?): Int? {
+        return value?.let {
+            numberPattern.findAll(it)
+                    .map(MatchResult::value)
+                    .map(String::toInt)
+                    .firstOrNull()
         }
     }
 

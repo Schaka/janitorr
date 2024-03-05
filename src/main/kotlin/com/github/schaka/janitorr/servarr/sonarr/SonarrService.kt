@@ -24,7 +24,7 @@ class SonarrService(
 
         val applicationProperties: ApplicationProperties,
 
-        var upgradesAllowed: Boolean = false
+        var upgradesAllowed: Boolean = false,
 
         var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 

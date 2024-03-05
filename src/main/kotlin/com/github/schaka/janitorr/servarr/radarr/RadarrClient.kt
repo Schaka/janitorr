@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.servarr.radarr
 
+import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
@@ -13,6 +14,9 @@ interface RadarrClient {
 
     @RequestLine("GET /movie")
     fun getAllMovies(): List<MoviePayload>
+
+    @RequestLine("GET /tag")
+    fun getAllTags(): List<Tag>
 
     @RequestLine("GET /movie/{id}")
     fun getMovie(@Param("id") id: Int): MoviePayload

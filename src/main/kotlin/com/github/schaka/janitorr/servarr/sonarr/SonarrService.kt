@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import jakarta.annotation.PostConstruct
@@ -23,10 +24,9 @@ class SonarrService(
 
         val applicationProperties: ApplicationProperties,
 
-        @Sonarr
-        val client: RestTemplate,
-
         var upgradesAllowed: Boolean = false
+
+        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 
 ) : ServarrService {
 
@@ -37,10 +37,13 @@ class SonarrService(
     @PostConstruct
     fun postConstruct() {
         upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
+        keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }
 
     override fun getEntries(): List<LibraryItem> {
-        val history = sonarrClient.getAllSeries().flatMap { series ->
+        val history = sonarrClient.getAllSeries()
+                .filter { !it.tags.contains(keepTag.id) }
+                .flatMap { series ->
             series.seasons.map { season ->
                 sonarrClient.getHistory(series.id, season.seasonNumber)
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }

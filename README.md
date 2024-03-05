@@ -31,6 +31,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ## Features
 - Dry-run mode to investigate changes before committing to any deletion
+- Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in Jellyfin, Jellyseerr, Radarr, and Sonarr
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think "Leaving soon"
 - Unmonitor and delete media from *arr
@@ -50,6 +51,7 @@ Currently, the code is only published as a docker image to [DockerHub](https://h
 
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab history in the *arr apps.
 By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will consider the most recent download when calculating its age.
+To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag Janitorr looks for can be adjusted in your config file.
 
 ### Setting up Docker
 - map /config from within the container to a host folder of your choice

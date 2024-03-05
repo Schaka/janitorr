@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
@@ -22,7 +23,9 @@ class RadarrService(
 
         val fileSystemProperties: FileSystemProperties,
 
-        var upgradesAllowed: Boolean = false
+        var upgradesAllowed: Boolean = false,
+
+        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 
 ) : ServarrService {
 
@@ -33,11 +36,14 @@ class RadarrService(
     @PostConstruct
     fun postConstruct() {
         upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
+        keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }
 
     override fun getEntries(): List<LibraryItem> {
-        return radarrClient.getAllMovies().mapNotNull { movie ->
-            radarrClient.getHistory(movie.id)
+        return radarrClient.getAllMovies()
+                .filter { !it.tags.contains(keepTag.id) }
+                .mapNotNull { movie ->
+                    radarrClient.getHistory(movie.id)
                     .filter { movie.movieFile != null && it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                     .map {
                         LibraryItem(

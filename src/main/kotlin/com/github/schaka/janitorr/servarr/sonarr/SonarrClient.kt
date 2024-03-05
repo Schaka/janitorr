@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.servarr.sonarr
 
+import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeFile
@@ -21,6 +22,9 @@ interface SonarrClient {
 
     @RequestLine("GET /series")
     fun getAllSeries(): List<SeriesPayload>
+
+    @RequestLine("GET /tag")
+    fun getAllTags(): List<Tag>
 
     @RequestLine("DELETE /series/{id}?deleteFiles={files}&addImportListExclusion={blacklist}")
     fun deleteSeries(@Param("id") id: Int, @Param("files") files: Boolean = false, @Param("blacklist") blacklist: Boolean = false)

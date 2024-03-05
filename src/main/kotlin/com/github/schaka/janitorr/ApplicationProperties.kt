@@ -11,4 +11,5 @@ data class ApplicationProperties(
     var leavingSoon: Duration = Duration.ofDays(14),
     var movieExpiration: Duration = Duration.ofDays(90),
     var seasonExpiration: Duration =Duration.ofDays(90),
+    val exclusionTag: String = "janitorr_keep"
 )

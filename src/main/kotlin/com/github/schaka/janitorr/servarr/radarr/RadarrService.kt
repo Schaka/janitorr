@@ -38,7 +38,7 @@ class RadarrService(
     override fun getEntries(): List<LibraryItem> {
         return radarrClient.getAllMovies().mapNotNull { movie ->
             radarrClient.getHistory(movie.id)
-                    .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
+                    .filter { movie.movieFile != null && it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                     .map {
                         LibraryItem(
                                 movie.id,

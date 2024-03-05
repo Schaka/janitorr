@@ -107,7 +107,7 @@ class JellyfinRestService(
         }
     }
 
-    private fun parseMetadataId(value: String?): Int? {
+    fun parseMetadataId(value: String?): Int? {
         return value?.let {
             numberPattern.findAll(it)
                     .map(MatchResult::value)

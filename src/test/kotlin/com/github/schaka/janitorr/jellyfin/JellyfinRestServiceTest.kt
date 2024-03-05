@@ -12,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @ExtendWith(MockKExtension::class)
 internal class JellyfinRestServiceTest {
@@ -81,6 +82,13 @@ internal class JellyfinRestServiceTest {
         assertEquals(Path.of("/data/media/tv/tv-show [imdb-812543]/season 01"), structure.sourceFile)
         assertEquals(Path.of("/data/media/leaving-soon/tv/tv-show [imdb-812543]"), structure.targetFolder)
         assertEquals(Path.of("/data/media/leaving-soon/tv/tv-show [imdb-812543]/season 01"), structure.targetFile)
+    }
+
+    @Test
+    fun testMetadataParsing() {
+        assertEquals(4513, jellyfinRestService.parseMetadataId("4513-30-days-of-night"))
+        assertEquals(4513, jellyfinRestService.parseMetadataId( "4513"))
+        assertNull(jellyfinRestService.parseMetadataId(null))
     }
 
 }

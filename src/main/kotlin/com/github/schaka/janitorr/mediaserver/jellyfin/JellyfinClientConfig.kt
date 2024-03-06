@@ -30,38 +30,38 @@ class JellyfinClientConfig {
         private val janitorrClientString = "Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\""
     }
 
-    @com.github.schaka.janitorr.mediaserver.jellyfin.Jellyfin
+    @Jellyfin
     @Bean
-    fun jellyfinRestTemplate(builder: RestTemplateBuilder, properties: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties): RestTemplate {
+    fun jellyfinRestTemplate(builder: RestTemplateBuilder, properties: JellyfinProperties): RestTemplate {
         return builder
             .rootUri("${properties.url}/")
-            .defaultHeader(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", ${com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig.Companion.janitorrClientString}")
+            .defaultHeader(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
             .build()
     }
 
     @Bean
-    fun jellyfinClient(properties: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties, mapper: ObjectMapper): com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClient {
+    fun jellyfinClient(properties: JellyfinProperties, mapper: ObjectMapper): JellyfinClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
                 .requestInterceptor {
-                    it.header(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", ${com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig.Companion.janitorrClientString}")
+                    it.header(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
-                .target(com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClient::class.java, properties.url)
+                .target(JellyfinClient::class.java, properties.url)
     }
 
     @Bean
-    fun jellyfinUserClient(properties: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties, mapper: ObjectMapper): com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinUserClient {
+    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): JellyfinUserClient {
         return Feign.builder()
             .decoder(JacksonDecoder(mapper))
             .encoder(JacksonEncoder(mapper))
-            .requestInterceptor(com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig.JellyfinUserInterceptor(properties))
-            .target(com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinUserClient::class.java, properties.url)
+            .requestInterceptor(JellyfinUserInterceptor(properties))
+            .target(JellyfinUserClient::class.java, properties.url)
     }
 
     private class JellyfinUserInterceptor(
-        val properties: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties
+        val properties: JellyfinProperties
     ) : RequestInterceptor {
 
         var lastUpdate: LocalDateTime = LocalDateTime.MIN
@@ -73,17 +73,17 @@ class JellyfinClientConfig {
                 val userInfo = getUserInfo(properties)
                 accessToken = userInfo.body?.get("AccessToken").toString()
                 lastUpdate = LocalDateTime.now()
-                com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig.Companion.log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
+                log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
             }
 
-            template.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", ${com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig.Companion.janitorrClientString}")
+            template.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", $janitorrClientString}")
             template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
         }
 
-        private fun getUserInfo(properties: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties): ResponseEntity<Map<*, *>> {
+        private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
             val login = RestTemplate()
             val headers = HttpHeaders()
-            headers.set(AUTHORIZATION, "MediaBrowser , ${com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig.Companion.janitorrClientString}")
+            headers.set(AUTHORIZATION, "MediaBrowser , ${janitorrClientString}")
             headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             val content = object {
                 val Username = properties.username

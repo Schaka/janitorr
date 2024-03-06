@@ -27,7 +27,7 @@ abstract class MediaServerService {
     protected fun isMediaFile(path: String) =
             filePattern.matches(path)
 
-    fun parseMetadataId(value: String?): Int? {
+    internal fun parseMetadataId(value: String?): Int? {
         return value?.let {
             numberPattern.findAll(it)
                     .map(MatchResult::value)
@@ -45,7 +45,7 @@ abstract class MediaServerService {
         }
     }
 
-    protected fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
+    internal fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
         val rootPath = Path.of(it.rootFolderPath)
         val itemFilePath = Path.of(it.filePath)
         val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()

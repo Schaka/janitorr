@@ -1,7 +1,8 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin
+package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
+import com.github.schaka.janitorr.mediaserver.jellyfin.*
 import com.github.schaka.janitorr.servarr.LibraryItem
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -15,13 +16,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertNull
 
 @ExtendWith(MockKExtension::class)
-internal class EmbyRestServiceTest {
+internal class MediaRestServiceTest {
 
     @InjectMockKs
     lateinit var jellyfinRestService: JellyfinRestService
 
     @MockK
-    lateinit var jellyfinClient: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClient
+    lateinit var jellyfinClient: JellyfinClient
     @MockK
     lateinit var jellyfinUserClient: JellyfinUserClient
     @MockK

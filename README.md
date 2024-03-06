@@ -74,10 +74,12 @@ version: '3'
 services:
   janitorr:
     container_name: janitorr
-    image: schaka/janitorr
+    image: schaka/janitorr:latest
     ports:
       - 8978:8978 # Technically, we don't publish any endpoints, so this isn't strictly required
     volumes:
       - /appdata/janitorr/config:/config 
       - /share_media:/data
 ```
+
+To get the latest build as found in the development branch, grab the following image: `schaka/janitorr:develop`.

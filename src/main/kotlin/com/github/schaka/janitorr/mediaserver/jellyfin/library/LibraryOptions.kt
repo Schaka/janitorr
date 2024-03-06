@@ -22,7 +22,7 @@ data class LibraryOptions(
     val RequirePerfectSubtitleMatch: Boolean,
     val SaveLocalMetadata: Boolean,
     val SaveSubtitlesWithMedia: Boolean,
-    val SeasonZeroDisplayName: String,
+    val SeasonZeroDisplayName: String?,
     val SkipSubtitlesIfAudioTrackMatches: Boolean,
     val SkipSubtitlesIfEmbeddedSubtitlesPresent: Boolean,
     val SubtitleDownloadLanguages: List<String>?,

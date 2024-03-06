@@ -52,11 +52,14 @@ class EmbyRestService(
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
-        var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+        var goneSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         if (goneSoonCollection == null) {
             Files.createDirectories(path)
-            embyClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(path.toUri().path))
-            goneSoonCollection = embyClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+            val pathString = path.toUri().path
+            // Windows paths may have a trailing trash - Windows Emby can't deal with that
+            val pathForEmby = if (pathString.startsWith("/")) pathString.replaceFirst("/", "") else pathString
+            embyClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathForEmby))
+            goneSoonCollection = embyClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

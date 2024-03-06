@@ -22,19 +22,16 @@ import kotlin.io.path.*
 @ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
 class JellyfinRestService(
 
-        val jellyfinClient: com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClient,
+        val jellyfinClient: JellyfinClient,
         val jellyfinUserClient: JellyfinUserClient,
         val jellyfinProperties: JellyfinProperties,
         val applicationProperties: ApplicationProperties,
         val fileSystemProperties: FileSystemProperties
 
-) : MediaServerService {
+) : MediaServerService() {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
-        private val seasonPattern = Regex("Season (?<season>\\d+)")
-        private val filePattern = Regex("^.*\\.(mkv|mp4|avi|webm|mts|m2ts|ts|wmv|mpg|mpeg|mp2|m2v|m4v)\$")
-        private val numberPattern = Regex("[0-9]+")
     }
 
     override fun cleanupTvShows(items: List<LibraryItem>) {
@@ -107,15 +104,6 @@ class JellyfinRestService(
         return when (type) {
             MOVIES -> content.IsMovie
             TV_SHOWS -> content.IsSeries
-        }
-    }
-
-    fun parseMetadataId(value: String?): Int? {
-        return value?.let {
-            numberPattern.findAll(it)
-                    .map(MatchResult::value)
-                    .map(String::toInt)
-                    .firstOrNull()
         }
     }
 
@@ -195,32 +183,6 @@ class JellyfinRestService(
         }
     }
 
-    private fun isMediaFile(path: String) =
-        filePattern.matches(path)
 
-    private fun createSymLink(source: Path, target: Path, type: String) {
-        if (!Files.exists(target)) {
-            log.debug("Creating {} link from {} to {}", type, source, target)
-            Files.createSymbolicLink(target, source)
-        } else {
-            log.debug("{} link already exists from {} to {}", type, source, target)
-        }
-    }
-
-    fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
-        val rootPath = Path.of(it.rootFolderPath)
-        val itemFilePath = Path.of(it.filePath)
-        val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
-
-        val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
-
-        val sourceFolder = rootPath.resolve(itemFolderName)
-        val sourceFile = sourceFolder.resolve(fileOrFolder)
-
-        val targetFolder = leavingSoonParentPath.resolve(itemFolderName)
-        val targetFile = targetFolder.resolve(fileOrFolder)
-
-        return PathStructure(sourceFolder, sourceFile, targetFolder, targetFile)
-    }
 
 }

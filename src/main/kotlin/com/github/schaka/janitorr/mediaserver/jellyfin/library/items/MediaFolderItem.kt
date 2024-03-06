@@ -16,7 +16,7 @@ data class MediaFolderItem(
         val IndexNumberEnd: Int,
         val IsFolder: Boolean,
         val IsoType: String?,
-        val LocationType: String,
+        val LocationType: String?,
         val MediaSourceCount: Int,
         val MediaSources: List<Any>?,
         val MediaStreams: List<Any>?,

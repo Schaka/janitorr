@@ -124,7 +124,10 @@ class JellyfinRestService(
         var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         if (goneSoonCollection == null) {
             Files.createDirectories(path)
-            jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(path.toUri().path))
+            val pathString = path.toUri().path
+            // Windows paths may have a trailing trash - Windows Jellyfin can't deal with that
+            val pathforJellyfin = if (pathString.startsWith("/")) pathString.replaceFirst("/", "") else pathString
+            jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathforJellyfin))
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
@@ -149,7 +152,7 @@ class JellyfinRestService(
                     log.trace("Season folder - Source: {}, Target: {}", sourceSeasonFolder, targetSeasonFolder)
 
                     if (sourceSeasonFolder.exists()) {
-                        log.trace("Creating season folder", targetSeasonFolder)
+                        log.trace("Creating season folder {}", targetSeasonFolder)
                         Files.createDirectories(targetSeasonFolder)
 
                         val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> isMediaFile(f.toString()) }

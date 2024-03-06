@@ -68,6 +68,9 @@ class EmbyRestService(
             Files.createDirectories(path)
         }
 
+        // TODO: This entire block should probably go to the super class
+        // It's not dependent on any client
+
         items.forEach {
             try {
 
@@ -83,7 +86,7 @@ class EmbyRestService(
                     log.trace("Season folder - Source: {}, Target: {}", sourceSeasonFolder, targetSeasonFolder)
 
                     if (sourceSeasonFolder.exists()) {
-                        log.trace("Creating season folder", targetSeasonFolder)
+                        log.trace("Creating season folder {}", targetSeasonFolder)
                         Files.createDirectories(targetSeasonFolder)
 
                         val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> isMediaFile(f.toString()) }

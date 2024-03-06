@@ -1,8 +1,6 @@
 package com.github.schaka.janitorr.servarr
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.schaka.janitorr.jellyfin.JellyfinClient
-import com.github.schaka.janitorr.jellyfin.JellyfinProperties
 import com.github.schaka.janitorr.servarr.radarr.Radarr
 import com.github.schaka.janitorr.servarr.radarr.RadarrClient
 import com.github.schaka.janitorr.servarr.radarr.RadarrProperties

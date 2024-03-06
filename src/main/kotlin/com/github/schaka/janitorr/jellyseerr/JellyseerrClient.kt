@@ -1,6 +1,5 @@
 package com.github.schaka.janitorr.jellyseerr
 
-import com.github.schaka.janitorr.jellyfin.library.VirtualFolderResponse
 import com.github.schaka.janitorr.jellyseerr.paging.JellyseerrPage
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
 import feign.Param

@@ -23,8 +23,16 @@ clients:
   radarr:
     url: "http://localhost:7878"
     api-key: "cd0912f129d348c9b69bb20d49fcbe44"
+  ## You can only choose one out of Jellyfin or Emby. Emby is not yet fully supported
   jellyfin:
     enabled: true
+    url: "http://localhost:8096"
+    api-key: "4da8d93992804489ba2d1f0e31b8316c"
+    username: Janitorr
+    password: janitorr
+  ## You can only choose one out of Jellyfin or Emby. Emby is not yet fully supported
+  emby:
+    enabled: false
     url: "http://localhost:8096"
     api-key: "4da8d93992804489ba2d1f0e31b8316c"
     username: Janitorr
@@ -33,12 +41,3 @@ clients:
     enabled: true
     url: "http://localhost:5055"
     api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
-
-# Currently not in use - intended to check seeding status and not delete currently seeding media
-  torrent:
-    type: QBITTORRENT
-    name: qBittorrent
-    auto-resume: true
-    url: "locahost:8080"
-    username: admin
-    password: adminadmin

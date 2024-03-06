@@ -1,11 +1,9 @@
 package com.github.schaka.janitorr
 
-import com.github.schaka.janitorr.jellyfin.JellyfinService
-import com.github.schaka.janitorr.jellyfin.library.LibraryType
-import com.github.schaka.janitorr.jellyfin.library.LibraryType.MOVIES
-import com.github.schaka.janitorr.jellyfin.library.LibraryType.TV_SHOWS
-import com.github.schaka.janitorr.jellyseerr.JellyseerrRestService
+import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType.MOVIES
+import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrService
@@ -15,7 +13,7 @@ import java.time.LocalDateTime
 
 @Service
 class CleanupSchedule(
-        val jellyfinService: JellyfinService,
+        val mediaServerService: MediaServerService,
         val jellyseerrService: JellyseerrService,
         val applicationProperties: ApplicationProperties,
         val sonarrService: SonarrService,
@@ -33,14 +31,14 @@ class CleanupSchedule(
 
         val sonarrShows = sonarrService.getEntries()
         val leavingShows = sonarrShows.filter { it.date.plusDays(seasonExpiration - leavingSoonExpiration) < today && it.date.plusDays(seasonExpiration) >= today }
-        jellyfinService.updateGoneSoon(TV_SHOWS, leavingShows)
+        mediaServerService.updateGoneSoon(TV_SHOWS, leavingShows)
 
         val toDeleteShows = sonarrShows.filter { it.date.plusDays(seasonExpiration) < today }
         deleteTvShows(toDeleteShows)
 
         val radarrMovies = radarrService.getEntries()
         val leavingSoonMovies = radarrMovies.filter { it.date.plusDays(movieExpiration - leavingSoonExpiration) < today && it.date.plusDays(movieExpiration) >= today }
-        jellyfinService.updateGoneSoon(MOVIES, leavingSoonMovies)
+        mediaServerService.updateGoneSoon(MOVIES, leavingSoonMovies)
 
         val toDeleteMovies = radarrMovies.filter { it.date.plusDays(movieExpiration) < today }
         deleteMovies(toDeleteMovies)
@@ -53,8 +51,8 @@ class CleanupSchedule(
         val deletedMovies = toDeleteMovies.filter { !it.seeding }
 
         jellyseerrService.cleanupRequests(deletedMovies)
-        jellyfinService.cleanupMovies(deletedMovies)
-        jellyfinService.updateGoneSoon(MOVIES, cannotDeleteMovies, true)
+        mediaServerService.cleanupMovies(deletedMovies)
+        mediaServerService.updateGoneSoon(MOVIES, cannotDeleteMovies, true)
     }
 
     private fun deleteTvShows(toDeleteShows: List<LibraryItem>) {
@@ -64,7 +62,7 @@ class CleanupSchedule(
         val deletedShows = toDeleteShows.filter { !it.seeding }
 
         jellyseerrService.cleanupRequests(deletedShows)
-        jellyfinService.cleanupTvShows(deletedShows)
-        jellyfinService.updateGoneSoon(TV_SHOWS, cannotDeleteShow, true)
+        mediaServerService.cleanupTvShows(deletedShows)
+        mediaServerService.updateGoneSoon(TV_SHOWS, cannotDeleteShow, true)
     }
 }

@@ -9,13 +9,16 @@ import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
+@Sonarr
 @Service
+@ConditionalOnProperty("clients.sonarr.enabled", havingValue = "true", matchIfMissing = true)
 class SonarrService(
 
         val sonarrClient: SonarrClient,
@@ -44,8 +47,8 @@ class SonarrService(
         val history = sonarrClient.getAllSeries()
                 .filter { !it.tags.contains(keepTag.id) }
                 .flatMap { series ->
-            series.seasons.map { season ->
-                sonarrClient.getHistory(series.id, season.seasonNumber)
+                    series.seasons.map { season ->
+                    sonarrClient.getHistory(series.id, season.seasonNumber)
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                         .map {
                             LibraryItem(

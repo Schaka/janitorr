@@ -11,6 +11,7 @@ import feign.Feign
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,25 +28,8 @@ class ServarrClientConfig {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
-    @Radarr
     @Bean
-    fun radarrRestTemplate(builder: RestTemplateBuilder, properties: RadarrProperties): RestTemplate {
-        return builder
-            .rootUri("${properties.url}/api/v3")
-            .defaultHeader("X-Api-Key", properties.apiKey)
-            .build()
-    }
-
-    @Sonarr
-    @Bean
-    fun sonarrRestTemplate(builder: RestTemplateBuilder, properties: SonarrProperties): RestTemplate {
-        return builder
-            .rootUri("${properties.url}/api/v3")
-            .defaultHeader("X-Api-Key", properties.apiKey)
-            .build()
-    }
-
-    @Bean
+    @ConditionalOnProperty("clients.radarr.enabled", havingValue = "true", matchIfMissing = false)
     fun radarrClient(properties: RadarrProperties, mapper: ObjectMapper): RadarrClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
@@ -58,6 +42,7 @@ class ServarrClientConfig {
     }
 
     @Bean
+    @ConditionalOnProperty("clients.sonarr.enabled", havingValue = "true", matchIfMissing = false)
     fun sonarrClient(properties: SonarrProperties, mapper: ObjectMapper): SonarrClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))

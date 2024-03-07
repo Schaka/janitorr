@@ -3,7 +3,6 @@ package com.github.schaka.janitorr.mediaserver.jellyfin
 import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.MediaServerService
-import com.github.schaka.janitorr.mediaserver.jellyfin.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.jellyfin.library.AddLibraryRequest
 import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType
@@ -16,17 +15,16 @@ import org.springframework.stereotype.Service
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
-import kotlin.io.path.*
 
 @Service
 @ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true", matchIfMissing = false)
 class JellyfinRestService(
 
-        val jellyfinClient: JellyfinClient,
-        val jellyfinUserClient: JellyfinUserClient,
-        val jellyfinProperties: JellyfinProperties,
-        val applicationProperties: ApplicationProperties,
-        val fileSystemProperties: FileSystemProperties
+    val jellyfinClient: JellyfinClient,
+    val jellyfinUserClient: JellyfinUserClient,
+    val jellyfinProperties: JellyfinProperties,
+    val applicationProperties: ApplicationProperties,
+    val fileSystemProperties: FileSystemProperties
 
 ) : MediaServerService() {
 
@@ -47,14 +45,14 @@ class JellyfinRestService(
 
         for (show: LibraryItem in items) {
             jellyfinShows.firstOrNull { tvShowMatches(show, it) }
-                    ?.let { jellyfinContent ->
-                        if (!applicationProperties.dryRun) {
-                            jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
-                            log.info("Deleting {} {} from Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
-                        } else {
-                            log.info("Found {} {} on Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
-                        }
+                ?.let { jellyfinContent ->
+                    if (!applicationProperties.dryRun) {
+                        jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
+                        log.info("Deleting {} {} from Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
+                    } else {
+                        log.info("Found {} {} on Jellyfin", jellyfinContent.SeriesName, jellyfinContent.Name)
                     }
+                }
         }
 
         // TODO: Remove TV shows if all seasons gone
@@ -69,19 +67,22 @@ class JellyfinRestService(
 
         for (movie: LibraryItem in items) {
             jellyfinMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
-                    ?.let { jellyfinContent ->
-                        if (!applicationProperties.dryRun) {
-                            jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
-                            log.info("Deleting {} from Jellyfin", jellyfinContent.Name)
-                        } else {
-                            log.info("Found {} on Jellyfin", jellyfinContent.Name)
-                        }
+                ?.let { jellyfinContent ->
+                    if (!applicationProperties.dryRun) {
+                        jellyfinUserClient.deleteItemAndFiles(jellyfinContent.Id)
+                        log.info("Deleting {} from Jellyfin", jellyfinContent.Name)
+                    } else {
+                        log.info("Found {} on Jellyfin", jellyfinContent.Name)
                     }
+                }
         }
     }
 
     private fun tvShowMatches(item: LibraryItem, candidate: LibraryContent, matchSeason: Boolean = true): Boolean {
-        val seasonMatches = candidate.Type == "Season" && candidate.Name.contains("Season") && item.season == seasonPattern.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
+        val seasonMatches = candidate.Type == "Season"
+                && candidate.Name.contains("Season")
+                && item.season == seasonPattern.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
+
         return mediaMatches(TV_SHOWS, item, candidate) && if (matchSeason) seasonMatches else true
     }
 
@@ -121,21 +122,14 @@ class JellyfinRestService(
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
-        var goneSoonCollection =
-            result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+        var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         if (goneSoonCollection == null) {
             Files.createDirectories(path)
             val pathString = path.toUri().path
             // Windows paths may have a trailing trash - Windows Jellyfin can't deal with that, this is a bit hacky but makes development easier
             val pathforJellyfin = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
-            jellyfinClient.createLibrary(
-                "${type.collectionName} (Deleted Soon)",
-                type.collectionType,
-                AddLibraryRequest(),
-                listOf(pathforJellyfin)
-            )
-            goneSoonCollection = jellyfinClient.listLibraries()
-                .firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+            jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathforJellyfin))
+            goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

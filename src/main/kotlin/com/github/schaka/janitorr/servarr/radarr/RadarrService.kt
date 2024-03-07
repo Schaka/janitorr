@@ -8,13 +8,16 @@ import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
+@Radarr
 @Service
+@ConditionalOnProperty("clients.radarr.enabled", havingValue = "true", matchIfMissing = true)
 class RadarrService(
 
         val radarrClient: RadarrClient,

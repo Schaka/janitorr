@@ -1,7 +1,5 @@
 package com.github.schaka.janitorr.servarr
 
-import java.time.LocalDateTime
-
 interface ServarrService {
 
     fun getEntries(): List<LibraryItem>

@@ -17,7 +17,7 @@ import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
 @Service
-@ConditionalOnProperty("clients.emby.enabled", havingValue = "true")
+@ConditionalOnProperty("clients.emby.enabled", havingValue = "true", matchIfMissing = false)
 class EmbyRestService(
 
         val embyProperties: EmbyProperties,

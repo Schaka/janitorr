@@ -19,7 +19,7 @@ import java.nio.file.Path
 import kotlin.io.path.*
 
 @Service
-@ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
+@ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true", matchIfMissing = false)
 class JellyfinRestService(
 
         val jellyfinClient: JellyfinClient,

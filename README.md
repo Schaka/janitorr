@@ -55,7 +55,7 @@ To exclude media from being considered from deletion, set the `janitorr_keep` ta
 
 ### Setting up Docker
 - map /config from within the container to a host folder of your choice
-- within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/main/src/main/resources/application.yml) from this repository
+- within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application.yml) from this repository
 - adjust said copy with your own info like *arr, jellyfin and jellyseerr API keys and your preferred port
 - you do NOT need to fill in a torrent client YET 
 

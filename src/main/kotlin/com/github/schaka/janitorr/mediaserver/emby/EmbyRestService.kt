@@ -56,8 +56,8 @@ class EmbyRestService(
         if (goneSoonCollection == null) {
             Files.createDirectories(path)
             val pathString = path.toUri().path
-            // Windows paths may have a trailing trash - Windows Emby can't deal with that
-            val pathForEmby = if (pathString.startsWith("/")) pathString.replaceFirst("/", "") else pathString
+            // Windows paths may have a trailing trash - Windows Emby can't deal with that, this is a bit hacky but makes development easier
+            val pathForEmby = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
             embyClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathForEmby))
             goneSoonCollection = embyClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }

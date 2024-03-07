@@ -125,8 +125,8 @@ class JellyfinRestService(
         if (goneSoonCollection == null) {
             Files.createDirectories(path)
             val pathString = path.toUri().path
-            // Windows paths may have a trailing trash - Windows Jellyfin can't deal with that
-            val pathforJellyfin = if (pathString.startsWith("/")) pathString.replaceFirst("/", "") else pathString
+            // Windows paths may have a trailing trash - Windows Jellyfin can't deal with that, this is a bit hacky but makes development easier
+            val pathforJellyfin = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
             jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathforJellyfin))
             goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }

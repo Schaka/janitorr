@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.mediaserver
 
+import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
 import com.github.schaka.janitorr.mediaserver.jellyfin.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType
@@ -7,6 +8,8 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
 
 abstract class MediaServerService {
 
@@ -59,5 +62,54 @@ abstract class MediaServerService {
         val targetFile = targetFolder.resolve(fileOrFolder)
 
         return PathStructure(sourceFolder, sourceFile, targetFolder, targetFile)
+    }
+
+    protected fun createLinks(items: List<LibraryItem>, path: Path, type: LibraryType) {
+        items.forEach {
+            try {
+
+                // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated in Sonarr
+                // Idea: If we did have an item for every episode in a season, this might work
+                // For now, just assume season folders are always activated
+                val structure = pathStructure(it, path)
+
+                if (type == LibraryType.TV_SHOWS && it.season != null && !isMediaFile(structure.sourceFile.toString())) {
+                    // TV Shows
+                    val sourceSeasonFolder = structure.sourceFile
+                    val targetSeasonFolder = structure.targetFile
+                    log.trace("Season folder - Source: {}, Target: {}", sourceSeasonFolder, targetSeasonFolder)
+
+                    if (sourceSeasonFolder.exists()) {
+                        log.trace("Creating season folder {}", targetSeasonFolder)
+                        Files.createDirectories(targetSeasonFolder)
+
+                        val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> isMediaFile(f.toString()) }
+                        for (file in files) {
+                            val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
+
+                            val source = sourceSeasonFolder.resolve(fileName)
+                            val target = targetSeasonFolder.resolve(fileName)
+                            createSymLink(source, target, "episode")
+                        }
+                    } else {
+                        log.info("Can't find original season folder - no links to create {}", sourceSeasonFolder)
+                    }
+                } else if (type == LibraryType.MOVIES) {
+                    // Movies
+                    val source = structure.sourceFile
+                    log.trace("Movie folder - {}", structure)
+
+                    if (source.exists()) {
+                        val target = structure.targetFile
+                        Files.createDirectories(structure.targetFolder)
+                        createSymLink(source, target, "movie")
+                    } else {
+                        log.info("Can't find original movie folder - no links to create {}", source)
+                    }
+                }
+            } catch (e: Exception) {
+                log.error("Couldn't find path {}", it.parentPath)
+            }
+        }
     }
 }

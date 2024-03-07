@@ -121,14 +121,21 @@ class JellyfinRestService(
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
-        var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+        var goneSoonCollection =
+            result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         if (goneSoonCollection == null) {
             Files.createDirectories(path)
             val pathString = path.toUri().path
             // Windows paths may have a trailing trash - Windows Jellyfin can't deal with that, this is a bit hacky but makes development easier
             val pathforJellyfin = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
-            jellyfinClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathforJellyfin))
-            goneSoonCollection = jellyfinClient.listLibraries().firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+            jellyfinClient.createLibrary(
+                "${type.collectionName} (Deleted Soon)",
+                type.collectionType,
+                AddLibraryRequest(),
+                listOf(pathforJellyfin)
+            )
+            goneSoonCollection = jellyfinClient.listLibraries()
+                .firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
@@ -137,55 +144,7 @@ class JellyfinRestService(
             Files.createDirectories(path)
         }
 
-        items.forEach {
-            try {
-
-                // FIXME: Figure out if we're dealing with single episodes in a season when season folders are deactivated in Sonarr
-                // Idea: If we did have an item for every episode in a season, this might work
-                // For now, just assume season folders are always activated
-                val structure = pathStructure(it, path)
-
-                if (type == TV_SHOWS && it.season != null && !isMediaFile(structure.sourceFile.toString())) {
-                    // TV Shows
-                    val sourceSeasonFolder = structure.sourceFile
-                    val targetSeasonFolder = structure.targetFile
-                    log.trace("Season folder - Source: {}, Target: {}", sourceSeasonFolder, targetSeasonFolder)
-
-                    if (sourceSeasonFolder.exists()) {
-                        log.trace("Creating season folder {}", targetSeasonFolder)
-                        Files.createDirectories(targetSeasonFolder)
-
-                        val files = sourceSeasonFolder.listDirectoryEntries().filter { f -> isMediaFile(f.toString()) }
-                        for (file in files) {
-                            val fileName = file.subtract(sourceSeasonFolder).firstOrNull()!!
-
-                            val source = sourceSeasonFolder.resolve(fileName)
-                            val target = targetSeasonFolder.resolve(fileName)
-                            createSymLink(source, target, "episode")
-                        }
-                    } else {
-                        log.info("Can't find original season folder - no links to create {}", sourceSeasonFolder)
-                    }
-                } else if (type == MOVIES) {
-                    // Movies
-                    val source = structure.sourceFile
-                    log.trace("Movie folder - {}", structure)
-
-                    if (source.exists()) {
-                        val target = structure.targetFile
-                        Files.createDirectories(structure.targetFolder)
-                        createSymLink(source, target, "movie")
-                    }
-                    else {
-                        log.info("Can't find original movie folder - no links to create {}", source)
-                    }
-                }
-            } catch (e: Exception) {
-                log.error("Couldn't find path {}", it.parentPath)
-            }
-        }
+        createLinks(items, path, type)
     }
-
-
 
 }

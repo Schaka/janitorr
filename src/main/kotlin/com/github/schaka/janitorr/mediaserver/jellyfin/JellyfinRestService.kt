@@ -120,6 +120,12 @@ class JellyfinRestService(
         // subdirectory (i.e. /leaving-soon/tv
         val path = Path.of(fileSystemProperties.leavingSoonDir, type.folderName)
 
+        // Clean up library - consider also deleting the collection in Jellyfin
+        if (items.isEmpty()) {
+            FileSystemUtils.deleteRecursively(path)
+            return
+        }
+
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var goneSoonCollection = result.firstOrNull { it.CollectionType == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }

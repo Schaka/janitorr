@@ -2,7 +2,10 @@ package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
-import com.github.schaka.janitorr.mediaserver.jellyfin.*
+import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClient
+import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties
+import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
+import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinUserClient
 import com.github.schaka.janitorr.servarr.LibraryItem
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -65,7 +68,7 @@ internal class MediaRestServiceTest {
         val episode = LibraryItem(
             1,
             LocalDateTime.now().minusDays(14),
-            "/data/torrents/tv/tv-show-folder-season 01/movie.mkv",
+            "/data/torrents/tv/tv-show-folder-season 01/ep01.mkv",
             "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
 
             "/data/media/tv/tv-show [imdb-812543]",

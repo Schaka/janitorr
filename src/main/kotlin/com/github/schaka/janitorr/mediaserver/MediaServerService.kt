@@ -1,9 +1,7 @@
 package com.github.schaka.janitorr.mediaserver
 
-import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService
-import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
-import com.github.schaka.janitorr.mediaserver.jellyfin.filesystem.PathStructure
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType
+import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
+import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import java.nio.file.Files

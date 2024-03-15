@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.library
+package com.github.schaka.janitorr.mediaserver.library
 
 data class ExternalUrl(
     val Name: String,

@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.library
+package com.github.schaka.janitorr.mediaserver.library
 
 data class LibraryContent(
         val Audio: String?,
@@ -16,7 +16,6 @@ data class LibraryContent(
         val ExtraType: String?,
         val Genres: List<String>?,
         val Id: String,
-        val ImageBlurHashes: ImageBlurHashes,
         val IndexNumber: Int,
         val IndexNumberEnd: Int,
         val IsFolder: Boolean,
@@ -26,7 +25,7 @@ data class LibraryContent(
         val IsPlaceHolder: Boolean,
         val IsRepeat: Boolean,
         val IsSeries: Boolean,
-        val LocationType: String,
+        val LocationType: String?,
         val LockData: Boolean,
         val MediaType: String?,
         val MovieCount: Int?,

@@ -1,13 +1,13 @@
-package com.github.schaka.janitorr.mediaserver.emby
+package com.github.schaka.janitorr.mediaserver
 
-import com.github.schaka.janitorr.mediaserver.jellyfin.api.User
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.*
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.items.ItemPage
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.items.MediaFolderItem
+import com.github.schaka.janitorr.mediaserver.api.User
+import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
+import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
+import com.github.schaka.janitorr.mediaserver.library.*
 import feign.Param
 import feign.RequestLine
 
-interface EmbyClient {
+interface MediaServerClient {
 
     @RequestLine("GET /Users")
     fun listUsers(): List<User>
@@ -33,10 +33,10 @@ interface EmbyClient {
     @RequestLine("GET /Library/MediaFolders")
     fun getAllItems(): ItemPage<MediaFolderItem>
 
-    @RequestLine("GET /Items?limit=10000&includeItemTypes=Series&parentId={parentId}&fields=Path,ProviderIds")
+    @RequestLine("GET /Items?limit=10000&includeItemTypes=Series&parentId={parentId}&fields=Path,ProviderIds&Recursive=true")
     fun getAllTvShows(@Param("parentId") parentId: String): ItemPage<LibraryContent>
 
-    @RequestLine("GET /Items?limit=10000&includeItemTypes=Movies&parentId={parentId}&fields=Path,ProviderIds")
+    @RequestLine("GET /Items?limit=10000&includeItemTypes=Movie&parentId={parentId}&fields=Path,ProviderIds&Recursive=true")
     fun getAllMovies(@Param("parentId") parentId: String): ItemPage<LibraryContent>
 
 

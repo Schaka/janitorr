@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.library.items
+package com.github.schaka.janitorr.mediaserver.library.items
 
 
 data class ItemPage<T>(

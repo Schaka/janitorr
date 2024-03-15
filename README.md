@@ -26,25 +26,32 @@ logging:
 - Do you have a lot of media that never gets watched?
 - Do your users constantly request media, and let it sit there afterward never to be touched again?
 
-You NEED [Maintainerr for Plex](https://github.com/jorenn92/Maintainerr) or Janitorr for Jellyfin.
+You NEED [Maintainerr for Plex](https://github.com/jorenn92/Maintainerr) or Janitorr for Jellyfin and Emby.
 It's THE solution for cleaning up your server and freeing up space before you run into issues.
 
 ## Features
 - Dry-run mode to investigate changes before committing to any deletion
 - Exclude items from deletion via tags in Sonarr/Radarr
-- Configure expiration times for your media in Jellyfin, Jellyseerr, Radarr, and Sonarr
+- Configure expiration times for your media in Jellyfin, Emby, Jellyseerr, Radarr, and Sonarr
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think "Leaving soon"
 - Unmonitor and delete media from *arr
 - Season by season removal for TV shows
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 
 ### Disclaimer
+- I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
-- Jellyfin requires user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
-- Jellyfin does NOT provide viewing stats like Jellyfin, so we go by file age
-- Jellyfin and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders, metadata, etc
-- To disable Jellyfin/Jellyseerr, you need to entirely delete their client info from the config file or disable them via properties
+- Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
+- Jellyfin does NOT provide viewing stats like Jellyfin, so we go by file age in the *arrs
+- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders, metadata, etc
+- To disable Jellyfin/Emby/Jellyseerr, you need to entirely delete their client info from the config file or disable them via properties
+- Only one of Jellyfin or Emby can be enabled at a time
 - **If file system access isn't given, files currently still seeding may be deleted**
+
+### Note to developers
+I currently have to load pretty much the entire library to manually match media. While both Jellyfin and Emby have some (different) filters for your library's content,
+I found both of them to be pretty wonky at best. Some parameters seemed to do nothing, others weren't marked as required when they were or results were unpredictable when an invalid value was supplied.
+This is also one area where Jellyfin and Emby tend to be quite different. 
 
 ## Setup
 Currently, the code is only published as a docker image to [DockerHub](https://hub.docker.com/repository/docker/schaka/janitorr/general). If you cannot use Docker, you're out of luck for now.

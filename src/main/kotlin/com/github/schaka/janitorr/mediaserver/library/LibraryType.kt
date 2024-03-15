@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.library
+package com.github.schaka.janitorr.mediaserver.library
 
 enum class LibraryType(
         val collectionType: String,

@@ -1,15 +1,13 @@
 package com.github.schaka.janitorr
 
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType.MOVIES
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType.TV_SHOWS
+import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
+import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.Radarr
-import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
-import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime

@@ -1,8 +1,8 @@
 package com.github.schaka.janitorr.mediaserver.emby
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClientConfig
-import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinUserClient
+import com.github.schaka.janitorr.mediaserver.MediaServerClient
+import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import feign.Feign
 import feign.RequestInterceptor
 import feign.RequestTemplate
@@ -19,9 +19,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.converter.FormHttpMessageConverter
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.util.MultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
@@ -36,8 +34,9 @@ class EmbyClientConfig {
 
 
 
+    @Emby
     @Bean
-    fun embyClient(properties: EmbyProperties, mapper: ObjectMapper): EmbyClient {
+    fun embyClient(properties: EmbyProperties, mapper: ObjectMapper): MediaServerClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
@@ -45,16 +44,17 @@ class EmbyClientConfig {
                     it.header("X-Emby-Token", properties.apiKey)
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
-                .target(EmbyClient::class.java, "${properties.url}/emby")
+                .target(MediaServerClient::class.java, "${properties.url}/emby")
     }
 
+    @Emby
     @Bean
-    fun embyUserClient(properties: EmbyProperties, mapper: ObjectMapper): EmbyUserClient {
+    fun embyUserClient(properties: EmbyProperties, mapper: ObjectMapper): MediaServerUserClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
                 .requestInterceptor(EmbyUserInterceptor(properties))
-                .target(EmbyUserClient::class.java, "${properties.url}/emby")
+                .target(MediaServerUserClient::class.java, "${properties.url}/emby")
     }
 
     private class EmbyUserInterceptor(

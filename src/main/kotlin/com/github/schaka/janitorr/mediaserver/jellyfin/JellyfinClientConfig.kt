@@ -1,6 +1,8 @@
 package com.github.schaka.janitorr.mediaserver.jellyfin
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.schaka.janitorr.mediaserver.MediaServerClient
+import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import feign.Feign
 import feign.RequestInterceptor
 import feign.RequestTemplate
@@ -17,7 +19,6 @@ import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
@@ -39,8 +40,9 @@ class JellyfinClientConfig {
             .build()
     }
 
+    @Jellyfin
     @Bean
-    fun jellyfinClient(properties: JellyfinProperties, mapper: ObjectMapper): JellyfinClient {
+    fun jellyfinClient(properties: JellyfinProperties, mapper: ObjectMapper): MediaServerClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
@@ -48,16 +50,17 @@ class JellyfinClientConfig {
                     it.header(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
-                .target(JellyfinClient::class.java, properties.url)
+                .target(MediaServerClient::class.java, properties.url)
     }
 
+    @Jellyfin
     @Bean
-    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): JellyfinUserClient {
+    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): MediaServerUserClient {
         return Feign.builder()
             .decoder(JacksonDecoder(mapper))
             .encoder(JacksonEncoder(mapper))
             .requestInterceptor(JellyfinUserInterceptor(properties))
-            .target(JellyfinUserClient::class.java, properties.url)
+            .target(MediaServerUserClient::class.java, properties.url)
     }
 
     private class JellyfinUserInterceptor(

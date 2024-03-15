@@ -1,9 +1,8 @@
 package com.github.schaka.janitorr.mediaserver
 
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.LibraryType
+import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 

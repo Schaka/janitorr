@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.api
+package com.github.schaka.janitorr.mediaserver.api
 
 data class User(
     val Name: String,

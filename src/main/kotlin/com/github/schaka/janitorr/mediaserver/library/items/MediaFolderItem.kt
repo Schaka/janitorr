@@ -1,6 +1,6 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.library.items
+package com.github.schaka.janitorr.mediaserver.library.items
 
-import com.github.schaka.janitorr.mediaserver.jellyfin.library.ProviderIds
+import com.github.schaka.janitorr.mediaserver.library.ProviderIds
 
 data class MediaFolderItem(
         val ChildCount: Int,
@@ -27,7 +27,7 @@ data class MediaFolderItem(
         val ParentId: String,
         val ParentIndexNumber: Int,
         val PartCount: Int,
-        val Path: String,
+        val Path: String?,
         val ProductionYear: Int,
         val ProgramCount: Int,
         val ProviderIds: ProviderIds,

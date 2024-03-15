@@ -2,10 +2,8 @@ package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.ApplicationProperties
 import com.github.schaka.janitorr.FileSystemProperties
-import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinClient
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
-import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinUserClient
 import com.github.schaka.janitorr.servarr.LibraryItem
 import io.mockk.impl.annotations.InjectMockKs
 import io.mockk.impl.annotations.MockK
@@ -25,9 +23,9 @@ internal class MediaRestServiceTest {
     lateinit var jellyfinRestService: JellyfinRestService
 
     @MockK
-    lateinit var jellyfinClient: JellyfinClient
+    lateinit var mediaServerClient: MediaServerClient
     @MockK
-    lateinit var jellyfinUserClient: JellyfinUserClient
+    lateinit var mediaServerUserClient: MediaServerUserClient
     @MockK
     lateinit var jellyfinProperties: JellyfinProperties
     @MockK

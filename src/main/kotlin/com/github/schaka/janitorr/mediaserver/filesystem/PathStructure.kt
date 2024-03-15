@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.mediaserver.jellyfin.filesystem
+package com.github.schaka.janitorr.mediaserver.filesystem
 
 import java.nio.file.Path
 

@@ -35,7 +35,7 @@ abstract class AbstractMediaServerRestService(
         val parentFolders = mediaServerClient.getAllItems()
 
         val mediaServerShows = parentFolders.Items.flatMap { parent ->
-            mediaServerClient.getAllTvShows(parent.Id).Items.flatMap { show ->
+            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type == "Series" }.flatMap { show ->
                 val seasons = mediaServerClient.getAllSeasons(show.Id).Items
                 seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
                 seasons

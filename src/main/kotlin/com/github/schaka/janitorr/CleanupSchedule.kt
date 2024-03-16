@@ -4,18 +4,23 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.Radarr
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import java.io.File
+import java.time.Duration
 import java.time.LocalDateTime
 
 @Service
 class CleanupSchedule(
         val mediaServerService: MediaServerService,
         val jellyseerrService: JellyseerrService,
+        val fileSystemProperties: FileSystemProperties,
         val applicationProperties: ApplicationProperties,
         @Sonarr
         val sonarrService: ServarrService,
@@ -23,28 +28,56 @@ class CleanupSchedule(
         val radarrService: ServarrService,
 ) {
 
+    companion object {
+        private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+    }
+
     // run every hour
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedule() {
 
+        val seasonExpiration = determineDeletion(applicationProperties.seasonExpiration)
+        val movieExpiration = determineDeletion(applicationProperties.movieExpiration)
+
+        cleanupMediaType(TV_SHOWS, sonarrService, seasonExpiration, this::deleteTvShows)
+        cleanupMediaType(MOVIES, radarrService, movieExpiration, this::deleteMovies)
+    }
+
+    /**
+     * Convert to full days and do some math.
+     * This should probably work just letting the user set the duration entirely. But I think forcing full days will avoid some user errors.
+     */
+    private fun cleanupMediaType(type: LibraryType, servarrService: ServarrService, expiration: Duration?, deleteTask: (list: List<LibraryItem>) -> Unit) {
+
+        if (expiration == null) {
+            log.info("Not deleting ${type.collectionName} because minimum disk threshold was not reached.")
+            return
+        }
+
         val today = LocalDateTime.now()
-        val seasonExpiration = applicationProperties.seasonExpiration.toDays()
-        val movieExpiration = applicationProperties.movieExpiration.toDays()
         val leavingSoonExpiration = applicationProperties.leavingSoon.toDays()
+        val expirationDays = expiration.toDays()
 
-        val sonarrShows = sonarrService.getEntries()
-        val leavingShows = sonarrShows.filter { it.date.plusDays(seasonExpiration - leavingSoonExpiration) < today && it.date.plusDays(seasonExpiration) >= today }
-        mediaServerService.updateGoneSoon(TV_SHOWS, leavingShows)
+        val servarrEntries = servarrService.getEntries()
+        val leavingSoon = servarrEntries.filter { it.date.plusDays(expirationDays - leavingSoonExpiration) < today && it.date.plusDays(expirationDays) >= today }
+        mediaServerService.updateGoneSoon(type, leavingSoon)
 
-        val toDeleteShows = sonarrShows.filter { it.date.plusDays(seasonExpiration) < today }
-        deleteTvShows(toDeleteShows)
+        val toDeleteMedia = servarrEntries.filter { it.date.plusDays(expirationDays) < today }
+        deleteTask(toDeleteMedia)
+    }
 
-        val radarrMovies = radarrService.getEntries()
-        val leavingSoonMovies = radarrMovies.filter { it.date.plusDays(movieExpiration - leavingSoonExpiration) < today && it.date.plusDays(movieExpiration) >= today }
-        mediaServerService.updateGoneSoon(MOVIES, leavingSoonMovies)
+    private fun determineDeletion(deletionConditions: Map<Int, Duration>): Duration? {
 
-        val toDeleteMovies = radarrMovies.filter { it.date.plusDays(movieExpiration) < today }
-        deleteMovies(toDeleteMovies)
+        // If we don't have access to the same file system as the library, we can't determine the actual space left and will just choose the longest expiration time available
+        if (!fileSystemProperties.access) {
+            return deletionConditions.entries.maxByOrNull { it.value.toDays() }?.value
+        }
+
+        val filesystem = File("/")
+        val freeSpacePercentage = (filesystem.freeSpace.toDouble() / filesystem.totalSpace.toDouble()) * 100
+
+        val entry = deletionConditions.entries.filter { freeSpacePercentage < it.key }.minByOrNull { it.key }
+        return entry?.value
     }
 
     private fun deleteMovies(toDeleteMovies: List<LibraryItem>) {
@@ -68,4 +101,5 @@ class CleanupSchedule(
         mediaServerService.cleanupTvShows(deletedShows)
         mediaServerService.updateGoneSoon(TV_SHOWS, cannotDeleteShow, true)
     }
+
 }

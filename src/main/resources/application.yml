@@ -12,8 +12,18 @@ file-system:
 application:
   dry-run: true
   leaving-soon: 14d # 14 days before a movie is deleted, it gets added to a "Leaving Soon" type collection (i.e. movies that are 76 to 89 days old)
-  movie-expiration: 90d # 3 months - if a movie's files on your system are older than this, they will be deleted
-  season-expiration: 60d # 2 months - if a season's files on your system are older than this, they will be deleted
+  movie-expiration:
+    # Percentage of free disk space to expiration time - if the highest given number is not reached, nothing will be deleted
+    # If filesystem access is not given, disk percentage can't be determined. As a result, Janitorr will always choose the largest expiration time.
+    5: 15d # 15 days
+    10: 30d # 1 month - if a movie's files on your system are older than this, they will be deleted
+    15: 30d # 2 months
+    20: 90d # 3 months
+  season-expiration:
+    5: 15d # 15 days
+    10: 20d # 20 days - if a season's files on your system are older than this, they will be deleted
+    15: 60d # 2 months
+    20: 120d # 4 months
   exclusion-tag: "janitorr_keep" # Set this tag to your movies or TV shows in the *arrs to exclude media from being cleaned up
 
 clients:
@@ -25,14 +35,14 @@ clients:
     enabled: true
     url: "http://localhost:7878"
     api-key: "cd0912f129d348c9b69bb20d49fcbe44"
-  ## You can only choose one out of Jellyfin or Emby. Emby is not yet fully supported
+  ## You can only choose one out of Jellyfin or Emby.
   jellyfin:
     enabled: true
     url: "http://localhost:8096"
     api-key: "4da8d93992804489ba2d1f0e31b8316c"
     username: Janitorr
     password: janitorr
-  ## You can only choose one out of Jellyfin or Emby. Emby is not yet fully supported
+  ## You can only choose one out of Jellyfin or Emby. Emby support is secondary.
   emby:
     enabled: false
     url: "http://localhost:8096"

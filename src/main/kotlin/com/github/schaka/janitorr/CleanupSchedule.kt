@@ -51,6 +51,9 @@ class CleanupSchedule(
 
         if (expiration == null) {
             log.info("Not deleting ${type.collectionName} because minimum disk threshold was not reached.")
+            if (fileSystemProperties.access) {
+                log.info("Free disk space: ${getFreeSpacePercentage()}%")
+            }
             return
         }
 
@@ -73,11 +76,15 @@ class CleanupSchedule(
             return deletionConditions.entries.maxByOrNull { it.value.toDays() }?.value
         }
 
-        val filesystem = File("/")
-        val freeSpacePercentage = (filesystem.freeSpace.toDouble() / filesystem.totalSpace.toDouble()) * 100
+        val freeSpacePercentage = getFreeSpacePercentage()
 
         val entry = deletionConditions.entries.filter { freeSpacePercentage < it.key }.minByOrNull { it.key }
         return entry?.value
+    }
+
+    private fun getFreeSpacePercentage(): Double {
+        val filesystem = File("/")
+        return (filesystem.freeSpace.toDouble() / filesystem.totalSpace.toDouble()) * 100
     }
 
     private fun deleteMovies(toDeleteMovies: List<LibraryItem>) {

@@ -7,3 +7,29 @@ spring:
   threads:
     virtual:
       enabled: true
+
+clients:
+  sonarr:
+    enabled: true
+    url: "http://sonarr:8989"
+    api-key: "sonarr-key"
+  radarr:
+    enabled: true
+    url: "http://htpc.local:7878"
+    api-key: "radarr-key"
+  jellyfin:
+    enabled: true
+    url: "http://jellyfin:8096"
+    api-key: "jellyfin-key"
+    username: "janitorr"
+    password: "janitorr"
+  emby:
+    enabled: false
+    url: "http://emby:8096"
+    api-key: "emby-key"
+    username: "janitorr"
+    password: "janitorr"
+  jellyseerr:
+    enabled: true
+    url: "http://jellyseerr:5055"
+    api-key: "jellyseerr-key"

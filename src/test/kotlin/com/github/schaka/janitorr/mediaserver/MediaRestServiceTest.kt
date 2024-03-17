@@ -1,7 +1,7 @@
 package com.github.schaka.janitorr.mediaserver
 
-import com.github.schaka.janitorr.ApplicationProperties
-import com.github.schaka.janitorr.FileSystemProperties
+import com.github.schaka.janitorr.config.ApplicationProperties
+import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -24,10 +24,13 @@ internal class MediaRestServiceTest {
 
     @MockK
     lateinit var mediaServerClient: MediaServerClient
+
     @MockK
     lateinit var mediaServerUserClient: MediaServerUserClient
+
     @MockK
     lateinit var jellyfinProperties: JellyfinProperties
+
     @MockK
     lateinit var applicationProperties: ApplicationProperties
 
@@ -38,16 +41,16 @@ internal class MediaRestServiceTest {
     fun testMovieStructure() {
 
         val movie = LibraryItem(
-            1,
-            LocalDateTime.now().minusDays(14),
-            "/data/torrents/movies/movie-folder/movie.mkv",
-            "/data/media/movies/movie [imdb-812543]/movie.mkv",
+                1,
+                LocalDateTime.now().minusDays(14),
+                "/data/torrents/movies/movie-folder/movie.mkv",
+                "/data/media/movies/movie [imdb-812543]/movie.mkv",
 
-            "/data/media/movies/movie [imdb-812543]",
-            "/data/media/movies",
-            "/data/media/movies/movie [imdb-812543]/movie.mkv",
+                "/data/media/movies/movie [imdb-812543]",
+                "/data/media/movies",
+                "/data/media/movies/movie [imdb-812543]/movie.mkv",
 
-            "812543"
+                "812543"
 
         )
 
@@ -64,16 +67,16 @@ internal class MediaRestServiceTest {
     fun testTvStructure() {
 
         val episode = LibraryItem(
-            1,
-            LocalDateTime.now().minusDays(14),
-            "/data/torrents/tv/tv-show-folder-season 01/ep01.mkv",
-            "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
+                1,
+                LocalDateTime.now().minusDays(14),
+                "/data/torrents/tv/tv-show-folder-season 01/ep01.mkv",
+                "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
 
-            "/data/media/tv/tv-show [imdb-812543]",
-            "/data/media/tv",
-            "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
+                "/data/media/tv/tv-show [imdb-812543]",
+                "/data/media/tv",
+                "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
 
-            "812543"
+                "812543"
 
         )
 
@@ -89,7 +92,7 @@ internal class MediaRestServiceTest {
     @Test
     fun testMetadataParsing() {
         assertEquals(4513, jellyfinRestService.parseMetadataId("4513-30-days-of-night"))
-        assertEquals(4513, jellyfinRestService.parseMetadataId( "4513"))
+        assertEquals(4513, jellyfinRestService.parseMetadataId("4513"))
         assertNull(jellyfinRestService.parseMetadataId(null))
     }
 

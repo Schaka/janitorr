@@ -1,18 +1,23 @@
 # Janitorr - Cleans up your media library
 
 ### Inspiration
+
 This application is heavily inspired by [Maintainerr](https://github.com/jorenn92/Maintainerr).
-If you're within the Plex ecosystem, want an easy to use GUI and more sophisticated functionality, you're better off using it instead.
+If you're within the Plex ecosystem, want an easy to use GUI and more sophisticated functionality, you're better off
+using it instead.
 
 ### Warning
+
 Please use at your own risk It's still undergoing testing.
 You may enable dry-run mode. This is enabled in the config template by default.
 Unless you disable dry-run mode, nothing will be deleted.
 
-You may check the container logs for Janitorr to observe what the application would do, were you to turn off dry-run mode.
+You may check the container logs for Janitorr to observe what the application would do, were you to turn off dry-run
+mode.
 If you don't manage your container via a GUI like portainer, try `docker logs janitorr`
 
 To enable debug logging, add the following lines at the top of your `application.yml`:
+
 ```yml
 logging:
   level:
@@ -20,6 +25,7 @@ logging:
 ```
 
 ### Introduction
+
 **Janitorr** manages your media and cleans up after you.
 
 - Do you hate being the janitor of your server?
@@ -30,51 +36,72 @@ You NEED [Maintainerr for Plex](https://github.com/jorenn92/Maintainerr) or Jani
 It's THE solution for cleaning up your server and freeing up space before you run into issues.
 
 ## Features
+
 - Dry-run mode to investigate changes before committing to any deletion
 - Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in Jellyfin, Emby, Jellyseerr, Radarr, and Sonarr
-- Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think "Leaving soon"
+- Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion.
+  Think "Leaving soon"
 - Unmonitor and delete media from *arr
 - Season by season removal for TV shows
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 
 ### Disclaimer
+
 - I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
-- Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
+- Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user
+  specifically for this task
 - Jellyfin does NOT provide viewing stats like Jellyfin, so we go by file age in the *arrs
-- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders, metadata, etc
-- To disable Jellyfin/Emby/Jellyseerr, you need to entirely delete their client info from the config file or disable them via properties
+- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,
+  metadata, etc
+- To disable Jellyfin/Emby/Jellyseerr, you need to entirely delete their client info from the config file or disable
+  them via properties
 - Only one of Jellyfin or Emby can be enabled at a time
 - **If file system access isn't given, files currently still seeding may be deleted**
 
 ### Note to developers
-I currently have to load pretty much the entire library to manually match media. While both Jellyfin and Emby have some (different) filters for your library's content,
-I found both of them to be pretty wonky at best. Some parameters seemed to do nothing, others weren't marked as required when they were or results were unpredictable when an invalid value was supplied.
-This is also one area where Jellyfin and Emby tend to be quite different. 
+
+I currently have to load pretty much the entire library to manually match media. While both Jellyfin and Emby have
+some (different) filters for your library's content,
+I found both of them to be pretty wonky at best. Some parameters seemed to do nothing, others weren't marked as required
+when they were or results were unpredictable when an invalid value was supplied.
+This is also one area where Jellyfin and Emby tend to be quite different.
 
 ## Setup
-Currently, the code is only published as a docker image to [DockerHub](https://hub.docker.com/repository/docker/schaka/janitorr/general). If you cannot use Docker, you're out of luck for now.
 
-Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab history in the *arr apps.
-By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will consider the most recent download when calculating its age.
-To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag Janitorr looks for can be adjusted in your config file.
+Currently, the code is only published as a docker image
+to [DockerHub](https://hub.docker.com/repository/docker/schaka/janitorr/general). If you cannot use Docker, you're out
+of luck for now.
+
+Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
+history in the *arr apps.
+By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will
+consider the most recent download when calculating its age.
+To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
+Janitorr looks for can be adjusted in your config file.
 
 ### Setting up Docker
+
 - map /config from within the container to a host folder of your choice
-- within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application.yml) from this repository
+- within that host folder, put a copy
+  of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from
+  this repository
 - adjust said copy with your own info like *arr, jellyfin and jellyseerr API keys and your preferred port
-- you do NOT need to fill in a torrent client YET 
+- you do NOT need to fill in a torrent client YET
 
 If using Jellyfin with filesystem access, ensure that Janitorr has access to the exact directory structure as Jellyfin.
 If Jellyfin finds its TV shows under `/data/media/tv` Janitorr needs the exact same mapping for its Docker container.
 
 ### Docker config
-Before using this, please make sure you've created the `application.yml` file and put it in the correct config directory you intend to map.
+
+Before using this, please make sure you've created the `application.yml` file and put it in the correct config directory
+you intend to map.
 The application requires it. You need to supply it, or Janitorr will not start correctly.
 You don't have to publish ANY ports on the host machine.
 
 An example of a `docker-compose.yml` may look like this:
+
 ```yml
 version: '3'
 

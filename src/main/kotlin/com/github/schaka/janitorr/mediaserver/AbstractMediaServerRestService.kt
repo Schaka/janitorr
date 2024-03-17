@@ -1,7 +1,7 @@
 package com.github.schaka.janitorr.mediaserver
 
-import com.github.schaka.janitorr.ApplicationProperties
-import com.github.schaka.janitorr.FileSystemProperties
+import com.github.schaka.janitorr.config.ApplicationProperties
+import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.library.AddLibraryRequest
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -44,14 +44,18 @@ abstract class AbstractMediaServerRestService(
 
         for (show: LibraryItem in items) {
             mediaServerShows.firstOrNull { tvShowMatches(show, it) }
-                ?.let { mediaServerContent ->
-                    if (!applicationProperties.dryRun) {
-                        mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
-                        log.info("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
-                    } else {
-                        log.info("Found {} {} on $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
+                    ?.let { mediaServerContent ->
+                        if (!applicationProperties.dryRun) {
+                            try {
+                                mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
+                                log.info("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
+                            } catch (e: Exception) {
+                                log.error("Deleting from $serviceName failed", e)
+                            }
+                        } else {
+                            log.info("Found {} {} on $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
+                        }
                     }
-                }
         }
 
         // TODO: Remove TV shows if all seasons gone
@@ -66,14 +70,18 @@ abstract class AbstractMediaServerRestService(
 
         for (movie: LibraryItem in items) {
             mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
-                ?.let { mediaServerContent ->
-                    if (!applicationProperties.dryRun) {
-                        mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
-                        log.info("Deleting {} from $serviceName", mediaServerContent.Name)
-                    } else {
-                        log.info("Found {} on $serviceName", mediaServerContent.Name)
+                    ?.let { mediaServerContent ->
+                        if (!applicationProperties.dryRun) {
+                            try {
+                                mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
+                                log.info("Deleting {} from $serviceName", mediaServerContent.Name)
+                            } catch (e: Exception) {
+                                log.error("Deleting from $serviceName failed", e)
+                            }
+                        } else {
+                            log.info("Found {} on $serviceName", mediaServerContent.Name)
+                        }
                     }
-                }
         }
     }
 

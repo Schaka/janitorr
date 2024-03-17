@@ -1,17 +1,16 @@
 package com.github.schaka.janitorr.servarr.sonarr
 
-import com.github.schaka.janitorr.ApplicationProperties
-import com.github.schaka.janitorr.FileSystemProperties
+import com.github.schaka.janitorr.config.ApplicationProperties
+import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.radarr.RadarrService
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
@@ -35,6 +34,7 @@ class SonarrService(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+        const val CACHE_NAME = "sonarr-cache"
     }
 
     @PostConstruct
@@ -43,31 +43,35 @@ class SonarrService(
         keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }
 
+    @Cacheable(CACHE_NAME)
     override fun getEntries(): List<LibraryItem> {
+        val allTags = sonarrClient.getAllTags()
+
         val history = sonarrClient.getAllSeries()
                 .filter { !it.tags.contains(keepTag.id) }
                 .flatMap { series ->
                     series.seasons.map { season ->
-                    sonarrClient.getHistory(series.id, season.seasonNumber)
-                        .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
-                        .map {
-                            LibraryItem(
-                                    series.id,
-                                    LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
-                                    it.data.droppedPath!!,
-                                    it.data.importedPath!!,
-                                    series.path,
-                                    series.rootFolderPath,
-                                    it.data.importedPath, //points to the file
-                                    season = season.seasonNumber,
-                                    tvdbId = series.tvdbId,
-                                    imdbId = series.imdbId
-                            )
-                        }
-                        .sortedWith(byDate(upgradesAllowed))
-                        .firstOrNull()
-            }
-        }.filterNotNull()
+                        sonarrClient.getHistory(series.id, season.seasonNumber)
+                                .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
+                                .map {
+                                    LibraryItem(
+                                            series.id,
+                                            LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
+                                            it.data.droppedPath!!,
+                                            it.data.importedPath!!,
+                                            series.path,
+                                            series.rootFolderPath,
+                                            it.data.importedPath, //points to the file
+                                            season = season.seasonNumber,
+                                            tvdbId = series.tvdbId,
+                                            imdbId = series.imdbId,
+                                            tags = allTags.filter { tag -> series.tags.contains(tag.id) }.map { tag -> tag.label }
+                                    )
+                                }
+                                .sortedWith(byDate(upgradesAllowed))
+                                .firstOrNull()
+                    }
+                }.filterNotNull()
 
         // history may be outdated, we need to find the current path, as it currently stands in the library
         return history.map {

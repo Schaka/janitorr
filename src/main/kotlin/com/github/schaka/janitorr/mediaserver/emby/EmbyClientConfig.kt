@@ -33,7 +33,6 @@ class EmbyClientConfig {
     }
 
 
-
     @Emby
     @Bean
     fun embyClient(properties: EmbyProperties, mapper: ObjectMapper): MediaServerClient {

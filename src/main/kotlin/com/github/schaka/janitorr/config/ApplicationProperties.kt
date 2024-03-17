@@ -1,6 +1,7 @@
-package com.github.schaka.janitorr
+package com.github.schaka.janitorr.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.NestedConfigurationProperty
 import org.springframework.stereotype.Component
 import java.time.Duration
 
@@ -9,13 +10,9 @@ import java.time.Duration
 data class ApplicationProperties(
         var dryRun: Boolean = false,
         var leavingSoon: Duration = Duration.ofDays(14),
-        var movieExpiration: Map<Int, Duration> = mapOf(
-                10 to Duration.ofDays(90),
-                20 to Duration.ofDays(120)
-                ),
-        var seasonExpiration: Map<Int, Duration> = mapOf(
-                10 to Duration.ofDays(90),
-                20 to Duration.ofDays(120)
-        ),
+        @NestedConfigurationProperty
+        var mediaDeletion: MediaDeletion,
+        @NestedConfigurationProperty
+        var tagBasedDeletion: TagDeletion,
         var exclusionTag: String = "janitorr_keep"
 )

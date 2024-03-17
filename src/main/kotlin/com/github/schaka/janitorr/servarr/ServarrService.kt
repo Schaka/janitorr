@@ -10,7 +10,7 @@ interface ServarrService {
      * Sort by oldest file. If upgrades are allowed, sort by most recently grabbed files.
      */
     fun byDate(upgradesAllowed: Boolean): Comparator<LibraryItem> {
-        val comp = compareBy<LibraryItem>{ it.date }
+        val comp = compareBy<LibraryItem> { it.date }
         return if (upgradesAllowed) comp.reversed() else comp
     }
 }

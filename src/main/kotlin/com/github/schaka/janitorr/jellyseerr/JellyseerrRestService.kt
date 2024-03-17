@@ -1,6 +1,6 @@
 package com.github.schaka.janitorr.jellyseerr
 
-import com.github.schaka.janitorr.ApplicationProperties
+import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory

@@ -13,6 +13,7 @@ abstract class MediaServerService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+
         @JvmStatic
         protected val seasonPattern = Regex("Season (?<season>\\d+)")
         private val filePattern = Regex("^.*\\.(mkv|mp4|avi|webm|mts|m2ts|ts|wmv|mpg|mpeg|mp2|m2v|m4v)\$")

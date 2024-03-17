@@ -1,10 +1,8 @@
 package com.github.schaka.janitorr.servarr
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.schaka.janitorr.servarr.radarr.Radarr
 import com.github.schaka.janitorr.servarr.radarr.RadarrClient
 import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
-import com.github.schaka.janitorr.servarr.sonarr.Sonarr
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import feign.Feign
@@ -12,14 +10,10 @@ import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
-import org.springframework.http.MediaType
-import org.springframework.http.MediaType.*
-import org.springframework.web.client.RestTemplate
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 
 @Configuration
 class ServarrClientConfig {

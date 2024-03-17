@@ -14,9 +14,9 @@ import org.gradle.kotlin.dsl.getByType
  */
 fun Project.collectSubprojectsReportFiles(include: String): String {
     return subprojects
-        .joinToString(",") { subproject: Project ->
-            subproject.collectReportFiles(include)
-        }
+            .joinToString(",") { subproject: Project ->
+                subproject.collectReportFiles(include)
+            }
 }
 
 /**
@@ -26,10 +26,10 @@ fun Project.collectSubprojectsReportFiles(include: String): String {
  */
 fun Project.collectSubprojectsSourceDirectories(sourceSetName: String): String {
     return subprojects
-        .map { it.extensions.getByName("sourceSets") as SourceSetContainer }
-        .map { it.getByName(sourceSetName) }
-        .flatMap { it.java.srcDirs }
-        .joinToString(",")
+            .map { it.extensions.getByName("sourceSets") as SourceSetContainer }
+            .map { it.getByName(sourceSetName) }
+            .flatMap { it.java.srcDirs }
+            .joinToString(",")
 }
 
 /**
@@ -44,8 +44,8 @@ fun Project.collectReportFiles(include: String): String {
     }
 
     return fileTree
-        .files
-        .joinToString(",")
+            .files
+            .joinToString(",")
 }
 
 /**
@@ -53,9 +53,9 @@ fun Project.collectReportFiles(include: String): String {
  */
 fun Project.subprojectTasks(taskName: String): List<TaskProvider<DefaultTask>> {
     return subprojects
-        .map { subproject: Project ->
-            subproject.tasks.named(taskName, org.gradle.api.DefaultTask::class.java)
-        }
+            .map { subproject: Project ->
+                subproject.tasks.named(taskName, org.gradle.api.DefaultTask::class.java)
+            }
 }
 
 /**

@@ -1,9 +1,9 @@
 package com.github.schaka.janitorr.servarr.radarr
 
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import feign.Param
 import feign.RequestLine
 

@@ -20,5 +20,6 @@ data class LibraryItem(
         val season: Int? = null,
 
         var seeding: Boolean = false,
+        val tags: List<String> = listOf()
 
-        )
+)

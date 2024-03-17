@@ -1,16 +1,15 @@
 package com.github.schaka.janitorr.servarr.radarr
 
-import com.github.schaka.janitorr.ApplicationProperties
-import com.github.schaka.janitorr.FileSystemProperties
+import com.github.schaka.janitorr.config.ApplicationProperties
+import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.sonarr.SonarrService
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
@@ -34,6 +33,8 @@ class RadarrService(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+
+        const val CACHE_NAME = "radarr-cache"
     }
 
     @PostConstruct
@@ -42,28 +43,32 @@ class RadarrService(
         keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }
 
+    @Cacheable(CACHE_NAME)
     override fun getEntries(): List<LibraryItem> {
+        val allTags = radarrClient.getAllTags()
+
         return radarrClient.getAllMovies()
                 .filter { !it.tags.contains(keepTag.id) }
                 .mapNotNull { movie ->
                     radarrClient.getHistory(movie.id)
-                    .filter { movie.movieFile != null && it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
-                    .map {
-                        LibraryItem(
-                                movie.id,
-                                LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
-                                it.data.droppedPath!!,
-                                it.data.importedPath!!,
-                                movie.path,
-                                movie.rootFolderPath!!,
-                                movie.movieFile!!.path,
-                                tmdbId = movie.tmdbId,
-                                imdbId = movie.imdbId
-                        )
-                    }
-                    .sortedWith ( byDate(upgradesAllowed) )
-                    .firstOrNull()
-        }
+                            .filter { movie.movieFile != null && it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
+                            .map {
+                                LibraryItem(
+                                        movie.id,
+                                        LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
+                                        it.data.droppedPath!!,
+                                        it.data.importedPath!!,
+                                        movie.path,
+                                        movie.rootFolderPath!!,
+                                        movie.movieFile!!.path,
+                                        tmdbId = movie.tmdbId,
+                                        imdbId = movie.imdbId,
+                                        tags = allTags.filter { tag -> movie.tags.contains(tag.id) }.map { tag -> tag.label }
+                                )
+                            }
+                            .sortedWith(byDate(upgradesAllowed))
+                            .firstOrNull()
+                }
     }
 
     override fun removeEntries(items: List<LibraryItem>) {

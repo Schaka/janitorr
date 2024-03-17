@@ -1,9 +1,9 @@
 package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.mediaserver.api.User
+import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
 import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
-import com.github.schaka.janitorr.mediaserver.library.*
 import feign.Param
 import feign.RequestLine
 

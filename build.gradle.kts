@@ -1,13 +1,13 @@
 import com.google.cloud.tools.jib.api.buildplan.ImageFormat
+import net.nemerosa.versioning.VersioningExtension
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import net.nemerosa.versioning.VersioningExtension
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.2.1"
+    id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.4"
     id("com.google.cloud.tools.jib") version "3.4.0"
     id("net.nemerosa.versioning") version "2.8.2"
@@ -24,6 +24,8 @@ repositories {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
@@ -146,15 +148,15 @@ jib {
         volumes = listOf("/config")
 
         labels.set(
-            mapOf(
-                "org.opencontainers.image.created" to "${project.extra["build.date"]}T${project.extra["build.time"]}",
-                "org.opencontainers.image.revision" to project.extra["build.revision"] as String,
-                "org.opencontainers.image.version" to project.version as String,
-                "org.opencontainers.image.title" to project.name,
-                "org.opencontainers.image.authors" to "Schaka <schaka@github.com>",
-                "org.opencontainers.image.source" to project.extra["docker.image.source"] as String,
-                "org.opencontainers.image.description" to project.description,
-            )
+                mapOf(
+                        "org.opencontainers.image.created" to "${project.extra["build.date"]}T${project.extra["build.time"]}",
+                        "org.opencontainers.image.revision" to project.extra["build.revision"] as String,
+                        "org.opencontainers.image.version" to project.version as String,
+                        "org.opencontainers.image.title" to project.name,
+                        "org.opencontainers.image.authors" to "Schaka <schaka@github.com>",
+                        "org.opencontainers.image.source" to project.extra["docker.image.source"] as String,
+                        "org.opencontainers.image.description" to project.description,
+                )
         )
 
 

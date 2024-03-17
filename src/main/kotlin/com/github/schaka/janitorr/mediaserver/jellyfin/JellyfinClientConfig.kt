@@ -35,9 +35,9 @@ class JellyfinClientConfig {
     @Bean
     fun jellyfinRestTemplate(builder: RestTemplateBuilder, properties: JellyfinProperties): RestTemplate {
         return builder
-            .rootUri("${properties.url}/")
-            .defaultHeader(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
-            .build()
+                .rootUri("${properties.url}/")
+                .defaultHeader(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
+                .build()
     }
 
     @Jellyfin
@@ -57,14 +57,14 @@ class JellyfinClientConfig {
     @Bean
     fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): MediaServerUserClient {
         return Feign.builder()
-            .decoder(JacksonDecoder(mapper))
-            .encoder(JacksonEncoder(mapper))
-            .requestInterceptor(JellyfinUserInterceptor(properties))
-            .target(MediaServerUserClient::class.java, properties.url)
+                .decoder(JacksonDecoder(mapper))
+                .encoder(JacksonEncoder(mapper))
+                .requestInterceptor(JellyfinUserInterceptor(properties))
+                .target(MediaServerUserClient::class.java, properties.url)
     }
 
     private class JellyfinUserInterceptor(
-        val properties: JellyfinProperties
+            val properties: JellyfinProperties
     ) : RequestInterceptor {
 
         var lastUpdate: LocalDateTime = LocalDateTime.MIN

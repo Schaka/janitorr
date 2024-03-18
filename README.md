@@ -8,13 +8,16 @@ using it instead.
 
 ### Warning
 
-Please use at your own risk It's still undergoing testing.
+Please use at your own risk.
 You may enable dry-run mode. This is enabled in the config template by default.
 Unless you disable dry-run mode, nothing will be deleted.
 
 You may check the container logs for Janitorr to observe what the application would do, were you to turn off dry-run
 mode.
-If you don't manage your container via a GUI like portainer, try `docker logs janitorr`
+If you don't manage your container via a GUI like portainer, try `docker logs janitorr`.
+
+If you still don't trust Janitorr, you may enable Recycle Bin in the *arrs and disable Jellyfin/Emby.
+This way, no deletes will be triggered on Jellyfin and everthing triggered in the *arrs will only go to the Recycle Bin.
 
 To enable debug logging, add the following lines at the top of your `application.yml`:
 
@@ -38,6 +41,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 ## Features
 
 - Dry-run mode to investigate changes before committing to any deletion
+- Remote deletion, disk space aware deletion as well as tag based delete schedules supported
 - Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in Jellyfin, Emby, Jellyseerr, Radarr, and Sonarr
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion.
@@ -48,21 +52,19 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ### Disclaimer
 
-- I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports
+- **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user
   specifically for this task
-- Jellyfin does NOT provide viewing stats like Jellyfin, so we go by file age in the *arrs
+- Jellyfin does NOT provide viewing stats like Plex, so we go by file age in the *arrs - Jellystat integration is planned
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,
   metadata, etc
-- To disable Jellyfin/Emby/Jellyseerr, you need to entirely delete their client info from the config file or disable
-  them via properties
 - Only one of Jellyfin or Emby can be enabled at a time
 - **If file system access isn't given, files currently still seeding may be deleted**
 
 ### Note to developers
 
-I currently have to load pretty much the entire library to manually match media. While both Jellyfin and Emby have
+I currently have to load pretty much the entire library in one REST call to manually match media. While both Jellyfin and Emby have
 some (different) filters for your library's content,
 I found both of them to be pretty wonky at best. Some parameters seemed to do nothing, others weren't marked as required
 when they were or results were unpredictable when an invalid value was supplied.
@@ -75,9 +77,9 @@ to [DockerHub](https://hub.docker.com/repository/docker/schaka/janitorr/general)
 of luck for now.
 
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
-history in the *arr apps.
-By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will
+history in the *arr apps. By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will
 consider the most recent download when calculating its age.
+
 To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
 Janitorr looks for can be adjusted in your config file.
 
@@ -87,11 +89,17 @@ Janitorr looks for can be adjusted in your config file.
 - within that host folder, put a copy
   of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from
   this repository
-- adjust said copy with your own info like *arr, jellyfin and jellyseerr API keys and your preferred port
-- you do NOT need to fill in a torrent client YET
+- adjust said copy with your own info like *arr, Jellyfin and Jellyseerr API keys and your preferred port
 
-If using Jellyfin with filesystem access, ensure that Janitorr has access to the exact directory structure as Jellyfin.
-If Jellyfin finds its TV shows under `/data/media/tv` Janitorr needs the exact same mapping for its Docker container.
+If using Jellyfin with filesystem access, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
+Additionally, make sure the *arrs directories are mapped the same way Janitorr into Janitorr as well.
+
+Janitorr creates symlinks from whatever directory it receives from the arrs' API into the leaving-soon-dir.
+If Radarr finds movies at `/data/media/movies` Janitorr needs to find them at `/data/media/movies` too. 
+You need to ensure links can be created from the source (what's available in the arrs) to the destination (leaving-soon).
+Since Janitorr creates the "Leaving Soon" collection for you with the path given in the config file, it needs to be accessible by Jellyfin.
+If Janitorr thinks the directory can be found at `/somedir/leaving-soon`, Jellyfin needs to find it at `/somedir/leaving-soon` too.
+
 
 ### Docker config
 

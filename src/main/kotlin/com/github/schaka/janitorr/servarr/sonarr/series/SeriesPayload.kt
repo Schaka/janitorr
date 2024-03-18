@@ -19,7 +19,7 @@ data class SeriesPayload(
         val monitored: Boolean,
         val network: String?,
         val nextAiring: String?,
-        val originalLanguage: OriginalLanguage,
+        val originalLanguage: OriginalLanguage?,
         val overview: String,
         val path: String,
         val previousAiring: String?,

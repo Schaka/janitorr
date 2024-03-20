@@ -36,5 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 
+### MacOS crap ###
+.DS_Store
+**/.DS_Store
+
 # Local
 application-local.yml

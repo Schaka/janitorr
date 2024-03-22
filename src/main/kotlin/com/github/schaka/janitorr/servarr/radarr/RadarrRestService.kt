@@ -5,25 +5,29 @@ import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
+import com.github.schaka.janitorr.servarr.history.HistoryResponse
+import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
-@Radarr
+@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, HistoryResponse::class])
 @Service
-@ConditionalOnProperty("clients.radarr.enabled", havingValue = "true", matchIfMissing = true)
-class RadarrService(
+class RadarrRestService(
 
         val radarrClient: RadarrClient,
 
         val applicationProperties: ApplicationProperties,
 
         val fileSystemProperties: FileSystemProperties,
+
+        val radarrProperties: RadarrProperties,
 
         var upgradesAllowed: Boolean = false,
 
@@ -38,7 +42,11 @@ class RadarrService(
     }
 
     @PostConstruct
-    fun postConstruct() {
+    override fun postConstruct() {
+        if (!radarrProperties.enabled) {
+            return
+        }
+
         upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
         keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }

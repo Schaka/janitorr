@@ -11,17 +11,15 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.Radarr
-import com.github.schaka.janitorr.servarr.radarr.RadarrService
+import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
-import com.github.schaka.janitorr.servarr.sonarr.SonarrService
+import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-@ConditionalOnProperty("application.tag-based-deletion.enabled", havingValue = "true")
 class TagBasedCleanupSchedule(
         mediaServerService: MediaServerService,
         jellyseerrService: JellyseerrService,
@@ -38,9 +36,14 @@ class TagBasedCleanupSchedule(
     }
 
     // run every hour
-    @CacheEvict(cacheNames = [SonarrService.CACHE_NAME, RadarrService.CACHE_NAME])
+    @CacheEvict(cacheNames = [SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME])
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedule() {
+
+        if (!applicationProperties.tagBasedDeletion.enabled) {
+            log.info("Tag based cleanup disabled, do nothing")
+            return
+        }
 
         for (tag in applicationProperties.tagBasedDeletion.schedules) {
             log.debug("Deleting TV shows and movies with tag: $tag")

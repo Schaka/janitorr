@@ -4,11 +4,7 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
 
-@Service
-@ConditionalOnProperty("clients.jellyseerr.enabled", havingValue = "true")
 class JellyseerrRestService(
 
         val jellyseerrClient: JellyseerrClient,

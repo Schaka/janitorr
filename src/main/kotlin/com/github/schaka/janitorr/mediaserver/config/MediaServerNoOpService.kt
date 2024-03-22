@@ -1,16 +1,13 @@
-package com.github.schaka.janitorr.mediaserver
+package com.github.schaka.janitorr.mediaserver.config
 
+import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
 
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
  */
-@Service
-@ConditionalOnProperty(value = ["clients.emby.enabled", "clients.jellyfin.enabled"], havingValue = "false")
 class MediaServerNoOpService : MediaServerService() {
 
     companion object {

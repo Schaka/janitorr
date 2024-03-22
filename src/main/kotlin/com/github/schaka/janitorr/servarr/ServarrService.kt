@@ -1,5 +1,7 @@
 package com.github.schaka.janitorr.servarr
 
+import jakarta.annotation.PostConstruct
+
 interface ServarrService {
 
     fun getEntries(): List<LibraryItem>
@@ -13,4 +15,5 @@ interface ServarrService {
         val comp = compareBy<LibraryItem> { it.date }
         return if (upgradesAllowed) comp.reversed() else comp
     }
+    fun postConstruct()
 }

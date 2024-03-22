@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 
-@Configuration
+@Configuration(proxyBeanMethods = false)
 class ServarrClientConfig {
 
     companion object {

@@ -11,7 +11,7 @@ data class SeriesPayload(
         val seasonFolder: Boolean,
         val seasons: List<Season>,
         val seriesType: String,
-        val tags: List<Any>,
+        val tags: List<Int>,
         val title: String,
         val titleSlug: String,
         val tvMazeId: Int,

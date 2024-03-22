@@ -3,6 +3,9 @@ import net.nemerosa.versioning.VersioningExtension
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.dsl.SpringBootExtension
+import org.springframework.boot.gradle.tasks.aot.ProcessAot
+import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
 
@@ -11,6 +14,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.4"
     id("com.google.cloud.tools.jib") version "3.4.0"
     id("net.nemerosa.versioning") version "2.8.2"
+    id("org.graalvm.buildtools.native") version "0.10.1"
 
     kotlin("jvm") version "1.9.22"
     kotlin("plugin.spring") version "1.9.22"
@@ -34,7 +38,7 @@ dependencies {
     implementation("io.github.openfeign:feign-jackson:13.1")
     implementation("io.github.openfeign:feign-httpclient:13.1")
 
-    developmentOnly("org.springframework.boot:spring-boot-devtools")
+    implementation("org.slf4j:jcl-over-slf4j")
 
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.13.9")
@@ -62,6 +66,10 @@ kotlin {
     }
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 tasks.withType<JavaCompile> {
     sourceCompatibility = JavaVersion.VERSION_21.toString()
     targetCompatibility = JavaVersion.VERSION_21.toString()
@@ -72,10 +80,6 @@ tasks.withType<KotlinCompile> {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = JavaVersion.VERSION_21.toString()
     }
-}
-
-tasks.withType<Test> {
-    useJUnitPlatform()
 }
 
 configure<VersioningExtension> {
@@ -112,15 +116,43 @@ extra {
 
 }
 
+tasks.withType<BootRun> {
+    jvmArgs(
+        arrayOf(
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml"
+        )
+    )
+}
+
+tasks.withType<ProcessAot> {
+    args("-Dspring.config.additional-location=optional:file:/config/application.yaml")
+}
+
+tasks.withType<BootBuildImage> {
+
+    docker.publishRegistry.url = "ghcr.io"
+    docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
+    docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
+    // docker.publishRegistry.token = System.getenv("GITHUB_TOKEN") ?: "INVALID_TOKEN"
+
+    imageName = "ghcr.io/${project.extra["docker.image.name"]}:${project.extra["docker.image.version"]}"
+    version = project.extra["docker.image.version"] as String
+    createdDate = "now"
+    tags = listOf(
+            "ghcr.io/${project.extra["docker.image.name"]}:native",
+            "ghcr.io/${project.extra["docker.image.name"]}:native:${project.extra["docker.image.version"]}"
+    )
+
+}
 
 jib {
     to {
-        image = "docker.io/${project.extra["docker.image.name"]}"
+        image = "ghcr.io/${project.extra["docker.image.name"]}"
         tags = project.extra["docker.image.tags"] as Set<String>
 
         auth {
-            username = System.getenv("DOCKERHUB_USER")
-            password = System.getenv("DOCKERHUB_PASSWORD")
+            username = System.getenv("USERNAME")
+            password = System.getenv("GITHUB_TOKEN")
         }
     }
     from {
@@ -141,7 +173,7 @@ jib {
         }
     }
     container {
-        jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms512m")
+        jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms256m")
         mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
         ports = listOf("8978")
         format = ImageFormat.Docker

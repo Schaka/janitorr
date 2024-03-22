@@ -9,8 +9,6 @@ import feign.RequestTemplate
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.boot.web.client.RestTemplateBuilder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpEntity
@@ -22,22 +20,12 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
-@Configuration
-@ConditionalOnProperty("clients.jellyfin.enabled", havingValue = "true")
+@Configuration(proxyBeanMethods = false)
 class JellyfinClientConfig {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
         private val janitorrClientString = "Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\""
-    }
-
-    @Jellyfin
-    @Bean
-    fun jellyfinRestTemplate(builder: RestTemplateBuilder, properties: JellyfinProperties): RestTemplate {
-        return builder
-                .rootUri("${properties.url}/")
-                .defaultHeader(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
-                .build()
     }
 
     @Jellyfin

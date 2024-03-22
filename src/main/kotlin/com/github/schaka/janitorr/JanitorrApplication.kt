@@ -1,10 +1,19 @@
 package com.github.schaka.janitorr
 
+import com.github.schaka.janitorr.jellyseerr.JellyseerrClient
+import com.github.schaka.janitorr.mediaserver.MediaServerClient
+import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
+import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.radarr.RadarrClient
+import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
+import org.springframework.aot.hint.RuntimeHints
+import org.springframework.aot.hint.RuntimeHintsRegistrar
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.cache.annotation.EnableCaching
+import org.springframework.context.annotation.ImportRuntimeHints
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
 
@@ -14,8 +23,22 @@ import org.springframework.scheduling.annotation.EnableScheduling
 @EnableScheduling
 @ConfigurationPropertiesScan
 @SpringBootApplication
-class JanitorrApplication
+@ImportRuntimeHints(JanitorrApplication.Hints::class)
+class JanitorrApplication {
+
+    class Hints : RuntimeHintsRegistrar {
+        override fun registerHints(hints: RuntimeHints, classLoader: ClassLoader?) {
+            hints.proxies().registerJdkProxy(JellyseerrClient::class.java)
+            hints.proxies().registerJdkProxy(MediaServerClient::class.java)
+            hints.proxies().registerJdkProxy(MediaServerUserClient::class.java)
+            hints.proxies().registerJdkProxy(RadarrClient::class.java)
+            hints.proxies().registerJdkProxy(SonarrClient::class.java)
+            hints.proxies().registerJdkProxy(ServarrService::class.java)
+        }
+    }
+}
 
 fun main(args: Array<String>) {
     runApplication<JanitorrApplication>(*args)
 }
+

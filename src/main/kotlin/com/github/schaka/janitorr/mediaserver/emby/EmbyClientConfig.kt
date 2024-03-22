@@ -9,7 +9,6 @@ import feign.RequestTemplate
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpEntity
@@ -23,8 +22,7 @@ import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
-@Configuration
-@ConditionalOnProperty("clients.emby.enabled", havingValue = "true")
+@Configuration(proxyBeanMethods = false)
 class EmbyClientConfig {
 
     companion object {

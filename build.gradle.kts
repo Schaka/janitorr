@@ -140,7 +140,7 @@ tasks.withType<BootBuildImage> {
     createdDate = "now"
     tags = listOf(
             "ghcr.io/${project.extra["docker.image.name"]}:native",
-            "ghcr.io/${project.extra["docker.image.name"]}:native:${project.extra["docker.image.version"]}"
+            "ghcr.io/${project.extra["docker.image.name"]}:native-${project.extra["docker.image.version"]}"
     )
 
 }

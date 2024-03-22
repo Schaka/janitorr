@@ -5,12 +5,8 @@ import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerRestService
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
-import org.springframework.stereotype.Service
 
-@Service
-@ConditionalOnProperty("clients.emby.enabled", havingValue = "true", matchIfMissing = false)
-class EmbyRestService(
+open class EmbyRestService(
 
         @Emby embyClient: MediaServerClient,
         @Emby embyUserClient: MediaServerUserClient,

@@ -5,19 +5,13 @@ import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.stereotype.Service
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
-@Radarr
-@Service
-@ConditionalOnProperty("clients.radarr.enabled", havingValue = "true", matchIfMissing = true)
-class RadarrService(
+open class RadarrRestService(
 
         val radarrClient: RadarrClient,
 
@@ -37,7 +31,6 @@ class RadarrService(
         const val CACHE_NAME = "radarr-cache"
     }
 
-    @PostConstruct
     fun postConstruct() {
         upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
         keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag

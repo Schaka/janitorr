@@ -6,19 +6,13 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
-import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.stereotype.Service
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
-@Sonarr
-@Service
-@ConditionalOnProperty("clients.sonarr.enabled", havingValue = "true", matchIfMissing = true)
-class SonarrService(
+open class SonarrRestService(
 
         val sonarrClient: SonarrClient,
 
@@ -37,7 +31,6 @@ class SonarrService(
         const val CACHE_NAME = "sonarr-cache"
     }
 
-    @PostConstruct
     fun postConstruct() {
         upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
         keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag

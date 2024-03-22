@@ -9,27 +9,23 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.Radarr
-import com.github.schaka.janitorr.servarr.radarr.RadarrService
+import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
-import com.github.schaka.janitorr.servarr.sonarr.SonarrService
+import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
 import org.slf4j.LoggerFactory
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Duration
 
 @Service
-@ConditionalOnProperty("application.media-deletion.enabled", havingValue = "true")
 class MediaCleanupSchedule(
         mediaServerService: MediaServerService,
         jellyseerrService: JellyseerrService,
         fileSystemProperties: FileSystemProperties,
         applicationProperties: ApplicationProperties,
-        @Sonarr
-        sonarrService: ServarrService,
-        @Radarr
-        radarrService: ServarrService,
+        @Sonarr sonarrService: ServarrService,
+        @Radarr radarrService: ServarrService,
 ) : AbstractCleanupSchedule(mediaServerService, jellyseerrService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
 
     companion object {
@@ -37,9 +33,15 @@ class MediaCleanupSchedule(
     }
 
     // run every hour
-    @CacheEvict(cacheNames = [SonarrService.CACHE_NAME, RadarrService.CACHE_NAME])
+    @CacheEvict(cacheNames = [SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME])
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedule() {
+
+        if (!applicationProperties.mediaDeletion.enabled) {
+            log.info("Media based cleanup disabled, do nothing")
+            return
+        }
+
         val seasonExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.seasonExpiration)
         val movieExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.movieExpiration)
 

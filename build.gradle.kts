@@ -140,7 +140,7 @@ tasks.withType<BootBuildImage> {
     createdDate = "now"
     tags = (project.extra["docker.image.tags"] as Set<String>).map { "ghcr.io/${project.extra["docker.image.name"]}:$it" }
 
-    tags.add("native")
+    tags.add("ghcr.io/${project.extra["docker.image.name"]}:native")
 
     // publish = true
 }

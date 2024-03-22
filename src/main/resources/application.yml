@@ -15,7 +15,7 @@ clients:
     api-key: "sonarr-key"
   radarr:
     enabled: true
-    url: "http://htpc.local:7878"
+    url: "http://radarr:7878"
     api-key: "radarr-key"
   jellyfin:
     enabled: true

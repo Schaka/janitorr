@@ -20,4 +20,8 @@ class RadarrNoOpService : ServarrService {
     override fun removeEntries(items: List<LibraryItem>) {
         log.info("Radarr is disabled, not deleting any movies")
     }
+
+    override fun postConstruct() {
+
+    }
 }

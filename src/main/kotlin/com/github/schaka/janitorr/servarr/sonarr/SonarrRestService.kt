@@ -5,20 +5,30 @@ import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
+import com.github.schaka.janitorr.servarr.history.HistoryResponse
+import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.Cacheable
+import org.springframework.stereotype.Service
 import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
-open class SonarrRestService(
+@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, SeriesPayload::class, HistoryResponse::class, EpisodeResponse::class])
+@Service
+class SonarrRestService(
 
         val sonarrClient: SonarrClient,
 
         val fileSystemProperties: FileSystemProperties,
 
         val applicationProperties: ApplicationProperties,
+
+        val sonarrProperties: SonarrProperties,
 
         var upgradesAllowed: Boolean = false,
 
@@ -30,8 +40,12 @@ open class SonarrRestService(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
         const val CACHE_NAME = "sonarr-cache"
     }
+    @PostConstruct
+    override fun postConstruct() {
+        if (!sonarrProperties.enabled) {
+            return
+        }
 
-    fun postConstruct() {
         upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
         keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }

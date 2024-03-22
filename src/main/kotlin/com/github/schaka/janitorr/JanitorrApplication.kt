@@ -5,9 +5,7 @@ import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.RadarrClient
-import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
-import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
 import org.springframework.aot.hint.RuntimeHints
 import org.springframework.aot.hint.RuntimeHintsRegistrar
 import org.springframework.boot.autoconfigure.SpringBootApplication

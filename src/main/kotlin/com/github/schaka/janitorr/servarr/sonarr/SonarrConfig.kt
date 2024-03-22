@@ -17,8 +17,8 @@ import org.springframework.context.annotation.Configuration
  * Only required for native image
  */
 @Configuration(proxyBeanMethods = false)
-@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, SeriesPayload::class, HistoryResponse::class, EpisodeResponse::class])
 class SonarrConfig(
+    val sonarrRestService: SonarrRestService,
     val sonarrNoOpService: SonarrNoOpService
 ) {
 
@@ -36,9 +36,8 @@ class SonarrConfig(
     ): ServarrService {
 
         if (sonarrProperties.enabled) {
-            val service = SonarrRestService(sonarrClient, filesystemProperties, applicationProperties)
-            service.postConstruct()
-            return service
+            return sonarrRestService
+            //return SonarrRestService(sonarrClient, filesystemProperties, applicationProperties, sonarrProperties)
         }
 
         return sonarrNoOpService

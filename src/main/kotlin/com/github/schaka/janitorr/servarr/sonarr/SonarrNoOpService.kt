@@ -20,4 +20,7 @@ class SonarrNoOpService : ServarrService {
     override fun removeEntries(items: List<LibraryItem>) {
         log.info("Sonarr is disabled, not deleting any shows")
     }
+
+    override fun postConstruct() {
+    }
 }

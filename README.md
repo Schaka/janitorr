@@ -71,11 +71,15 @@ I found both of them to be pretty wonky at best. Some parameters seemed to do no
 when they were or results were unpredictable when an invalid value was supplied.
 This is also one area where Jellyfin and Emby tend to be quite different.
 
-## Setup
+For those more familiar with Java/Kotlin, GraalVM and Spring:
+The reason the code looks a little messy and doesn't let Spring's magic with `@ConditonalOnProperty` is because native images don't support this (yet).
+Proxies are very limited and creating a `@Bean` inside a `@Config` doesn't produce working proxies for things like `@PostConstruct` and `@Cacheable` half the time.
+AOT also doesn't work exactly the same as native image deployment and thus is a lot harder to debug.
 
-Currently, the code is only published as a docker image
-to [DockerHub](https://hub.docker.com/repository/docker/schaka/janitorr/general). If you cannot use Docker, you're out
-of luck for now.
+## Setup
+**The old registry at hub.docker.com is deprecated. Please use ghcr.io.**
+Currently, the code is only published as a docker image to [GitHub](https://github.com/Schaka/janitorr/pkgs/container/janitorr).
+If you cannot use Docker, you're out of luck for now.
 
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
 history in the *arr apps. By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will
@@ -87,9 +91,7 @@ Janitorr looks for can be adjusted in your config file.
 ### Setting up Docker
 
 - map /config from within the container to a host folder of your choice
-- within that host folder, put a copy
-  of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from
-  this repository
+- within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from this repository
 - adjust said copy with your own info like *arr, Jellyfin and Jellyseerr API keys and your preferred port
 
 If using Jellyfin with filesystem access, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
@@ -117,12 +119,26 @@ version: '3'
 services:
   janitorr:
     container_name: janitorr
-    image: schaka/janitorr:latest
-    ports:
-      - 8978:8978 # Technically, we don't publish any endpoints, so this isn't strictly required
+    image: ghcr.io/schaka/janitorr:latest
     volumes:
       - /appdata/janitorr/config:/config 
       - /share_media:/data
 ```
 
-To get the latest build as found in the development branch, grab the following image: `schaka/janitorr:develop`.
+A native image is also published for every tagged release. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
+If you restart more often than once a week or have a very low powered server, this is now recommended.
+That image is always tagged `:native`. It also requires you to map application.yml slightly differently - see below:
+
+```yml
+version: '3'
+
+services:
+  janitorr:
+    container_name: janitorr
+    image: ghcr.io/schaka/janitorr:native
+    volumes:
+      - /appdata/janitorr/config/application.yml:/workspace/application.yml 
+      - /share_media:/data
+```
+
+To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:develop`.

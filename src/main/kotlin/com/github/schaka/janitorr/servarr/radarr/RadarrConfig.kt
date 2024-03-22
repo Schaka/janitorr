@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration
  * Only required for native image
  */
 @Configuration(proxyBeanMethods = false)
-@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, HistoryResponse::class])
 class RadarrConfig(
+    val radarrRestService: RadarrRestService,
     val radarrNoOpService: RadarrNoOpService
 ) {
 
@@ -28,11 +28,12 @@ class RadarrConfig(
         applicationProperties: ApplicationProperties,
         fileSystemProperties: FileSystemProperties
     ): ServarrService {
+
         if (radarrProperties.enabled) {
-            val service = RadarrRestService(radarrClient, applicationProperties, fileSystemProperties)
-            service.postConstruct()
-            return service
+            //return RadarrRestService(radarrClient, applicationProperties, fileSystemProperties, radarrProperties)
+            return radarrRestService
         }
+
         return radarrNoOpService
     }
 }

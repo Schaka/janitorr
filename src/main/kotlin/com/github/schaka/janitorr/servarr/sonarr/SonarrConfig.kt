@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
@@ -16,7 +17,7 @@ import org.springframework.context.annotation.Configuration
  * Only required for native image
  */
 @Configuration(proxyBeanMethods = false)
-@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, SeriesPayload::class, HistoryResponse::class])
+@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, SeriesPayload::class, HistoryResponse::class, EpisodeResponse::class])
 class SonarrConfig(
     val sonarrNoOpService: SonarrNoOpService
 ) {

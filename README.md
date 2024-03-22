@@ -127,7 +127,8 @@ services:
 
 A native image is also published for every tagged release. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
 If you restart more often than once a week or have a very low powered server, this is now recommended.
-That image is always tagged `:native`. It also requires you to map application.yml slightly differently - see below:
+That image is always tagged `:native`. To get a specific version, use `:native-v1.x.x`.
+It also requires you to map application.yml slightly differently - see below:
 
 ```yml
 version: '3'

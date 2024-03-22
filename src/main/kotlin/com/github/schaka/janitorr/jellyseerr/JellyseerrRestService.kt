@@ -1,13 +1,10 @@
 package com.github.schaka.janitorr.jellyseerr
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.jellyseerr.paging.JellyseerrPage
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 
-@RegisterReflectionForBinding(classes = [JellyseerrPage::class, RequestResponse::class])
 class JellyseerrRestService(
 
         val jellyseerrClient: JellyseerrClient,

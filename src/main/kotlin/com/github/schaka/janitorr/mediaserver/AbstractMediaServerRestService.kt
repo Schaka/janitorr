@@ -7,12 +7,8 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
-import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
-import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
-import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
@@ -21,7 +17,6 @@ import java.nio.file.Path
  * Keep 2 layers of abstract classes. The time is 100% going to come when Emby will split off from Jellyfin or the other way around.
  * By the point, it'll be much easier to refactor this.
  */
-@RegisterReflectionForBinding(classes = [ItemPage::class, MediaFolderItem::class, LibraryContent::class, VirtualFolderResponse::class])
 abstract class AbstractMediaServerRestService(
 
         val serviceName: String,

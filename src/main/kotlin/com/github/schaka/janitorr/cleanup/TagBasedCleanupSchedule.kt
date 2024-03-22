@@ -43,6 +43,7 @@ class TagBasedCleanupSchedule(
     fun runSchedule() {
 
         for (tag in applicationProperties.tagBasedDeletion.schedules) {
+            log.debug("Deleting TV shows and movies with tag: $tag")
             scheduleDelete(TV_SHOWS, tag.expiration, entryFilter = { item -> tagMatches(item, tag) })
             scheduleDelete(MOVIES, tag.expiration, entryFilter = { item -> tagMatches(item, tag) })
         }
@@ -53,7 +54,7 @@ class TagBasedCleanupSchedule(
     }
 
     override fun needToDelete(type: LibraryType): Boolean {
-        return if (fileSystemProperties.access) applicationProperties.tagBasedDeletion.minimumFreeDiskPercent <= getFreeSpacePercentage() else false
+        return if (fileSystemProperties.access) getFreeSpacePercentage() <= applicationProperties.tagBasedDeletion.minimumFreeDiskPercent else true
     }
 
 

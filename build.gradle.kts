@@ -173,7 +173,7 @@ jib {
         }
     }
     container {
-        jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms512m")
+        jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms256m")
         mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
         ports = listOf("8978")
         format = ImageFormat.Docker

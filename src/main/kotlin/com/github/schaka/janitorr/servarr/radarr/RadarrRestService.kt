@@ -17,8 +17,8 @@ import java.nio.file.Path
 import java.time.LocalDateTime
 import kotlin.io.path.exists
 
-@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, HistoryResponse::class])
 @Service
+@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, HistoryResponse::class])
 class RadarrRestService(
 
         val radarrClient: RadarrClient,
@@ -40,15 +40,11 @@ class RadarrRestService(
 
         const val CACHE_NAME = "radarr-cache"
     }
-
-    @PostConstruct
-    override fun postConstruct() {
-        if (!radarrProperties.enabled) {
-            return
+    init {
+        if (radarrProperties.enabled) {
+            upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
+            keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
         }
-
-        upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
-        keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
     }
 
     @Cacheable(CACHE_NAME)

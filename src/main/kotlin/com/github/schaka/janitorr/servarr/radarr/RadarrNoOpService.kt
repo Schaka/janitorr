@@ -21,7 +21,4 @@ class RadarrNoOpService : ServarrService {
         log.info("Radarr is disabled, not deleting any movies")
     }
 
-    override fun postConstruct() {
-
-    }
 }

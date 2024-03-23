@@ -15,5 +15,4 @@ interface ServarrService {
         val comp = compareBy<LibraryItem> { it.date }
         return if (upgradesAllowed) comp.reversed() else comp
     }
-    fun postConstruct()
 }

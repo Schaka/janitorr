@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration(proxyBeanMethods = false)
 class RadarrConfig(
-    val radarrRestService: RadarrRestService,
+    //val radarrRestService: RadarrRestService,
     val radarrNoOpService: RadarrNoOpService
 ) {
 
@@ -30,8 +30,8 @@ class RadarrConfig(
     ): ServarrService {
 
         if (radarrProperties.enabled) {
-            //return RadarrRestService(radarrClient, applicationProperties, fileSystemProperties, radarrProperties)
-            return radarrRestService
+            return RadarrRestService(radarrClient, applicationProperties, fileSystemProperties, radarrProperties)
+            //return radarrRestService
         }
 
         return radarrNoOpService

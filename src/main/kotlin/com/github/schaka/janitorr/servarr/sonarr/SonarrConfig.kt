@@ -18,7 +18,7 @@ import org.springframework.context.annotation.Configuration
  */
 @Configuration(proxyBeanMethods = false)
 class SonarrConfig(
-    val sonarrRestService: SonarrRestService,
+    //val sonarrRestService: SonarrRestService,
     val sonarrNoOpService: SonarrNoOpService
 ) {
 
@@ -36,8 +36,8 @@ class SonarrConfig(
     ): ServarrService {
 
         if (sonarrProperties.enabled) {
-            return sonarrRestService
-            //return SonarrRestService(sonarrClient, filesystemProperties, applicationProperties, sonarrProperties)
+            //return sonarrRestService
+            return SonarrRestService(sonarrClient, filesystemProperties, applicationProperties, sonarrProperties)
         }
 
         return sonarrNoOpService

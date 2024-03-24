@@ -33,9 +33,9 @@ application:
     enabled: true
     minimum-free-disk-percent: 100
     schedules:
-      - tag: "5 - demo"
+      - tag: 5 - demo
         expiration: 30d
-      - tag: "10 - demo"
+      - tag: 10 - demo
         expiration: 7d
 
 clients:

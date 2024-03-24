@@ -24,6 +24,8 @@ abstract class MediaServerService {
 
     abstract fun cleanupMovies(items: List<LibraryItem>)
 
+    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType)
+
     abstract fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 
     protected fun isMediaFile(path: String) =

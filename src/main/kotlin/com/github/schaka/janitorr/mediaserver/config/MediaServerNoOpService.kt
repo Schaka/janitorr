@@ -22,6 +22,10 @@ class MediaServerNoOpService : MediaServerService() {
         log.info("Media Server not implemented. No movies deleted.")
     }
 
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType) {
+        log.info("Media Server not implemented. No server IDs populated.")
+    }
+
     override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
         log.info("Media Server not implemented. No 'Gone Soon' library created.")
     }

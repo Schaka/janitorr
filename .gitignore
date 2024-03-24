@@ -42,3 +42,4 @@ out/
 
 # Local
 application-local.yml
+application-seedbox.yml

@@ -31,16 +31,19 @@ abstract class AbstractMediaServerRestService(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
-    override fun cleanupTvShows(items: List<LibraryItem>) {
-        val parentFolders = mediaServerClient.getAllItems()
-
-        val mediaServerShows = parentFolders.Items.flatMap { parent ->
-            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type == "Series" }.flatMap { show ->
-                val seasons = mediaServerClient.getAllSeasons(show.Id).Items
-                seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
-                seasons
-            }
+    /**
+     * Populates the library items with Jellyfin/Emby IDs if available.
+     * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
+     */
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType) {
+        when (type) {
+            TV_SHOWS -> populateTvShowIds(items)
+            MOVIES -> populateMovieIds(items)
         }
+    }
+
+    override fun cleanupTvShows(items: List<LibraryItem>) {
+        val mediaServerShows = getTvLibrary()
 
         for (show: LibraryItem in items) {
             mediaServerShows.firstOrNull { tvShowMatches(show, it) }
@@ -61,12 +64,43 @@ abstract class AbstractMediaServerRestService(
         // TODO: Remove TV shows if all seasons gone
     }
 
-    override fun cleanupMovies(items: List<LibraryItem>) {
+    private fun populateTvShowIds(items: List<LibraryItem>) {
+        val mediaServerShows = getTvLibrary()
+        for (show: LibraryItem in items) {
+            mediaServerShows.firstOrNull { tvShowMatches(show, it) }
+                    ?.let { mediaServerContent ->
+                        show.mediaServerId = mediaServerContent.Id
+                    }
+        }
+    }
+
+    private fun getTvLibrary(): List<LibraryContent> {
         val parentFolders = mediaServerClient.getAllItems()
 
-        val mediaServerMovies = parentFolders.Items.flatMap {
-            mediaServerClient.getAllMovies(it.Id).Items
+        val mediaServerShows = parentFolders.Items.flatMap { parent ->
+            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type == "Series" }.flatMap { show ->
+                val seasons = mediaServerClient.getAllSeasons(show.Id).Items
+                seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
+                seasons
+            }
         }
+
+        return mediaServerShows
+    }
+
+    private fun populateMovieIds(items: List<LibraryItem>) {
+        val mediaServerMovies = getMovieLibrary()
+
+        for (movie: LibraryItem in items) {
+            mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
+                    ?.let { mediaServerContent ->
+                        movie.mediaServerId = mediaServerContent.Id
+                    }
+        }
+    }
+
+    override fun cleanupMovies(items: List<LibraryItem>) {
+        val mediaServerMovies = getMovieLibrary()
 
         for (movie: LibraryItem in items) {
             mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
@@ -83,6 +117,16 @@ abstract class AbstractMediaServerRestService(
                         }
                     }
         }
+    }
+
+    private fun getMovieLibrary(): List<LibraryContent> {
+        val parentFolders = mediaServerClient.getAllItems()
+
+        val mediaServerMovies = parentFolders.Items.flatMap {
+            mediaServerClient.getAllMovies(it.Id).Items
+        }
+
+        return mediaServerMovies
     }
 
     private fun tvShowMatches(item: LibraryItem, candidate: LibraryContent, matchSeason: Boolean = true): Boolean {

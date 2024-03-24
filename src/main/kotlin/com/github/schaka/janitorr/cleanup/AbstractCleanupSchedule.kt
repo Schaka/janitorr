@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.jellystat.JellystatService
 import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -17,6 +18,7 @@ import java.time.LocalDateTime
 abstract class AbstractCleanupSchedule(
         protected val mediaServerService: MediaServerService,
         protected val jellyseerrService: JellyseerrService,
+        protected val jellystatService: JellystatService,
         protected val fileSystemProperties: FileSystemProperties,
         protected val applicationProperties: ApplicationProperties,
         protected val sonarrService: ServarrService,
@@ -64,10 +66,12 @@ abstract class AbstractCleanupSchedule(
         val expirationDays = expiration.toDays()
 
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
-        val leavingSoon = servarrEntries.filter { it.date.plusDays(expirationDays - leavingSoonExpiration) < today && it.date.plusDays(expirationDays) >= today }
+        jellystatService.populateWatchHistory(servarrEntries, type)
+
+        val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
         mediaServerService.updateGoneSoon(type, leavingSoon)
 
-        val toDeleteMedia = servarrEntries.filter { it.date.plusDays(expirationDays) < today }
+        val toDeleteMedia = servarrEntries.filter { it.historyAge.plusDays(expirationDays) < today }
         deleteTask(toDeleteMedia)
     }
 

@@ -72,11 +72,12 @@ when they were or results were unpredictable when an invalid value was supplied.
 This is also one area where Jellyfin and Emby tend to be quite different.
 
 For those more familiar with Java/Kotlin, GraalVM and Spring:
-The reason the code looks a little messy and doesn't let Spring's magic with `@ConditonalOnProperty` is because native images don't support this (yet).
+The reason the code looks a little messy and doesn't let Spring's magic run wild with `@ConditonalOnProperty` is because native images don't support this (yet).
 Proxies are very limited and creating a `@Bean` inside a `@Config` doesn't produce working proxies for things like `@PostConstruct` and `@Cacheable` half the time.
 AOT also doesn't work exactly the same as native image deployment and thus is a lot harder to debug.
 
 ## Setup
+
 **The old registry at hub.docker.com is deprecated. Please use ghcr.io.**
 Currently, the code is only published as a docker image to [GitHub](https://github.com/Schaka/janitorr/pkgs/container/janitorr).
 If you cannot use Docker, you're out of luck for now.
@@ -98,11 +99,10 @@ If using Jellyfin with filesystem access, ensure that Janitorr has access to the
 Additionally, make sure the *arrs directories are mapped the same way Janitorr into Janitorr as well.
 
 Janitorr creates symlinks from whatever directory it receives from the arrs' API into the leaving-soon-dir.
-If Radarr finds movies at `/data/media/movies` Janitorr needs to find them at `/data/media/movies` too. 
+If Radarr finds movies at `/data/media/movies` Janitorr needs to find them at `/data/media/movies` too.
 You need to ensure links can be created from the source (what's available in the arrs) to the destination (leaving-soon).
 Since Janitorr creates the "Leaving Soon" collection for you with the path given in the config file, it needs to be accessible by Jellyfin.
 If Janitorr thinks the directory can be found at `/somedir/leaving-soon`, Jellyfin needs to find it at `/somedir/leaving-soon` too.
-
 
 ### Docker config
 
@@ -121,7 +121,7 @@ services:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:latest
     volumes:
-      - /appdata/janitorr/config:/config 
+      - /appdata/janitorr/config:/config
       - /share_media:/data
 ```
 
@@ -138,7 +138,7 @@ services:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:native
     volumes:
-      - /appdata/janitorr/config/application.yml:/workspace/application.yml 
+      - /appdata/janitorr/config/application.yml:/workspace/application.yml
       - /share_media:/data
 ```
 

@@ -4,7 +4,7 @@ import java.time.LocalDateTime
 
 data class LibraryItem(
         val id: Int,
-        val date: LocalDateTime,
+        val importedDate: LocalDateTime,
 
         // History only: these 2 names are only accurate for the time of import and don't get updated when filenames change
         val originalPath: String,
@@ -19,7 +19,13 @@ data class LibraryItem(
         val tmdbId: Int? = null,
         val season: Int? = null,
 
+        var mediaServerId: String? = null,
         var seeding: Boolean = false,
-        val tags: List<String> = listOf()
+        var lastSeen: LocalDateTime? = null,
 
+        val tags: List<String> = listOf()
 )
+{
+    val historyAge: LocalDateTime
+        get() = lastSeen ?: importedDate
+}

@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.jellystat.JellystatService
 import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -22,11 +23,12 @@ import java.time.Duration
 class MediaCleanupSchedule(
         mediaServerService: MediaServerService,
         jellyseerrService: JellyseerrService,
+        jellystatService: JellystatService,
         fileSystemProperties: FileSystemProperties,
         applicationProperties: ApplicationProperties,
         @Sonarr sonarrService: ServarrService,
         @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(mediaServerService, jellyseerrService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
+) : AbstractCleanupSchedule(mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

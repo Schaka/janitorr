@@ -68,4 +68,4 @@ clients:
   jellystat:
     enabled: true
     url: "http://jellystat:3000"
-    api-key: "jellystat-key
+    api-key: "jellystat-key"

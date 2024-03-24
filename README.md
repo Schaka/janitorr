@@ -43,9 +43,8 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Dry-run mode to investigate changes before committing to any deletion
 - Remote deletion, disk space aware deletion as well as tag based delete schedules supported
 - Exclude items from deletion via tags in Sonarr/Radarr
-- Configure expiration times for your media in Jellyfin, Emby, Jellyseerr, Radarr, and Sonarr
-- Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion.
-  Think "Leaving soon"
+- Configure expiration times for your media in the *arrs and optionally, if media can be found in JellyStat
+- Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
 - Unmonitor and delete media from *arr
 - Season by season removal for TV shows
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
@@ -55,11 +54,9 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Sonarr v3 is not officially supported - it may or may not be compatible. I highly recommend upgrading to v4 either way
 - **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
-- Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user
-  specifically for this task
-- Jellyfin does NOT provide viewing stats like Plex, so we go by file age in the *arrs - Jellystat integration is planned
-- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,
-  metadata, etc
+- Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
+- Jellyfin does NOT provide viewing stats like Plex, so we go by file age in the *arrs - unless you provide access to JellyStat
+- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
 - Only one of Jellyfin or Emby can be enabled at a time
 - **If file system access isn't given, files currently still seeding may be deleted**
 

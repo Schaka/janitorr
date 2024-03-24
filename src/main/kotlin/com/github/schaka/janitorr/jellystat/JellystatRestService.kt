@@ -27,10 +27,12 @@ class JellystatRestService(
         mediaServerService.populateMediaServerIds(items, type)
 
         for (item in items.filter { it.mediaServerId != null }) {
-            val watchHistory = jellystatClient.getRequests(ItemRequest(item.mediaServerId!!)).maxByOrNull { toDate(it.ActivityDateInserted) }
+            val watchHistory = jellystatClient.getRequests(ItemRequest(item.mediaServerId!!))
+                    .filter { it.PlaybackDuration > 60 }
+                    .maxByOrNull { toDate(it.ActivityDateInserted) }
 
             // only count view if at least one minute of content was watched - could be user adjustable later
-            if (watchHistory != null && watchHistory.PlaybackDuration > 60) {
+            if (watchHistory != null) {
                 item.lastSeen = toDate(watchHistory.ActivityDateInserted)
                 logWatchInfo(item, watchHistory)
             }

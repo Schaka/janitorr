@@ -10,7 +10,7 @@ data class ApplicationProperties(
         val mediaDeletion: MediaDeletion,
         @NestedConfigurationProperty
         val tagBasedDeletion: TagDeletion,
-        var dryRun: Boolean = false,
-        var leavingSoon: Duration = Duration.ofDays(14),
-        var exclusionTag: String = "janitorr_keep"
+        val dryRun: Boolean = false,
+        val leavingSoon: Duration = Duration.ofDays(14),
+        val exclusionTag: String = "janitorr_keep"
 )

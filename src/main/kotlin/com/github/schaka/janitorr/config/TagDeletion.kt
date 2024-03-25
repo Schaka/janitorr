@@ -1,7 +1,7 @@
 package com.github.schaka.janitorr.config
 
 data class TagDeletion(
-        var enabled: Boolean = true,
-        var minimumFreeDiskPercent: Double = 20.0,
-        var schedules: List<TagDeleteSchedule> = listOf()
+        val enabled: Boolean = true,
+        val minimumFreeDiskPercent: Double = 20.0,
+        val schedules: List<TagDeleteSchedule> = listOf()
 )

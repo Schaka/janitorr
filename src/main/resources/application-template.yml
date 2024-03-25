@@ -8,6 +8,7 @@ file-system:
   access: true
   leaving-soon-dir: "/data/media/leaving-soon" # A directory this container can write to and Jellyfin can find under the same path - this will contain new folders with symlinks to files for Jellyfin's "Leaving Soon" collections
   from-scratch: true # Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data - turning this off can save resources (less writes to drive)
+  free-space-check-dir: "/" # This is the default directory Janitorr uses to check how much space is left on your drives. By default, it checks the entire root - you may point it at a specific folder
 
 application:
   dry-run: true

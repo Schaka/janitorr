@@ -32,8 +32,12 @@ class JellyseerrRestService(
 
             for (request: RequestResponse in requests) {
                 if (!applicationProperties.dryRun) {
-                    log.info("Deleting request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
-                    jellyseerrClient.deleteRequest(request.id)
+                    try {
+                        log.info("Deleting request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
+                        jellyseerrClient.deleteRequest(request.id)
+                    } catch(e: Exception) {
+                        log.trace("Error deleting Jellyseerr request", e)
+                    }
                 } else {
                     log.info("Found request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
                 }

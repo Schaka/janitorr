@@ -78,7 +78,7 @@ class RadarrRestService(
     override fun removeEntries(items: List<LibraryItem>) {
         for (movie in items) {
 
-            if (fileSystemProperties.access && Path.of(movie.originalPath).exists()) {
+            if (fileSystemProperties.access && fileSystemProperties.validateSeeding && Path.of(movie.originalPath).exists()) {
                 log.info("Can't delete movie [still seeding - file exists] ({}), id: {}, imdb: {}", movie.originalPath, movie.id, movie.imdbId)
                 movie.seeding = true
                 continue

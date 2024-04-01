@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component
 data class FileSystemProperties(
         val leavingSoonDir: String?,
         val access: Boolean = false,
+        val validateSeeding: Boolean = true,
         val fromScratch: Boolean = true,
         val freeSpaceCheckDir: String = "/"
 )

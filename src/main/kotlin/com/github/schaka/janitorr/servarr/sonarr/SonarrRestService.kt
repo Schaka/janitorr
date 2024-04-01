@@ -96,7 +96,7 @@ class SonarrRestService(
         // we are always treating seasons as a whole, even if technically episodes could be handled individually
         for (item in items) {
 
-            if (fileSystemProperties.access && Path.of(item.originalPath).exists()) {
+            if (fileSystemProperties.access && fileSystemProperties.validateSeeding && Path.of(item.originalPath).exists()) {
                 log.info("Can't delete season [still seeding - file exists] ({}), id: {}, imdb: {}", item.originalPath, item.id, item.imdbId)
                 item.seeding = true
                 continue

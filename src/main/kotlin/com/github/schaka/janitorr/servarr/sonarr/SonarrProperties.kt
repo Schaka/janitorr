@@ -7,5 +7,6 @@ data class SonarrProperties(
         val enabled: Boolean,
         val url: String,
         val apiKey: String,
-        val deleteEmptyShows: Boolean = true
+        val handleEmptyShows: Boolean = true,
+        val onlyUnmonitorEmpty: Boolean = false
 )

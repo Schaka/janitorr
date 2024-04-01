@@ -9,10 +9,8 @@ import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
-import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.nio.file.Path
@@ -115,7 +113,7 @@ class SonarrRestService(
             }
 
             if (!applicationProperties.dryRun) {
-                unmonitorSeason(item.id, item.season)
+                unmonitorSeasons(item.id, item.season)
             }
         }
 
@@ -125,24 +123,28 @@ class SonarrRestService(
 
     }
 
-    private fun unmonitorSeason(seriesId: Int, seasonNumber: Int) {
+    private fun unmonitorSeasons(seriesId: Int, vararg seasonNumbers: Int) {
         val series = sonarrClient.getSeries(seriesId)
-        val seasonToEdit = series.seasons.firstOrNull { it.seasonNumber == seasonNumber }
-        val isMonitored = seasonToEdit?.monitored
-        seasonToEdit?.monitored = false
-        sonarrClient.updateSeries(seriesId, series)
+        series.seasons
+                .filter { seasonNumbers.contains(it.seasonNumber) }
+                .forEach { seasonToEdit ->
+                    val isMonitored = seasonToEdit.monitored
+                    seasonToEdit.monitored = false
 
-        if (isMonitored == true) {
-            log.info("Unmonitoring {} - season {}", series.title, seasonToEdit.seasonNumber)
-        }
+                    if (isMonitored) {
+                        log.info("Unmonitoring {} - season {}", series.title, seasonToEdit.seasonNumber)
+                    }
+                }
+
+        sonarrClient.updateSeries(seriesId, series)
     }
 
     // If all seasons are unmonitored or don't have any files, we delete them
     // If the latest season is monitored, we have to assume the intention is to grab future episodes on release and not delete anything
     private fun deleteEmptyShows(affectedShows: List<SeriesPayload>) {
 
-        if (!sonarrProperties.deleteEmptyShows) {
-            log.info("Feature turned off - not deleting any TV shows without files or monitoring")
+        if (!sonarrProperties.handleEmptyShows) {
+            log.info("Feature turned off - not deleting or unmonitoring any TV shows without files or monitoring")
             return
         }
 
@@ -169,8 +171,13 @@ class SonarrRestService(
             }
 
             if (noFiles) {
-                sonarrClient.deleteSeries(show.id, true)
-                log.info("Deleting {} [{}] - All seasons were unused", show.title, show.id)
+                if (sonarrProperties.onlyUnmonitorEmpty) {
+                    unmonitorSeasons(show.id, *show.seasons.map { it.seasonNumber }.toIntArray())
+                }
+                else {
+                    sonarrClient.deleteSeries(show.id, true)
+                    log.info("Deleting {} [{}] - All seasons were unused", show.title, show.id)
+                }
             }
         }
     }

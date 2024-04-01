@@ -141,6 +141,11 @@ class SonarrRestService(
     // If the latest season is monitored, we have to assume the intention is to grab future episodes on release and not delete anything
     private fun deleteEmptyShows(affectedShows: List<SeriesPayload>) {
 
+        if (!sonarrProperties.deleteEmptyShows) {
+            log.info("Feature turned off - not deleting any TV shows without files or monitoring")
+            return
+        }
+
         // Do nothing during dry-run
         if (applicationProperties.dryRun) {
             log.info("Dry run - not deleting any TV shows without files or monitoring")

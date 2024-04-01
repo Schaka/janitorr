@@ -6,5 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class SonarrProperties(
         val enabled: Boolean,
         val url: String,
-        val apiKey: String
+        val apiKey: String,
+        val deleteEmptyShows: Boolean = true
 )

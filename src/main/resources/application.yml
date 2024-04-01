@@ -13,8 +13,7 @@ clients:
     enabled: true
     url: "http://sonarr:8989"
     api-key: "sonarr-key"
-    handle-empty-shows: true
-    only-unmonitor-empty: false
+    delete-empty-shows: true
   radarr:
     enabled: true
     url: "http://radarr:7878"

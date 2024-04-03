@@ -22,6 +22,7 @@ abstract class AbstractMediaServerRestService(
         val serviceName: String,
         val mediaServerClient: MediaServerClient,
         val mediaServerUserClient: MediaServerUserClient,
+        val mediaServerProperties: MediaServerProperties,
         val applicationProperties: ApplicationProperties,
         val fileSystemProperties: FileSystemProperties
 
@@ -43,6 +44,12 @@ abstract class AbstractMediaServerRestService(
     }
 
     override fun cleanupTvShows(items: List<LibraryItem>) {
+
+        if (!mediaServerProperties.delete) {
+            log.info("Deletion from $serviceName disabled")
+            return
+        }
+
         val mediaServerShows = getTvLibrary()
 
         for (show: LibraryItem in items) {

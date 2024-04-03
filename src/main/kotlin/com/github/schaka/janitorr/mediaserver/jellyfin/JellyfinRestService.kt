@@ -10,7 +10,8 @@ open class JellyfinRestService(
 
         @Jellyfin jellyfinClient: MediaServerClient,
         @Jellyfin jellyfinUserClient: MediaServerUserClient,
+        jellyfinProperties: JellyfinProperties,
         applicationProperties: ApplicationProperties,
         fileSystemProperties: FileSystemProperties
 
-) : AbstractMediaServerRestService("Jellyfin", jellyfinClient, jellyfinUserClient, applicationProperties, fileSystemProperties)
+) : AbstractMediaServerRestService("Jellyfin", jellyfinClient, jellyfinUserClient, jellyfinProperties, applicationProperties, fileSystemProperties)

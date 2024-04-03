@@ -50,20 +50,26 @@ clients:
     enabled: true
     url: "http://localhost:7878"
     api-key: "cd0912f129d348c9b69bb20d49fcbe44"
+
   ## You can only choose one out of Jellyfin or Emby.
+  ## User login is only needed if deletion is enabled.
   jellyfin:
     enabled: true
     url: "http://localhost:8096"
     api-key: "4da8d93992804489ba2d1f0e31b8316c"
     username: Janitorr
     password: janitorr
+    delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
+
   ## You can only choose one out of Jellyfin or Emby. Emby support is secondary.
+  ## User login is only needed if deletion is enabled.
   emby:
     enabled: false
     url: "http://localhost:8096"
     api-key: "4da8d93992804489ba2d1f0e31b8316c"
     username: Janitorr
     password: janitorr
+    delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
   jellyseerr:
     enabled: true
     url: "http://localhost:5055"

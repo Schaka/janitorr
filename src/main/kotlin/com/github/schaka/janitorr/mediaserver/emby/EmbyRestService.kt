@@ -10,7 +10,8 @@ open class EmbyRestService(
 
         @Emby embyClient: MediaServerClient,
         @Emby embyUserClient: MediaServerUserClient,
+        embyProperties: EmbyProperties,
         applicationProperties: ApplicationProperties,
         fileSystemProperties: FileSystemProperties
 
-) : AbstractMediaServerRestService("Emby", embyClient, embyUserClient, applicationProperties, fileSystemProperties)
+) : AbstractMediaServerRestService("Emby", embyClient, embyUserClient, embyProperties, applicationProperties, fileSystemProperties)

@@ -50,9 +50,9 @@ class MediaServerConfig(
         }
 
         if (embyProperties.enabled) {
-            return EmbyRestService(embyClient, embyUserClient, applicationProperties, fileSystemProperties)
+            return EmbyRestService(embyClient, embyUserClient, embyProperties, applicationProperties, fileSystemProperties)
         }
 
-        return JellyfinRestService(jellyfinClient, jellyfinUserClient, applicationProperties, fileSystemProperties)
+        return JellyfinRestService(jellyfinClient, jellyfinUserClient, jellyfinProperties, applicationProperties, fileSystemProperties)
     }
 }

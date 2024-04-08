@@ -9,7 +9,6 @@ data class RequestResponse(
         val profileId: Int?,
         val requestedBy: ModifiedBy,
         val rootFolder: String?,
-        val serverId: Int?,
         val status: Int,
         val updatedAt: String,
         val seasons: List<RequestSeason>?,

@@ -91,12 +91,13 @@ class JellyseerrRestService(
         val servarrProperties = if (candidate.type == "tv") sonarrProperties else radarrProperties
 
         // find server this request is responsible for
-        val serverSetting = servarrrSettings.firstOrNull { it.id == candidate.serverId }
+        val serverSetting = servarrrSettings.firstOrNull { it.id == candidate.media.serviceId }
         if (serverSetting == null) {
             log.debug("Found a Jellyseerr request [id: {}] not matching any known server: {}", candidate.id, candidate.media)
             return false
         }
 
+        // TODO: Maybe do some testing to figure out if matching by serviceUrl is more efficient
         val targetServerUri = URIBuilder()
             .setScheme(if (serverSetting.useSsl) "https" else "http")
             .setHost(serverSetting.hostname)

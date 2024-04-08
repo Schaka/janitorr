@@ -2,13 +2,23 @@ package com.github.schaka.janitorr.jellyseerr
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
+import com.github.schaka.janitorr.jellyseerr.servarr.ServarrSettings
 import com.github.schaka.janitorr.servarr.LibraryItem
+import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
+import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
+import org.apache.http.client.utils.URIBuilder
 import org.slf4j.LoggerFactory
+import org.springframework.web.util.UriComponentsBuilder
 
 class JellyseerrRestService(
 
-        val jellyseerrClient: JellyseerrClient,
-        val applicationProperties: ApplicationProperties
+    val jellyseerrClient: JellyseerrClient,
+    val jellyseerrProperties: JellyseerrProperties,
+    val sonarrProperties: SonarrProperties,
+    val radarrProperties: RadarrProperties,
+    val applicationProperties: ApplicationProperties,
+    var sonarrServers: List<ServarrSettings> = listOf(),
+    var radarrServers: List<ServarrSettings> = listOf()
 
 ) : JellyseerrService {
 
@@ -16,6 +26,12 @@ class JellyseerrRestService(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
+    init {
+        if (jellyseerrProperties.enabled) {
+            sonarrServers = jellyseerrClient.getSonarrServers()
+            radarrServers = jellyseerrClient.getRadarrServers()
+        }
+    }
 
     override fun cleanupRequests(items: List<LibraryItem>) {
         val allRequests = getAllRequests()
@@ -46,6 +62,11 @@ class JellyseerrRestService(
     }
 
     private fun mediaMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
+
+        if (!serverMatches(candidate)) {
+            return false
+        }
+
         // Check if the media type is the same before checking anything else
         if (!mediaTypeMatches(item, candidate)) {
             return false
@@ -64,7 +85,35 @@ class JellyseerrRestService(
         return imdbMatches || tmdbMatches || tvdbMatches
     }
 
+    private fun serverMatches(candidate: RequestResponse): Boolean {
+        // match media server first - some people use several Sonarr/Radarr installations
+        val servarrrSettings = if (candidate.type == "tv") sonarrServers else radarrServers
+        val servarrProperties = if (candidate.type == "tv") sonarrProperties else radarrProperties
+
+        // find server this request is responsible for
+        val serverSetting = servarrrSettings.firstOrNull { it.id == candidate.serverId }
+        if (serverSetting == null) {
+            log.debug("Found a Jellyseerr request [id: {}] not matching any known server: {}", candidate.id, candidate.media)
+            return false
+        }
+
+        val targetServerUri = URIBuilder()
+            .setScheme(if (serverSetting.useSsl) "https" else "http")
+            .setHost(serverSetting.hostname)
+            .setPort(serverSetting.port)
+            .setPath("") // force empty path for reliable match
+            .build()
+
+        val settingServerUri = UriComponentsBuilder
+            .fromHttpUrl(servarrProperties.url)
+            .path("") // force empty path for reliable match
+            .build().toUri()
+
+        return targetServerUri.equals(settingServerUri)
+    }
+
     private fun mediaTypeMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
+
         // Found TV show, both request and potential media have seasons
         if (item.season != null && (candidate.type == "tv" || candidate.seasons?.isNotEmpty() == true)) {
             return true

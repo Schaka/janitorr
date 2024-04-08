@@ -2,6 +2,7 @@ package com.github.schaka.janitorr.jellyseerr
 
 import com.github.schaka.janitorr.jellyseerr.paging.JellyseerrPage
 import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
+import com.github.schaka.janitorr.jellyseerr.servarr.ServarrSettings
 import feign.Param
 import feign.RequestLine
 
@@ -15,6 +16,12 @@ interface JellyseerrClient {
 
     @RequestLine("DELETE /request/{id}")
     fun deleteRequest(@Param("id") id: Int)
+
+    @RequestLine("GET /settings/radarr")
+    fun getRadarrServers(): List<ServarrSettings>
+
+    @RequestLine("GET /settings/radarr")
+    fun getSonarrServers(): List<ServarrSettings>
 
 
 }

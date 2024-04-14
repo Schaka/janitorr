@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
+import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
 import java.time.LocalDateTime
 
@@ -74,12 +75,13 @@ class JellyfinClientConfig {
         private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
             val login = RestTemplate()
             val headers = HttpHeaders()
-            headers.set(AUTHORIZATION, "MediaBrowser , ${janitorrClientString}")
+            headers.set(AUTHORIZATION, "MediaBrowser , $janitorrClientString")
             headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
-            val content = object {
-                val Username = properties.username
-                val Pw = properties.password
-            }
+
+            val content = LinkedMultiValueMap<String, String>()
+            content.add("Username", properties.username)
+            content.add("Pw", properties.password)
+
             return login.postForEntity("${properties.url}/Users/AuthenticateByName", HttpEntity(content, headers), Map::class.java)
         }
 

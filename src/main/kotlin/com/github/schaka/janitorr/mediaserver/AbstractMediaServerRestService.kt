@@ -60,7 +60,7 @@ abstract class AbstractMediaServerRestService(
                                 mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
                                 log.info("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
                             } catch (e: Exception) {
-                                log.error("Deleting from $serviceName failed", e)
+                                log.error("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name, e)
                             }
                         } else {
                             log.info("Found {} {} on $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)

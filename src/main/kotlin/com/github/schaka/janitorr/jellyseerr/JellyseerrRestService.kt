@@ -49,13 +49,13 @@ class JellyseerrRestService(
             for (request: RequestResponse in requests) {
                 if (!applicationProperties.dryRun) {
                     try {
-                        log.info("Deleting request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
+                        log.info("Deleting request for {} | IMDB: {} - {}", item.filePath, item.imdbId, request)
                         jellyseerrClient.deleteRequest(request.id)
                     } catch(e: Exception) {
                         log.trace("Error deleting Jellyseerr request", e)
                     }
                 } else {
-                    log.info("Found request for {} | IMDB: {} - {}", request, item.filePath, item.imdbId, request)
+                    log.info("Found request for {} | IMDB: {} - {}", item.filePath, item.imdbId, request)
                 }
             }
         }
@@ -64,6 +64,7 @@ class JellyseerrRestService(
     private fun mediaMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
 
         if (!serverMatches(candidate)) {
+            log.debug("Found request in Jellyseerr but server doesn't match!")
             return false
         }
 
@@ -86,6 +87,12 @@ class JellyseerrRestService(
     }
 
     private fun serverMatches(candidate: RequestResponse): Boolean {
+
+        // only validate the server, if the user enabled it
+        if (!jellyseerrProperties.matchServer) {
+            return true
+        }
+
         // match media server first - some people use several Sonarr/Radarr installations
         val servarrrSettings = if (candidate.type == "tv") sonarrServers else radarrServers
         val servarrProperties = if (candidate.type == "tv") sonarrProperties else radarrProperties

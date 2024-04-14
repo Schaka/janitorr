@@ -6,5 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class JellyseerrProperties(
         val enabled: Boolean,
         val url: String,
-        val apiKey: String
+        val apiKey: String,
+        val matchServer: Boolean = false
 )

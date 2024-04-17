@@ -79,7 +79,14 @@ class SonarrRestService(
 
         // history may be outdated, we need to find the current path, as it currently stands in the library
         return history.map {
-            val episodeResponse = sonarrClient.getAllEpisodes(it.id, it.season!!).firstOrNull { ep -> ep.hasFile && ep.episodeFileId != null }
+            val episodeResponses = sonarrClient.getAllEpisodes(it.id, it.season!!)
+
+            // If no files are available in this season, don't consider it for deletion, we only care about entries that represent real files
+            if (episodeResponses.none(EpisodeResponse::hasFile)) {
+                return@map null
+            }
+
+            val episodeResponse = episodeResponses.firstOrNull { ep -> ep.hasFile && ep.episodeFileId != null }
             if (episodeResponse == null) {
                 return@map it
             }
@@ -87,7 +94,7 @@ class SonarrRestService(
             val fileResponse = sonarrClient.getEpisodeFile(episodeResponse.episodeFileId!!)
 
             it.copy(filePath = fileResponse.path!!)
-        }
+        }.filterNotNull()
     }
 
     override fun removeEntries(items: List<LibraryItem>) {

@@ -179,7 +179,7 @@ abstract class AbstractMediaServerRestService(
         val path = Path.of(fileSystemProperties.leavingSoonDir, type.folderName)
 
         // Clean up library - consider also deleting the collection in Jellyfin/Emby
-        if (items.isEmpty()) {
+        if (items.isEmpty() && !onlyAddLinks) {
             FileSystemUtils.deleteRecursively(path)
             return
         }

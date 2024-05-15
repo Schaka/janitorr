@@ -77,7 +77,7 @@ abstract class AbstractCleanupSchedule(
 
     protected fun getFreeSpacePercentage(): Double {
         val filesystem = File(fileSystemProperties.freeSpaceCheckDir)
-        return (filesystem.freeSpace.toDouble() / filesystem.totalSpace.toDouble()) * 100
+        return (filesystem.usableSpace.toDouble() / filesystem.totalSpace.toDouble()) * 100
     }
 
     protected fun deleteMovies(toDeleteMovies: List<LibraryItem>) {

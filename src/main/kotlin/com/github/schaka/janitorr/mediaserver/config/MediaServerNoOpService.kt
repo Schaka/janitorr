@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.mediaserver.config
 
+import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -22,7 +23,7 @@ class MediaServerNoOpService : MediaServerService() {
         log.info("Media Server not implemented. No movies deleted.")
     }
 
-    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType) {
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, config: JellystatProperties) {
         log.info("Media Server not implemented. No server IDs populated.")
     }
 

@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.mediaserver
 
+import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -24,7 +25,7 @@ abstract class MediaServerService {
 
     abstract fun cleanupMovies(items: List<LibraryItem>)
 
-    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType)
+    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, config: JellystatProperties)
 
     abstract fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 

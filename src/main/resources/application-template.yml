@@ -79,5 +79,6 @@ clients:
     match-server: false # Enable if you have several Radarr/Sonarr instances set up in Jellyseerr. Janitorr will match them by the host+port supplied in their respective config settings.
   jellystat:
     enabled: true
+    whole-tv-show: false # Enabling this will make Jellystat consider TV shows as a whole if any episode of any season has been watched
     url: "http://jellystat:3000"
     api-key: "jellystat-key"

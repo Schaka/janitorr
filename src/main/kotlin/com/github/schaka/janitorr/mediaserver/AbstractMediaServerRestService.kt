@@ -37,9 +37,9 @@ abstract class AbstractMediaServerRestService(
      * Populates the library items with Jellyfin/Emby IDs if available.
      * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
      */
-    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType) {
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, config: JellystatProperties) {
         when (type) {
-            TV_SHOWS -> populateTvShowIds(items)
+            TV_SHOWS -> populateTvShowIds(items, !config.wholeTvShow)
             MOVIES -> populateMovieIds(items)
         }
     }
@@ -77,17 +77,20 @@ abstract class AbstractMediaServerRestService(
         // TODO: Remove TV shows if all seasons gone - only if wholeShow is turned off
     }
 
-    private fun populateTvShowIds(items: List<LibraryItem>) {
-        val mediaServerShows = getTvLibrary()
+    private fun populateTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true) {
+
+        val useSeason = !applicationProperties.wholeTvShow && bySeason
+
+        val mediaServerShows = getTvLibrary(useSeason)
         for (show: LibraryItem in items) {
-            mediaServerShows.firstOrNull { tvShowMatches(show, it, !applicationProperties.wholeTvShow) }
+            mediaServerShows.firstOrNull { tvShowMatches(show, it, useSeason) }
                     ?.let { mediaServerContent ->
                         show.mediaServerId = mediaServerContent.Id
                     }
         }
     }
 
-    private fun getTvLibrary(): List<LibraryContent> {
+    private fun getTvLibrary(bySeason: Boolean = true): List<LibraryContent> {
         val parentFolders = mediaServerClient.getAllItems()
 
         var mediaServerShows = parentFolders.Items.flatMap { parent ->
@@ -95,7 +98,7 @@ abstract class AbstractMediaServerRestService(
         }
 
         // don't treat library season by season, if not necessary
-        if (!applicationProperties.wholeTvShow) {
+        if (bySeason) {
             mediaServerShows = mediaServerShows.flatMap { show ->
                 val seasons = mediaServerClient.getAllSeasons(show.Id).Items
                 seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)

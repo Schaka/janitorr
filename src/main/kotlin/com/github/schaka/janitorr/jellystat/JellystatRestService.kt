@@ -15,6 +15,7 @@ import java.time.LocalDateTime
  */
 class JellystatRestService(
         val jellystatClient: JellystatClient,
+        val jellystatProperties: JellystatProperties,
         val mediaServerService: MediaServerService,
         val applicationProperties: ApplicationProperties
 ) : JellystatService {
@@ -24,7 +25,11 @@ class JellystatRestService(
     }
 
     override fun populateWatchHistory(items: List<LibraryItem>, type: LibraryType) {
-        mediaServerService.populateMediaServerIds(items, type)
+        // populates per season, per show or per movie, depending on properties
+        // e.g. each season item can be populated with its TV show mediaserver id
+        // watch age is determined by the matched mediaserver id
+        // TODO: find a better way - passing properties to an unrelated component couples them unnecessarily
+        mediaServerService.populateMediaServerIds(items, type, jellystatProperties)
 
         for (item in items.filter { it.mediaServerId != null }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here

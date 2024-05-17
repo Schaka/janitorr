@@ -10,6 +10,9 @@ import feign.RequestLine
 
 interface SonarrClient {
 
+    @RequestLine("GET /history/series?seriesId={seriesId}")
+    fun getHistory(@Param("seriesId") seriesId: Int): List<HistoryResponse>
+
     @RequestLine("GET /history/series?seriesId={seriesId}&seasonNumber={season}")
     fun getHistory(@Param("seriesId") seriesId: Int, @Param("season") season: Int): List<HistoryResponse>
 

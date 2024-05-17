@@ -27,6 +27,7 @@ class JellystatRestService(
         mediaServerService.populateMediaServerIds(items, type)
 
         for (item in items.filter { it.mediaServerId != null }) {
+            // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
             val watchHistory = jellystatClient.getRequests(ItemRequest(item.mediaServerId!!))
                     .filter { it.PlaybackDuration > 60 }
                     .maxByOrNull { toDate(it.ActivityDateInserted) }

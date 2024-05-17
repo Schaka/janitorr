@@ -2,6 +2,7 @@ package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
+import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.library.AddLibraryRequest
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -50,10 +51,15 @@ abstract class AbstractMediaServerRestService(
             return
         }
 
+        // if we're treating shows as a whole, getTvLibrary will return all TV shows, not seasons
+        // we also filter our library items, so we only need to match and delete each show once
         val mediaServerShows = getTvLibrary()
+        val showsForDeletion = if (applicationProperties.wholeTvShow) items.distinctBy { it.id } else items
 
-        for (show: LibraryItem in items) {
-            mediaServerShows.firstOrNull { tvShowMatches(show, it) }
+        for (show: LibraryItem in showsForDeletion) {
+            mediaServerShows
+                .firstOrNull { tvShowMatches(show, it) }
+                    // if we find any matches for TV show or season (depending on settings) delete that match
                     ?.let { mediaServerContent ->
                         if (!applicationProperties.dryRun) {
                             try {
@@ -68,13 +74,13 @@ abstract class AbstractMediaServerRestService(
                     }
         }
 
-        // TODO: Remove TV shows if all seasons gone
+        // TODO: Remove TV shows if all seasons gone - only if wholeShow is turned off
     }
 
     private fun populateTvShowIds(items: List<LibraryItem>) {
         val mediaServerShows = getTvLibrary()
         for (show: LibraryItem in items) {
-            mediaServerShows.firstOrNull { tvShowMatches(show, it) }
+            mediaServerShows.firstOrNull { tvShowMatches(show, it, !applicationProperties.wholeTvShow) }
                     ?.let { mediaServerContent ->
                         show.mediaServerId = mediaServerContent.Id
                     }
@@ -84,8 +90,13 @@ abstract class AbstractMediaServerRestService(
     private fun getTvLibrary(): List<LibraryContent> {
         val parentFolders = mediaServerClient.getAllItems()
 
-        val mediaServerShows = parentFolders.Items.flatMap { parent ->
-            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type == "Series" }.flatMap { show ->
+        var mediaServerShows = parentFolders.Items.flatMap { parent ->
+            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type == "Series" }
+        }
+
+        // don't treat library season by season, if not necessary
+        if (!applicationProperties.wholeTvShow) {
+            mediaServerShows = mediaServerShows.flatMap { show ->
                 val seasons = mediaServerClient.getAllSeasons(show.Id).Items
                 seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
                 seasons

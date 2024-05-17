@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
+import com.github.schaka.janitorr.servarr.sonarr.series.Season
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
@@ -51,31 +52,40 @@ class SonarrRestService(
     override fun getEntries(): List<LibraryItem> {
         val allTags = sonarrClient.getAllTags()
 
+        if (applicationProperties.wholeTvShow) {
+            return getEntriesPerShow(allTags)
+        }
+
+        return getEntriesPerSeason(allTags)
+    }
+
+    // this function is a bit hacky, but it makes the code much less convoluted and way easier to maintain
+    // the regular season based function already grabs all seasons with correct files, paths etc
+    // it's much easier to update all seasons with the date information of the whole show
+    private fun getEntriesPerShow(allTags: List<Tag>): List<LibraryItem> {
+       return getEntriesPerSeason(allTags).map {
+                val latestEpisode = sonarrClient.getHistory(it.id) // returns history of EVERY episode
+                    .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
+                    .sortedWith(historyByDate())
+                    .first()
+
+                // just fake the date so all seasons are treated as being the same age
+                it.copy(importedDate = parseDate(latestEpisode.date))
+            }
+    }
+
+    private fun getEntriesPerSeason(allTags: List<Tag>): List<LibraryItem> {
         val history = sonarrClient.getAllSeries()
-                .filter { !it.tags.contains(keepTag.id) }
-                .flatMap { series ->
-                    series.seasons.map { season ->
-                        sonarrClient.getHistory(series.id, season.seasonNumber)
-                                .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
-                                .map {
-                                    LibraryItem(
-                                            series.id,
-                                            LocalDateTime.parse(it.date.substring(0, it.date.length - 1)),
-                                            it.data.droppedPath!!,
-                                            it.data.importedPath!!,
-                                            series.path,
-                                            series.rootFolderPath,
-                                            it.data.importedPath, //points to the file
-                                            season = season.seasonNumber,
-                                            tvdbId = series.tvdbId,
-                                            imdbId = series.imdbId,
-                                            tags = allTags.filter { tag -> series.tags.contains(tag.id) }.map { tag -> tag.label }
-                                    )
-                                }
-                                .sortedWith(byDate(upgradesAllowed))
-                                .firstOrNull()
-                    }
-                }.filterNotNull()
+            .filter { !it.tags.contains(keepTag.id) }
+            .flatMap { series ->
+                series.seasons.map { season ->
+                    sonarrClient.getHistory(series.id, season.seasonNumber)
+                        .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
+                        .map{ mapItem(it, series, allTags, season) }
+                        .sortedWith(byDate(upgradesAllowed))
+                        .firstOrNull()
+                }
+            }.filterNotNull()
 
         // history may be outdated, we need to find the current path, as it currently stands in the library
         return history.map {
@@ -97,7 +107,56 @@ class SonarrRestService(
         }.filterNotNull()
     }
 
+    private fun mapItem(it: HistoryResponse, series: SeriesPayload, allTags: List<Tag>, season: Season? = null): LibraryItem {
+        return LibraryItem(
+            series.id,
+            parseDate(it.date),
+            it.data.droppedPath!!,
+            it.data.importedPath!!,
+            series.path,
+            series.rootFolderPath,
+            it.data.importedPath, //points to the file
+            season = season?.seasonNumber,
+            tvdbId = series.tvdbId,
+            imdbId = series.imdbId,
+            tags = allTags.filter { tag -> series.tags.contains(tag.id) }.map { tag -> tag.label }
+        )
+    }
+
+    private fun parseDate(date: String): LocalDateTime {
+        return LocalDateTime.parse(date.substring(0, date.length - 1))
+    }
+
     override fun removeEntries(items: List<LibraryItem>) {
+
+        if (applicationProperties.wholeTvShow) {
+
+            // if tv shows are treated as a whole, we don't need to delete every season, we can just delete the whole show
+            val affectedShows = items.filter {
+                !(applicationProperties.wholeShowSeedingCheck &&
+                        fileSystemProperties.access &&
+                        fileSystemProperties.validateSeeding &&
+                        Path.of(it.originalPath).exists())
+            }
+            .map { it.id }
+            .distinct()
+            .map { sonarrClient.getSeries(it) }
+
+            log.info("Treating TV shows as a whole - preparing to delete ${affectedShows.size} shows")
+            for (show in affectedShows) {
+                // no seeding check, we just delete everything - checking every single file for seeding isn't feasible
+                if (!applicationProperties.dryRun) {
+                    sonarrClient.deleteSeries(show.id, true)
+                }
+                log.info("Deleting ${show.title} [${show.id}}]")
+            }
+        }
+        else {
+            removeBySeason(items)
+        }
+    }
+
+    private fun removeBySeason(items: List<LibraryItem>) {
         // we are always treating seasons as a whole, even if technically episodes could be handled individually
         for (item in items) {
 
@@ -112,10 +171,8 @@ class SonarrRestService(
                 if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                     if (!applicationProperties.dryRun) {
                         sonarrClient.deleteEpisodeFile(episode.episodeFileId)
-                        log.info("Deleting {} - episode {} ({}) of season {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
-                    } else {
-                        log.info("Deleting {} - episode {} ({}) of season {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                     }
+                    log.info("Deleting {} - episode {} ({}) of season {}", item.parentPath, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                 }
             }
 
@@ -127,7 +184,6 @@ class SonarrRestService(
         // We could be more efficient and do this when grabbing the series in unmonitorSeason anyway, but more clear cut code should be better here
         val affectedShows = items.map { it.id }.distinct().map { sonarrClient.getSeries(it) }
         deleteEmptyShows(affectedShows)
-
     }
 
     private fun unmonitorSeasons(seriesId: Int, vararg seasonNumbers: Int) {
@@ -139,7 +195,7 @@ class SonarrRestService(
                     seasonToEdit.monitored = false
 
                     if (isMonitored) {
-                        log.info("Unmonitoring {} - season {}", series.title, seasonToEdit.seasonNumber)
+                        log.info("Unmonitoring ${series.title} - season ${seasonToEdit.seasonNumber}")
                     }
                 }
 
@@ -179,7 +235,7 @@ class SonarrRestService(
 
             if (noFiles) {
                 sonarrClient.deleteSeries(show.id, true)
-                log.info("Deleting {} [{}] - All seasons were unused", show.title, show.id)
+                log.info("Deleting ${show.title} [${show.id}] - All seasons were unused")
             }
         }
     }

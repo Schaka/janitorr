@@ -63,14 +63,16 @@ class SonarrRestService(
     // the regular season based function already grabs all seasons with correct files, paths etc
     // it's much easier to update all seasons with the date information of the whole show
     private fun getEntriesPerShow(allTags: List<Tag>): List<LibraryItem> {
-       return getEntriesPerSeason(allTags).map {
-                val latestEpisode = sonarrClient.getHistory(it.id) // returns history of EVERY episode
+       return getEntriesPerSeason(allTags).map { libItem ->
+                val latestEpisode = sonarrClient.getHistory(libItem.id) // returns history of EVERY episode
                     .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                     .sortedWith(historyByDate())
                     .first()
 
                 // just fake the date so all seasons are treated as being the same age
-                it.copy(importedDate = parseDate(latestEpisode.date))
+                val latestDate = parseDate(latestEpisode.date)
+                log.trace("Treat TV show as a whole - overwriting season import date - IMDB: ${libItem.imdbId} imported at $latestDate")
+                libItem.copy(importedDate = latestDate, lastSeen = latestDate)
             }
     }
 

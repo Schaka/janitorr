@@ -17,7 +17,7 @@ interface ServarrService {
         return if (upgradesAllowed) comp.reversed() else comp
     }
 
-    fun historyByDate(): Comparator<HistoryResponse> {
+    fun byHistoryMostRecent(): Comparator<HistoryResponse> {
         val comp = compareBy<HistoryResponse> { LocalDateTime.parse(it.date.substring(0, it.date.length - 1)) }
         return comp.reversed()
     }

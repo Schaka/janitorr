@@ -66,7 +66,7 @@ class SonarrRestService(
        return getEntriesPerSeason(allTags).map { libItem ->
                 val latestEpisode = sonarrClient.getHistory(libItem.id) // returns history of EVERY episode
                     .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
-                    .sortedWith(historyByDate())
+                    .sortedWith(byHistoryMostRecent())
                     .first()
 
                 // just fake the date so all seasons are treated as being the same age

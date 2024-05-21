@@ -46,7 +46,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Configure expiration times for your media in the *arrs and optionally, if media can be found in JellyStat
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
 - Unmonitor and delete media from *arr
-- Season by season removal for TV shows
+- Season by season removal for TV shows, or optionally the entire show
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 
 ### Disclaimer

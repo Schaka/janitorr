@@ -5,6 +5,7 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.library.AddLibraryRequest
+import com.github.schaka.janitorr.mediaserver.library.AddPathRequest
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -199,17 +200,24 @@ abstract class AbstractMediaServerRestService(
             return
         }
 
+        val pathString = path.toUri().path
+        Files.createDirectories(path)
+        val libraryName = "${libraryType.collectionName} (Deleted Soon)"
+
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
-        var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${libraryType.collectionName} (Deleted Soon)" }
+        var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
         if (leavingSoonCollection == null) {
-            Files.createDirectories(path)
-            val libraryPath = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName)
-            val pathString = libraryPath.toUri().path
             // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
             val pathForMediaServer = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
-            mediaServerClient.createLibrary("${libraryType.collectionName} (Deleted Soon)", libraryType.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
-            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${libraryType.collectionName} (Deleted Soon)" }
+            mediaServerClient.createLibrary(libraryName, libraryType.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
+            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
+        }
+
+        // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
+        val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
+        if (pathSet == false) {
+            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, pathString), true)
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

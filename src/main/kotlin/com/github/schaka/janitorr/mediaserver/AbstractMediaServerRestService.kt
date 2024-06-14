@@ -4,10 +4,7 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellystat.JellystatProperties
-import com.github.schaka.janitorr.mediaserver.library.AddLibraryRequest
-import com.github.schaka.janitorr.mediaserver.library.AddPathRequest
-import com.github.schaka.janitorr.mediaserver.library.LibraryContent
-import com.github.schaka.janitorr.mediaserver.library.LibraryType
+import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -217,7 +214,7 @@ abstract class AbstractMediaServerRestService(
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
-            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, pathString), true)
+            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathString)))
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

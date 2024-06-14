@@ -197,7 +197,7 @@ abstract class AbstractMediaServerRestService(
             return
         }
 
-        val pathString = path.toUri().path
+        val pathString = path.toUri().path.removeSuffix("/")
         Files.createDirectories(path)
         val libraryName = "${libraryType.collectionName} (Deleted Soon)"
 

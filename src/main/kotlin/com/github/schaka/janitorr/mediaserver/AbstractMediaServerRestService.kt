@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.mediaserver
 
+import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellystat.JellystatProperties
@@ -180,7 +181,7 @@ abstract class AbstractMediaServerRestService(
         }
     }
 
-    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
+    override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
 
         // Only do this, if we can get access to the file system to create a link structure
         if (!fileSystemProperties.access || fileSystemProperties.leavingSoonDir == null) {
@@ -188,9 +189,9 @@ abstract class AbstractMediaServerRestService(
         }
 
         val result = mediaServerClient.listLibraries()
-        val collectionFilter = type.collectionType.lowercase()
-        // subdirectory (i.e. /leaving-soon/tv
-        val path = Path.of(fileSystemProperties.leavingSoonDir, type.folderName)
+        val collectionFilter = libraryType.collectionType.lowercase()
+        // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
+        val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
 
         // Clean up library - consider also deleting the collection in Jellyfin/Emby
         if (items.isEmpty() && !onlyAddLinks) {
@@ -200,14 +201,15 @@ abstract class AbstractMediaServerRestService(
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
-        var goneSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
-        if (goneSoonCollection == null) {
+        var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${libraryType.collectionName} (Deleted Soon)" }
+        if (leavingSoonCollection == null) {
             Files.createDirectories(path)
-            val pathString = path.toUri().path
+            val libraryPath = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName)
+            val pathString = libraryPath.toUri().path
             // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
             val pathForMediaServer = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
-            mediaServerClient.createLibrary("${type.collectionName} (Deleted Soon)", type.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
-            goneSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${type.collectionName} (Deleted Soon)" }
+            mediaServerClient.createLibrary("${libraryType.collectionName} (Deleted Soon)", libraryType.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
+            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == "${libraryType.collectionName} (Deleted Soon)" }
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
@@ -216,7 +218,7 @@ abstract class AbstractMediaServerRestService(
             Files.createDirectories(path)
         }
 
-        createLinks(items, path, type)
+        createLinks(items, path, libraryType)
     }
 
 }

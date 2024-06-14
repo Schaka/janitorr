@@ -28,7 +28,7 @@ class MediaCleanupSchedule(
         applicationProperties: ApplicationProperties,
         @Sonarr sonarrService: ServarrService,
         @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
+) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

@@ -16,6 +16,7 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 abstract class AbstractCleanupSchedule(
+        protected val cleanupType: CleanupType,
         protected val mediaServerService: MediaServerService,
         protected val jellyseerrService: JellyseerrService,
         protected val jellystatService: JellystatService,
@@ -29,10 +30,10 @@ abstract class AbstractCleanupSchedule(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
-    protected fun scheduleDelete(type: LibraryType, expiration: Duration?, entryFilter: (LibraryItem) -> Boolean = { true }) {
+    protected fun scheduleDelete(libraryType: LibraryType, expiration: Duration?, entryFilter: (LibraryItem) -> Boolean = { true }) {
 
-        if (!needToDelete(type)) {
-            log.info("Not deleting ${type.collectionName} because minimum disk threshold was not reached.")
+        if (!needToDelete(libraryType)) {
+            log.info("Not deleting ${libraryType.collectionName} because minimum disk threshold was not reached.")
             if (fileSystemProperties.access) {
                 log.info("Free disk space: ${getFreeSpacePercentage()}%")
             }
@@ -44,9 +45,9 @@ abstract class AbstractCleanupSchedule(
             return
         }
 
-        when (type) {
-            TV_SHOWS -> cleanupMediaType(type, sonarrService, expiration, this::deleteTvShows, entryFilter)
-            MOVIES -> cleanupMediaType(type, radarrService, expiration, this::deleteMovies, entryFilter)
+        when (libraryType) {
+            TV_SHOWS -> cleanupMediaType(libraryType, sonarrService, expiration, this::deleteTvShows, entryFilter)
+            MOVIES -> cleanupMediaType(libraryType, radarrService, expiration, this::deleteMovies, entryFilter)
         }
 
     }
@@ -57,7 +58,7 @@ abstract class AbstractCleanupSchedule(
      * Convert to full days and do some math.
      * This should probably work just letting the user set the duration entirely. But I think forcing full days will avoid some user errors.
      */
-    private fun cleanupMediaType(type: LibraryType, servarrService: ServarrService, expiration: Duration,
+    private fun cleanupMediaType(libraryType: LibraryType, servarrService: ServarrService, expiration: Duration,
                                  deleteTask: (List<LibraryItem>) -> Unit,
                                  entryFilter: (LibraryItem) -> Boolean) {
 
@@ -66,10 +67,10 @@ abstract class AbstractCleanupSchedule(
         val expirationDays = expiration.toDays()
 
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
-        jellystatService.populateWatchHistory(servarrEntries, type)
+        jellystatService.populateWatchHistory(servarrEntries, libraryType)
 
         val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
-        mediaServerService.updateGoneSoon(type, leavingSoon)
+        mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon)
 
         val toDeleteMedia = servarrEntries.filter { it.historyAge.plusDays(expirationDays) < today }
         deleteTask(toDeleteMedia)
@@ -88,7 +89,7 @@ abstract class AbstractCleanupSchedule(
 
         jellyseerrService.cleanupRequests(deletedMovies)
         mediaServerService.cleanupMovies(deletedMovies)
-        mediaServerService.updateGoneSoon(MOVIES, cannotDeleteMovies, true)
+        mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
     }
 
     protected fun deleteTvShows(toDeleteShows: List<LibraryItem>) {
@@ -99,7 +100,7 @@ abstract class AbstractCleanupSchedule(
 
         jellyseerrService.cleanupRequests(deletedShows)
         mediaServerService.cleanupTvShows(deletedShows)
-        mediaServerService.updateGoneSoon(TV_SHOWS, cannotDeleteShow, true)
+        mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
     }
 
 }

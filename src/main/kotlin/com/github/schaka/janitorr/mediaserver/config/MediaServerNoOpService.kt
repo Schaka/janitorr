@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.mediaserver.config
 
+import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -27,7 +28,7 @@ class MediaServerNoOpService : MediaServerService() {
         log.info("Media Server not implemented. No server IDs populated.")
     }
 
-    override fun updateGoneSoon(type: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
-        log.info("Media Server not implemented. No 'Gone Soon' library created.")
+    override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
+        log.info("Media Server not implemented. No 'Leaving Soon' library created.")
     }
 }

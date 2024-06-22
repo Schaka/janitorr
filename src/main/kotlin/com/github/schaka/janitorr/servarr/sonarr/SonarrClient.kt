@@ -2,6 +2,7 @@ package com.github.schaka.janitorr.servarr.sonarr
 
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
+import com.github.schaka.janitorr.servarr.history.SonarrHistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
@@ -11,10 +12,10 @@ import feign.RequestLine
 interface SonarrClient {
 
     @RequestLine("GET /history/series?seriesId={seriesId}")
-    fun getHistory(@Param("seriesId") seriesId: Int): List<HistoryResponse>
+    fun getHistory(@Param("seriesId") seriesId: Int): List<SonarrHistoryResponse>
 
     @RequestLine("GET /history/series?seriesId={seriesId}&seasonNumber={season}")
-    fun getHistory(@Param("seriesId") seriesId: Int, @Param("season") season: Int): List<HistoryResponse>
+    fun getHistory(@Param("seriesId") seriesId: Int, @Param("season") season: Int): List<SonarrHistoryResponse>
 
     @RequestLine("GET /series/{id}")
     fun getSeries(@Param("id") id: Int): SeriesPayload

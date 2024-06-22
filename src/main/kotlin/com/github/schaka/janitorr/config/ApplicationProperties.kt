@@ -10,6 +10,8 @@ data class ApplicationProperties(
         val mediaDeletion: MediaDeletion,
         @NestedConfigurationProperty
         val tagBasedDeletion: TagDeletion,
+        @NestedConfigurationProperty
+        val episodeDeletion: EpisodeDeletion,
         val dryRun: Boolean = false,
         val wholeTvShow: Boolean = false,
         val wholeShowSeedingCheck: Boolean = false,

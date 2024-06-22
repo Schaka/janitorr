@@ -32,7 +32,9 @@ class SonarrRestService(
 
         var upgradesAllowed: Boolean = false,
 
-        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
+        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
+
+        var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 
 ) : ServarrService {
 
@@ -40,6 +42,7 @@ class SonarrRestService(
         if (sonarrProperties.enabled) {
             upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
             keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
+            episodeTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.episodeDeletion.tag } ?: episodeTag
         }
     }
 
@@ -79,6 +82,7 @@ class SonarrRestService(
     private fun getEntriesPerSeason(allTags: List<Tag>): List<LibraryItem> {
         val history = sonarrClient.getAllSeries()
             .filter { !it.tags.contains(keepTag.id) }
+            .filter { !it.tags.contains(episodeTag.id) }
             .flatMap { series ->
                 series.seasons.map { season ->
                     sonarrClient.getHistory(series.id, season.seasonNumber)

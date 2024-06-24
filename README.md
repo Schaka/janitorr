@@ -116,7 +116,7 @@ version: '3'
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:latest
+    image: ghcr.io/schaka/janitorr:stable
     volumes:
       - /appdata/janitorr/config:/config
       - /share_media:/data

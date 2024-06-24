@@ -106,7 +106,7 @@ extra {
     val containerImageName = "schaka/${project.name}"
     val containerImageTags = mutableSetOf(shortCommit, branch)
     if (branch == "main") {
-        containerImageTags.add("latest")
+        containerImageTags.add("stable")
     }
 
     project.extra["docker.image.name"] = containerImageName

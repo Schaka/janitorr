@@ -167,8 +167,8 @@ abstract class AbstractMediaServerRestService(
         val tvdbId = parseMetadataId(candidate.ProviderIds?.Tvdb)
 
         val imdbMatches = candidate.ProviderIds?.Imdb != null && candidate.ProviderIds?.Imdb == item.imdbId
-        val tmdbMatches = candidate.ProviderIds?.Tmdb != null && tmdbId == item.tmdbId
-        val tvdbMatches = candidate.ProviderIds?.Tvdb != null && tvdbId == item.tvdbId
+        val tmdbMatches = tmdbId != null && item.tmdbId != null && tmdbId == item.tmdbId
+        val tvdbMatches = tvdbId != null && item.tvdbId != null && tvdbId == item.tvdbId
         return imdbMatches || tmdbMatches || tvdbMatches
     }
 

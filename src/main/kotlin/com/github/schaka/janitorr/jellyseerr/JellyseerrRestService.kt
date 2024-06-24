@@ -80,9 +80,9 @@ class JellyseerrRestService(
         }
 
         // Fallback, match by meta data
-        val imdbMatches = candidate.media.imdbId != null && (candidate.media.imdbId == item.imdbId)
-        val tmdbMatches = candidate.media.tmdbId != null && (candidate.media.tmdbId == item.tmdbId)
-        val tvdbMatches = candidate.media.tvdbId != null && (candidate.media.tvdbId == item.tvdbId)
+        val imdbMatches = candidate.media.imdbId != null && item.imdbId != null && candidate.media.imdbId == item.imdbId
+        val tmdbMatches = candidate.media.tmdbId != null && item.tmdbId != null && candidate.media.tmdbId == item.tmdbId
+        val tvdbMatches = candidate.media.tvdbId != null && item.tvdbId != null && candidate.media.tvdbId == item.tvdbId
         return imdbMatches || tmdbMatches || tvdbMatches
     }
 

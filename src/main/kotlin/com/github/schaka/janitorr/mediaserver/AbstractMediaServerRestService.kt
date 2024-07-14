@@ -214,7 +214,7 @@ abstract class AbstractMediaServerRestService(
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
-            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathString)))
+            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathString), leavingSoonCollection?.Guid))
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

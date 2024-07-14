@@ -8,5 +8,9 @@ data class VirtualFolderResponse(
         val Name: String,
         val PrimaryImageItemId: String?,
         val RefreshProgress: Int,
-        val RefreshStatus: String?
+        val RefreshStatus: String?,
+
+        // Emby only - maybe find a cleaner solution?
+        val Id: String?, // equivalent of ItemId
+        val Guid: String? // new GUID
 )

@@ -33,7 +33,7 @@ class EmbyClientConfig {
 
     @Emby
     @Bean
-    fun embyClient(properties: EmbyProperties, mapper: ObjectMapper): MediaServerClient {
+    fun embyClient(properties: EmbyProperties, mapper: ObjectMapper): EmbyMediaServerClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
@@ -41,7 +41,7 @@ class EmbyClientConfig {
                     it.header("X-Emby-Token", properties.apiKey)
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
-                .target(MediaServerClient::class.java, "${properties.url}/emby")
+                .target(EmbyMediaServerClient::class.java, "${properties.url}/emby")
     }
 
     @Emby

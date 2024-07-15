@@ -8,6 +8,6 @@ import feign.RequestLine
 
 interface EmbyMediaServerClient : MediaServerClient {
 
-    @RequestLine("POST /Library/VirtualFolders")
-    fun createLibrary(request: AddVirtualFolder)
+    @RequestLine("POST /Library/VirtualFolders?name={name}&collectionType={type}&refreshLibrary=false")
+    fun createLibrary(@Param("name") name: String, @Param("type") collectionType: String, request: AddVirtualFolder)
 }

@@ -7,10 +7,8 @@ import com.github.schaka.janitorr.mediaserver.AbstractMediaServerRestService
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.library.AddVirtualFolder
-import com.github.schaka.janitorr.mediaserver.library.AddLibraryRequest
-import com.github.schaka.janitorr.mediaserver.library.AddPathRequest
-import com.github.schaka.janitorr.mediaserver.library.LibraryType
-import com.github.schaka.janitorr.mediaserver.library.PathInfo
+import com.github.schaka.janitorr.mediaserver.emby.library.LibraryOptions
+import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
@@ -42,7 +40,7 @@ open class EmbyRestService(
         }
 
         val result = mediaServerClient.listLibraries()
-        val collectionFilter = libraryType.collectionType.lowercase()
+        val collectionTypeLower = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
         val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
 
@@ -58,12 +56,13 @@ open class EmbyRestService(
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
-        var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
+        var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
         if (leavingSoonCollection == null) {
             // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
             val pathForMediaServer = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
-            embyClient.createLibrary(AddVirtualFolder(libraryName, libraryType.collectionType, listOf(pathForMediaServer)))
-            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
+            val libOptions = LibraryOptions(listOf(PathInfo(pathString)), ContentType = collectionTypeLower)
+            embyClient.createLibrary(libraryName, collectionTypeLower, AddVirtualFolder(libraryName, collectionTypeLower, listOf(pathForMediaServer), libOptions))
+            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
         }
 
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet

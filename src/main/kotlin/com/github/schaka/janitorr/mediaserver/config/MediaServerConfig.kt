@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerService
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.Emby
+import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
 import com.github.schaka.janitorr.mediaserver.emby.EmbyProperties
 import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService
 import com.github.schaka.janitorr.mediaserver.jellyfin.Jellyfin
@@ -27,7 +28,7 @@ import org.springframework.context.annotation.Configuration
 @RegisterReflectionForBinding(classes = [ItemPage::class, MediaFolderItem::class, LibraryContent::class, VirtualFolderResponse::class, ProviderIds::class, UserData::class])
 @Configuration(proxyBeanMethods = false)
 class MediaServerConfig(
-    @Emby val embyClient: MediaServerClient,
+    @Emby val embyClient: EmbyMediaServerClient,
     @Jellyfin val jellyfinClient: MediaServerClient,
     @Emby val embyUserClient: MediaServerUserClient,
     @Jellyfin val jellyfinUserClient: MediaServerUserClient,

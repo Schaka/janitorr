@@ -27,5 +27,5 @@ data class LibraryOptions(
         val SkipSubtitlesIfEmbeddedSubtitlesPresent: Boolean,
         val SubtitleDownloadLanguages: List<String>?,
         val SubtitleFetcherOrder: List<String>?,
-        val TypeOptions: List<TypeOption>
+        val TypeOptions: List<TypeOption>?
 )

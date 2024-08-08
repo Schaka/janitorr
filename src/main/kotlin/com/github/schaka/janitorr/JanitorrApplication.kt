@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.jellyseerr.JellyseerrClient
 import com.github.schaka.janitorr.jellystat.JellystatClient
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
+import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.RadarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
@@ -31,6 +32,7 @@ class JanitorrApplication {
         override fun registerHints(hints: RuntimeHints, classLoader: ClassLoader?) {
             hints.proxies().registerJdkProxy(JellyseerrClient::class.java)
             hints.proxies().registerJdkProxy(JellystatClient::class.java)
+            hints.proxies().registerJdkProxy(EmbyMediaServerClient::class.java)
             hints.proxies().registerJdkProxy(MediaServerClient::class.java)
             hints.proxies().registerJdkProxy(MediaServerUserClient::class.java)
             hints.proxies().registerJdkProxy(RadarrClient::class.java)

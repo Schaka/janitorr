@@ -38,7 +38,7 @@ class JellystatRestService(
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
             val watchHistory = jellystatClient.getRequests(ItemRequest(item.mediaServerId!!))
                     .filter { it.PlaybackDuration > 60 }
-                    .maxByOrNull { toDate(it.ActivityDateInserted) }
+                    .maxByOrNull { toDate(it.ActivityDateInserted) } // most recent date
 
             // only count view if at least one minute of content was watched - could be user adjustable later
             if (watchHistory != null) {

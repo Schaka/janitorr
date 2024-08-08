@@ -45,7 +45,9 @@ class MediaCleanupSchedule(
         }
 
         val seasonExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.seasonExpiration)
+        log.debug("Cleaning up TV shows older than ${seasonExpiration?.toDays()}")
         val movieExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.movieExpiration)
+        log.debug("Cleaning up movies older than ${movieExpiration?.toDays()}")
 
         scheduleDelete(TV_SHOWS, seasonExpiration)
         scheduleDelete(MOVIES, movieExpiration)

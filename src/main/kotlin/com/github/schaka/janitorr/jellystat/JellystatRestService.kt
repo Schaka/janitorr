@@ -47,6 +47,12 @@ class JellystatRestService(
             }
 
         }
+
+        if (log.isTraceEnabled) {
+            for (item in items.filter { it.mediaServerId == null }) {
+                log.trace("Could not find any matching media server id for ${item.filePath} IMDB: ${item.imdbId} TMDB: ${item.tmdbId} TVDB: ${item.tvdbId} Season: ${item.season}")
+            }
+        }
     }
 
     private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryResponse?) {

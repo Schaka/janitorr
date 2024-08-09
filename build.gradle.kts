@@ -105,7 +105,7 @@ extra {
 
     val containerImageName = "schaka/${project.name}"
     val containerImageTags = mutableSetOf(shortCommit, branch)
-    if (branch == "main") {
+    if (branch.startsWith("v1")) {
         containerImageTags.add("stable")
     }
 
@@ -113,6 +113,16 @@ extra {
     project.extra["docker.image.version"] = branch
     project.extra["docker.image.source"] = build.projectSourceRoot()
     project.extra["docker.image.tags"] = containerImageTags
+
+    val nativeBaseTag = "native"
+    val nativeImageName = "ghcr.io/${containerImageName}:$nativeBaseTag"
+    val nativeImageTags = mutableListOf("$nativeImageName-$branch")
+    if (branch.startsWith("v1")) {
+        nativeImageTags.add("$nativeBaseTag-stable")
+    }
+
+    project.extra["native.image.name"] = nativeImageName
+    project.extra["native.image.tags"] = nativeImageTags
 
 }
 
@@ -133,7 +143,6 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.url = "ghcr.io"
     docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
-    // docker.publishRegistry.token = System.getenv("GITHUB_TOKEN") ?: "INVALID_TOKEN"
 
     imageName = "ghcr.io/${project.extra["docker.image.name"]}:native"
     version = project.extra["docker.image.version"] as String

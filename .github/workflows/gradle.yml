@@ -50,7 +50,6 @@ jobs:
 
       - name: Build Native Image
         uses: gradle/actions/setup-gradle@v3
-        if: startsWith(github.ref, 'refs/tags/v')
         with:
           gradle-version: 8.9
           arguments: "bootBuildImage --publishImage"

@@ -122,9 +122,9 @@ services:
       - /share_media:/data
 ```
 
-A native image is also published for every tagged release. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
+A native image is also published for every build. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
 If you restart more often than once a week or have a very low powered server, this is now recommended.
-That image is always tagged `:native`. To get a specific version, use `:native-v1.x.x`.
+That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
 It also requires you to map application.yml slightly differently - see below:
 
 ```yml
@@ -133,10 +133,11 @@ version: '3'
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:native
+    image: ghcr.io/schaka/janitorr:native-stable
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml
       - /share_media:/data
 ```
 
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:develop`.
+The development version of the native image is available as `ghcr.io/schaka/janitorr:native-develop`.

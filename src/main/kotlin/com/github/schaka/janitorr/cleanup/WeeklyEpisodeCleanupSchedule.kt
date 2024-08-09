@@ -68,9 +68,11 @@ class WeeklyEpisodeCleanupSchedule(
                 if (grabDate + applicationProperties.episodeDeletion.maxAge <= today) {
                     log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because of its age")
 
-                    if (!applicationProperties.dryRun) {
-                        sonarrClient.deleteEpisodeFile(episode.episodeFileId!!)
-                        episodes.remove(episode)
+                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                        if (!applicationProperties.dryRun) {
+                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                            episodes.remove(episode)
+                        }
                     }
                 }
             }
@@ -83,9 +85,11 @@ class WeeklyEpisodeCleanupSchedule(
                 for (episode in leftoverEpisodes) {
                     log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because there are too many episodes")
 
-                    if (!applicationProperties.dryRun) {
-                        sonarrClient.deleteEpisodeFile(episode.episodeFileId!!)
-                        episodes.remove(episode)
+                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                        if (!applicationProperties.dryRun) {
+                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                            episodes.remove(episode)
+                        }
                     }
                 }
             }

@@ -39,7 +39,6 @@ interface MediaServerClient {
     @RequestLine("GET /Items?limit=10000&includeItemTypes=Movie&parentId={parentId}&fields=Path,ProviderIds&Recursive=true")
     fun getAllMovies(@Param("parentId") parentId: String): ItemPage<LibraryContent>
 
-
     @RequestLine("GET /Shows/{tvshow}/Seasons?fields=Path,ProviderIds")
     fun getAllSeasons(@Param("tvshow") showId: String): ItemPage<LibraryContent>
 

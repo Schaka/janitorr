@@ -154,12 +154,14 @@ abstract class AbstractMediaServerRestService(
     // https://api.jellyfin.org/#tag/Configuration/operation/GetConfiguration (UICulture)
     // https://github.com/jellyfin/jellyfin/blob/master/Emby.Server.Implementations/Localization/Core/ca.json
     private fun tvShowMatches(item: LibraryItem, candidate: LibraryContent, matchSeason: Boolean = true): Boolean {
-        val seasonMatches = candidate.Type == "Season"
+        val seasonMatchesTitle = candidate.Type == "Season"
                 // && candidate.Name.contains("Season")
                 // && item.season == seasonPattern.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
                 && item.season == seasonPatternLanguageAgnostic.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
 
-        return mediaMatches(TV_SHOWS, item, candidate) && if (matchSeason) seasonMatches else true
+        val seasonMatchesIndex = candidate.Type == "Season" && item.season == candidate.IndexNumber
+
+        return mediaMatches(TV_SHOWS, item, candidate) && if (matchSeason) seasonMatchesTitle || seasonMatchesIndex else true
     }
 
     private fun mediaMatches(type: LibraryType, item: LibraryItem, candidate: LibraryContent): Boolean {

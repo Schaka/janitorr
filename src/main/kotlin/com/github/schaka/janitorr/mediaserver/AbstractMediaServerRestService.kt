@@ -78,6 +78,7 @@ abstract class AbstractMediaServerRestService(
 
     private fun populateTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true) {
 
+        // Application wide season handling + Jellystat's separate property
         val useSeason = !applicationProperties.wholeTvShow && bySeason
 
         val mediaServerShows = getTvLibrary(useSeason)
@@ -149,10 +150,14 @@ abstract class AbstractMediaServerRestService(
         return mediaServerMovies
     }
 
+    // TODO: the right way is getting the server's localization settings and checking all of Jellyfin's location for the key NameSeasonNumber
+    // https://api.jellyfin.org/#tag/Configuration/operation/GetConfiguration (UICulture)
+    // https://github.com/jellyfin/jellyfin/blob/master/Emby.Server.Implementations/Localization/Core/ca.json
     private fun tvShowMatches(item: LibraryItem, candidate: LibraryContent, matchSeason: Boolean = true): Boolean {
         val seasonMatches = candidate.Type == "Season"
-                && candidate.Name.contains("Season")
-                && item.season == seasonPattern.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
+                // && candidate.Name.contains("Season")
+                // && item.season == seasonPattern.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
+                && item.season == seasonPatternLanguageAgnostic.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
 
         return mediaMatches(TV_SHOWS, item, candidate) && if (matchSeason) seasonMatches else true
     }

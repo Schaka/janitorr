@@ -18,6 +18,8 @@ abstract class MediaServerService {
 
         @JvmStatic
         protected val seasonPattern = Regex("Season (?<season>\\d+)")
+        @JvmStatic
+        protected val seasonPatternLanguageAgnostic = Regex("(\\w+) (?<season>\\d+)")
         private val filePattern = Regex("^.*\\.(mkv|mp4|avi|webm|mts|m2ts|ts|wmv|mpg|mpeg|mp2|m2v|m4v)\$")
         private val numberPattern = Regex("[0-9]+")
     }

@@ -1,7 +1,8 @@
 # Janitorr - Cleans up your media library
 
-![janitorr_logo](logos/janitorr_icon.png | width=384)
-<img src="logos/janitorr_icon.png" width=384>
+<p align="center">
+    <img src="logos/janitorr_icon.png" width=384>
+</p>
 
 ### Inspiration
 

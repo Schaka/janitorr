@@ -144,13 +144,10 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
-    imageName = "ghcr.io/${project.extra["docker.image.name"]}:native"
+    imageName = project.extra["native.image.name"] as String
     version = project.extra["docker.image.version"] as String
+    tags = project.extra["native.image.tags"] as List<String>
     createdDate = "now"
-    tags = listOf(
-            "ghcr.io/${project.extra["docker.image.name"]}:native",
-            "ghcr.io/${project.extra["docker.image.name"]}:native-${project.extra["docker.image.version"]}"
-    )
 
 }
 

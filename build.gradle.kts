@@ -118,7 +118,7 @@ extra {
     val nativeImageName = "ghcr.io/${containerImageName}:$nativeBaseTag"
     val nativeImageTags = mutableListOf("$nativeImageName-$branch")
     if (branch.startsWith("v1")) {
-        nativeImageTags.add("$nativeBaseTag-stable")
+        nativeImageTags.add("$nativeImageName-stable")
     }
 
     project.extra["native.image.name"] = nativeImageName

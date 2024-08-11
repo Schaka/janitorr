@@ -1,5 +1,8 @@
 # Janitorr - Cleans up your media library
 
+![janitorr_logo](logos/janitorr_icon.png | width=384)
+<img src="logos/janitorr_icon.png" width=384>
+
 ### Inspiration
 
 This application is heavily inspired by [Maintainerr](https://github.com/jorenn92/Maintainerr).
@@ -51,7 +54,6 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ### Disclaimer
 
-- Sonarr v3 is not officially supported - it may or may not be compatible. I highly recommend upgrading to v4 either way
 - **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task

@@ -144,3 +144,11 @@ services:
 
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:develop`.
 The development version of the native image is available as `ghcr.io/schaka/janitorr:native-develop`.
+
+
+## JetBrains
+Thank you to [<img src="logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.
+
+* [<img src="logos/idea.svg" alt="Idea" width="32"> IntelliJ Idea](https://www.jetbrains.com/idea/)
+* [<img src="logos/webstorm.svg" alt="WebStorm" width="32"> WebStorm](http://www.jetbrains.com/webstorm/)
+* [<img src="logos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)

@@ -39,7 +39,7 @@ open class EmbyRestService(
             return
         }
 
-        val result = mediaServerClient.listLibraries()
+        val result = embyClient.listLibrariesPage().Items
         val collectionTypeLower = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
         val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)

@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.library.AddVirtualFolder
 import com.github.schaka.janitorr.mediaserver.emby.library.LibraryOptions
 import com.github.schaka.janitorr.mediaserver.library.*
+import com.github.schaka.janitorr.mediaserver.emby.library.AddMediaPathRequest
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
@@ -61,13 +62,13 @@ open class EmbyRestService(
             val pathForMediaServer = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
             val libOptions = LibraryOptions(listOf(PathInfo(pathString)), ContentType = collectionTypeLower)
             embyClient.createLibrary(libraryName, collectionTypeLower, AddVirtualFolder(libraryName, collectionTypeLower, listOf(pathForMediaServer), libOptions))
-            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
+            leavingSoonCollection = embyClient.listLibrariesPage().Items.firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
         }
 
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
-            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathString), leavingSoonCollection?.Guid))
+            embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Guid!!, pathString, listOf(PathInfo(pathString))))
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

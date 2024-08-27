@@ -10,6 +10,7 @@ import com.github.schaka.janitorr.mediaserver.emby.library.LibraryOptions
 import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.emby.library.AddMediaPathRequest
 import com.github.schaka.janitorr.servarr.LibraryItem
+import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
@@ -30,6 +31,10 @@ open class EmbyRestService(
     applicationProperties,
     fileSystemProperties
 ) {
+
+    companion object {
+        private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+    }
 
     override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean
     ) {
@@ -65,10 +70,12 @@ open class EmbyRestService(
             leavingSoonCollection = embyClient.listLibrariesPage().Items.firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
         }
 
+        log.trace("Leaving Soon Collection Created/Found: ${leavingSoonCollection}")
+
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
-            embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Guid!!, pathString, listOf(PathInfo(pathString))))
+            embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Name, pathString, listOf(PathInfo(pathString))))
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

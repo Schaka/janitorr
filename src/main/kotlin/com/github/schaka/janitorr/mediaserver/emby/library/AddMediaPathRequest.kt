@@ -7,6 +7,7 @@ import com.github.schaka.janitorr.mediaserver.library.PathInfo
 @JsonInclude(NON_NULL)
 data class AddMediaPathRequest(
         val Id: String,
+        val Name: String,
         val Path: String,
         val PathInfo: List<PathInfo>,
 )

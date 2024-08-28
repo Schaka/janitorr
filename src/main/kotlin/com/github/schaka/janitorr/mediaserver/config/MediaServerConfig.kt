@@ -9,6 +9,8 @@ import com.github.schaka.janitorr.mediaserver.emby.Emby
 import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
 import com.github.schaka.janitorr.mediaserver.emby.EmbyProperties
 import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService
+import com.github.schaka.janitorr.mediaserver.emby.library.AddMediaPathRequest
+import com.github.schaka.janitorr.mediaserver.emby.library.AddVirtualFolder
 import com.github.schaka.janitorr.mediaserver.jellyfin.Jellyfin
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
@@ -22,7 +24,10 @@ import org.springframework.context.annotation.Configuration
 /**
  * Only required for native image
  */
-@RegisterReflectionForBinding(classes = [ItemPage::class, MediaFolderItem::class, LibraryContent::class, VirtualFolderResponse::class, ProviderIds::class, UserData::class, CollectionResponse::class])
+@RegisterReflectionForBinding(classes = [ItemPage::class, MediaFolderItem::class, LibraryContent::class,
+    VirtualFolderResponse::class, ProviderIds::class, UserData::class, CollectionResponse::class,
+    AddVirtualFolder::class, AddPathRequest::class, AddMediaPathRequest::class,
+])
 @Configuration(proxyBeanMethods = false)
 class MediaServerConfig(
     @Emby val embyClient: EmbyMediaServerClient,

@@ -79,6 +79,7 @@ open class EmbyRestService(
                 )
             } else {
                 log.error("Emby seems to think the path [$pathString] does not exist. You've probably mapped it wrong in your containers. Please correct this before running Janitorr again.")
+                return
             }
         }
 
@@ -99,6 +100,7 @@ open class EmbyRestService(
             embyClient.validatePath(PathWrapper(path))
             return true
         } catch (e: Exception) {
+            log.warn("Invalid path", e)
             return false
         }
     }

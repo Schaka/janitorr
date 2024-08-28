@@ -75,7 +75,11 @@ open class EmbyRestService(
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
-            embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Name, PathInfo(pathString)))
+            if (validatePath(pathString)) {
+                embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Name, PathInfo(pathString)))
+            } else {
+                log.error("Emby seems to think the path [$pathString] does not exist. You've probably mapped it wrong in your containers. Please correct this before running Janitorr again.")
+            }
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
@@ -85,5 +89,17 @@ open class EmbyRestService(
         }
 
         createLinks(items, path, libraryType)
+    }
+
+    /**
+     * Very simple request towards Emby that validates whether a Path is known
+     */
+    private fun validatePath(path: String): Boolean {
+        try  {
+            embyClient.validatePath(PathInfo(path))
+            return true
+        } catch (e: Exception) {
+            return false
+        }
     }
 }

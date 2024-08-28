@@ -18,4 +18,7 @@ interface EmbyMediaServerClient : MediaServerClient {
 
     @RequestLine("GET /Library/VirtualFolders/Query")
     fun listLibrariesPage(): ItemPage<VirtualFolderResponse>
+
+    @RequestLine("POST /Environment/ValidatePath")
+    fun validatePath(path: PathInfo)
 }

@@ -49,6 +49,7 @@ class EmbyClientConfig {
                         it.header(e.key, e.value)
                         it.query(e.key, e.value)
                     }
+                    it.query("reqformat", "json") // required because otherwise some endpoints will just throw server errors
                     it.header("X-Emby-Token", properties.apiKey)
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
@@ -85,6 +86,7 @@ class EmbyClientConfig {
                 template.header(e.key, e.value)
                 template.query(e.key, e.value)
             }
+            template.query("reqformat", "json")
             template.header(AUTHORIZATION, janitorrClientString)
             template.header("X-Emby-Token", accessToken)
             template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)

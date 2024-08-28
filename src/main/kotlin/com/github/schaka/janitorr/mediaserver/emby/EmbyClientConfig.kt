@@ -27,7 +27,14 @@ class EmbyClientConfig {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
-        private val janitorrClientString = "Emby Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"Janitorr-Device-Id\", Version=\"1.0\""
+        private val janitorrClientString = "Emby Client=\"Janitorr\", Device=\"Spring Boot\", DeviceId=\"b53a1d79-8f38-420c-bd65-1312b5a8ba39\", Version=\"1.0\""
+
+        private val headerMap = mapOf(
+            "X-Emby-Client" to "Janitorr",
+            "X-Emby-Device-Name" to "Spring Boot",
+            "X-Emby-Device-Id" to "b53a1d79-8f38-420c-bd65-1312b5a8ba39",
+            "X-Emby-Client-Version" to "1.0",
+        )
     }
 
 
@@ -38,6 +45,7 @@ class EmbyClientConfig {
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
                 .requestInterceptor {
+                    headerMap.map { e -> it.header(e.key, e.value) }
                     it.header("X-Emby-Token", properties.apiKey)
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
@@ -70,6 +78,7 @@ class EmbyClientConfig {
                 log.info("Logged in to Emby as {} {}", properties.username, accessToken)
             }
 
+            headerMap.map { e -> template.header(e.key, e.value) }
             template.header(AUTHORIZATION, janitorrClientString)
             template.header("X-Emby-Token", accessToken)
             template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -78,6 +87,7 @@ class EmbyClientConfig {
         private fun getUserInfo(properties: EmbyProperties): ResponseEntity<Map<*, *>> {
             val login = RestTemplate()
             val headers = HttpHeaders()
+            headerMap.map { e -> headers.set(e.key, e.value) }
             headers.set(AUTHORIZATION, janitorrClientString)
             headers.set(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
             headers.set(ACCEPT, MediaType.ALL_VALUE)

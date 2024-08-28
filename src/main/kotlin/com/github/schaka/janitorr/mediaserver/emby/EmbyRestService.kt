@@ -5,10 +5,8 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerRestService
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
-import com.github.schaka.janitorr.mediaserver.emby.library.AddVirtualFolder
-import com.github.schaka.janitorr.mediaserver.emby.library.LibraryOptions
-import com.github.schaka.janitorr.mediaserver.library.*
-import com.github.schaka.janitorr.mediaserver.emby.library.AddMediaPathRequest
+import com.github.schaka.janitorr.mediaserver.emby.library.*
+import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
@@ -76,7 +74,9 @@ open class EmbyRestService(
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
             if (validatePath(pathString)) {
-                embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Name, PathInfo(pathString)))
+                embyClient.addPathToLibrary(
+                    AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Guid!!, leavingSoonCollection.Name, PathInfo(pathString))
+                )
             } else {
                 log.error("Emby seems to think the path [$pathString] does not exist. You've probably mapped it wrong in your containers. Please correct this before running Janitorr again.")
             }
@@ -96,7 +96,7 @@ open class EmbyRestService(
      */
     private fun validatePath(path: String): Boolean {
         try  {
-            embyClient.validatePath(PathInfo(path))
+            embyClient.validatePath(PathWrapper(path))
             return true
         } catch (e: Exception) {
             return false

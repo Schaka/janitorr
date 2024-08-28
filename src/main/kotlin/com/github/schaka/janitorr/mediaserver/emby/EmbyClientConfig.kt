@@ -45,7 +45,10 @@ class EmbyClientConfig {
                 .decoder(JacksonDecoder(mapper))
                 .encoder(JacksonEncoder(mapper))
                 .requestInterceptor {
-                    headerMap.map { e -> it.header(e.key, e.value) }
+                    headerMap.map { e ->
+                        it.header(e.key, e.value)
+                        it.query(e.key, e.value)
+                    }
                     it.header("X-Emby-Token", properties.apiKey)
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
@@ -78,7 +81,10 @@ class EmbyClientConfig {
                 log.info("Logged in to Emby as {} {}", properties.username, accessToken)
             }
 
-            headerMap.map { e -> template.header(e.key, e.value) }
+            headerMap.map { e ->
+                template.header(e.key, e.value)
+                template.query(e.key, e.value)
+            }
             template.header(AUTHORIZATION, janitorrClientString)
             template.header("X-Emby-Token", accessToken)
             template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -87,7 +93,9 @@ class EmbyClientConfig {
         private fun getUserInfo(properties: EmbyProperties): ResponseEntity<Map<*, *>> {
             val login = RestTemplate()
             val headers = HttpHeaders()
-            headerMap.map { e -> headers.set(e.key, e.value) }
+            headerMap.map {
+                e -> headers.set(e.key, e.value)
+            }
             headers.set(AUTHORIZATION, janitorrClientString)
             headers.set(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
             headers.set(ACCEPT, MediaType.ALL_VALUE)

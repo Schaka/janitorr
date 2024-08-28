@@ -1,6 +1,5 @@
 package com.github.schaka.janitorr.mediaserver.emby.library
 
-import com.github.schaka.janitorr.mediaserver.library.PathInfo
 import com.github.schaka.janitorr.mediaserver.library.TypeOption
 
 data class LibraryOptions(

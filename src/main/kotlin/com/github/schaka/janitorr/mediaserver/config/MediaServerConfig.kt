@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Configuration
  * Only required for native image
  */
 @RegisterReflectionForBinding(classes = [ItemPage::class, MediaFolderItem::class, LibraryContent::class,
-    VirtualFolderResponse::class, ProviderIds::class, UserData::class, CollectionResponse::class,
+    VirtualFolderResponse::class, ProviderIds::class, UserData::class, CollectionResponse::class, AddLibraryRequest::class,
     AddVirtualFolder::class, AddPathRequest::class, AddMediaPathRequest::class,
 ])
 @Configuration(proxyBeanMethods = false)

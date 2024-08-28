@@ -75,7 +75,7 @@ open class EmbyRestService(
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
         if (pathSet == false) {
-            embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Name, pathString, listOf(PathInfo(pathString))))
+            embyClient.addPathToLibrary(AddMediaPathRequest(leavingSoonCollection?.Id!!, leavingSoonCollection.Name, PathInfo(pathString)))
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

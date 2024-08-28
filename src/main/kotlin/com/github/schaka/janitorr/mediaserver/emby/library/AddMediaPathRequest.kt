@@ -8,6 +8,5 @@ import com.github.schaka.janitorr.mediaserver.library.PathInfo
 data class AddMediaPathRequest(
         val Id: String,
         val Name: String,
-        val Path: String,
-        val PathInfo: List<PathInfo>,
+        val PathInfo: PathInfo,
 )

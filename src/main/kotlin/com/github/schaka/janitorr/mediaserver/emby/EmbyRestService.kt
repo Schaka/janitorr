@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerRestService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerRestService.Companion
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -46,6 +47,7 @@ open class EmbyRestService(
         val collectionTypeLower = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
         val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val mediaServerPath = Path.of(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
 
         // Clean up library - consider also deleting the collection in Jellyfin/Emby
         if (items.isEmpty() && !onlyAddLinks) {
@@ -53,7 +55,7 @@ open class EmbyRestService(
             return
         }
 
-        val pathString = path.toUri().path.removeSuffix("/")
+        val pathString = mediaServerPath.toUri().path.removeSuffix("/")
         Files.createDirectories(path)
         val libraryName = "${libraryType.collectionName} (Deleted Soon)"
 
@@ -68,7 +70,7 @@ open class EmbyRestService(
             leavingSoonCollection = embyClient.listLibrariesPage().Items.firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
         }
 
-        log.trace("Leaving Soon Collection Created/Found: ${leavingSoonCollection}")
+        log.trace("Leaving Soon Collection Created/Found: {}", leavingSoonCollection)
 
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)

@@ -7,7 +7,8 @@ server:
 file-system:
   access: true
   validate-seeding: true # validates seeding by checking if the original file exists and skips deletion - turning this off will send a delete to the *arrs even if a torrent may still be active
-  leaving-soon-dir: "/data/media/leaving-soon" # A directory this container can write to and Jellyfin can find under the same path - this will contain new folders with symlinks to files for Jellyfin's "Leaving Soon" collections
+  leaving-soon-dir: "/data/media/leaving-soon" # The directory that's known to Janitorr - this will contain new folders with symlinks to your media library for "Leaving Soon"
+  media-server-leaving-soon-dir: "/data/media/leaving-soon" # This is the directory Jellyfin/Emby will be told it can find the "Leaving Soon" library, in case its mapped differently
   from-scratch: true # Clean up entire "Leaving Soon" directory and rebuild from scratch - this can help with clearing orphaned data - turning this off can save resources (less writes to drive)
   free-space-check-dir: "/" # This is the default directory Janitorr uses to check how much space is left on your drives. By default, it checks the entire root - you may point it at a specific folder
 

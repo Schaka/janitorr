@@ -4,6 +4,8 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellystat.JellystatProperties
+import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService
+import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService.Companion
 import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
@@ -197,6 +199,7 @@ abstract class AbstractMediaServerRestService(
         val collectionFilter = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
         val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val mediaServerPath = Path.of(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
 
         // Clean up library - consider also deleting the collection in Jellyfin/Emby
         if (items.isEmpty() && !onlyAddLinks) {
@@ -204,7 +207,7 @@ abstract class AbstractMediaServerRestService(
             return
         }
 
-        val pathString = path.toUri().path.removeSuffix("/")
+        val pathString = mediaServerPath.toUri().path.removeSuffix("/")
         Files.createDirectories(path)
         val libraryName = "${libraryType.collectionName} (Deleted Soon)"
 
@@ -217,6 +220,8 @@ abstract class AbstractMediaServerRestService(
             mediaServerClient.createLibrary(libraryName, libraryType.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
             leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
         }
+
+        log.trace("Leaving Soon Collection Created/Found: {}", leavingSoonCollection)
 
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
         val pathSet = leavingSoonCollection?.Locations?.contains(pathString)

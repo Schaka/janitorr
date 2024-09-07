@@ -33,6 +33,7 @@ open class EmbyRestService(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+        private val windowsRegex = Regex("/\\w:.*")
     }
 
     override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean
@@ -56,6 +57,9 @@ open class EmbyRestService(
         }
 
         val pathString = mediaServerPath.toUri().path.removeSuffix("/")
+        // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
+        val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString
+
         Files.createDirectories(path)
         val libraryName = "${libraryType.collectionName} (Deleted Soon)"
 
@@ -63,8 +67,6 @@ open class EmbyRestService(
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }
         if (leavingSoonCollection == null) {
-            // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
-            val pathForMediaServer = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
             val libOptions = LibraryOptions(listOf(PathInfo(pathString)), ContentType = collectionTypeLower)
             embyClient.createLibrary(libraryName, collectionTypeLower, AddVirtualFolder(libraryName, collectionTypeLower, listOf(pathForMediaServer), libOptions))
             leavingSoonCollection = embyClient.listLibrariesPage().Items.firstOrNull { it.CollectionType?.lowercase() == collectionTypeLower && it.Name == libraryName }

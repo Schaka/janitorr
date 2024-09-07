@@ -32,6 +32,7 @@ abstract class AbstractMediaServerRestService(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+        private val windowsRegex = Regex("/\\w:.*")
     }
 
     /**
@@ -208,6 +209,9 @@ abstract class AbstractMediaServerRestService(
         }
 
         val pathString = mediaServerPath.toUri().path.removeSuffix("/")
+        // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
+        val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString
+
         Files.createDirectories(path)
         val libraryName = "${libraryType.collectionName} (Deleted Soon)"
 
@@ -215,8 +219,6 @@ abstract class AbstractMediaServerRestService(
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
         if (leavingSoonCollection == null) {
-            // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
-            val pathForMediaServer = if (pathString.startsWith("/C:")) pathString.replaceFirst("/", "") else pathString
             mediaServerClient.createLibrary(libraryName, libraryType.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
             leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
         }
@@ -224,9 +226,9 @@ abstract class AbstractMediaServerRestService(
         log.trace("Leaving Soon Collection Created/Found: {}", leavingSoonCollection)
 
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
-        val pathSet = leavingSoonCollection?.Locations?.contains(pathString)
+        val pathSet = leavingSoonCollection?.Locations?.contains(pathForMediaServer)
         if (pathSet == false) {
-            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathString)))
+            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathForMediaServer)))
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

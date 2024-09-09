@@ -33,7 +33,7 @@ abstract class AbstractCleanupSchedule(
     protected fun scheduleDelete(libraryType: LibraryType, expiration: Duration?, entryFilter: (LibraryItem) -> Boolean = { true }, onlyAddLinks: Boolean = false) {
 
         if (!needToDelete(libraryType)) {
-            log.info("Not deleting ${libraryType.collectionName} because minimum disk threshold was not reached.")
+            log.info("Not deleting ${libraryType.collectionType} because minimum disk threshold was not reached.")
             if (fileSystemProperties.access) {
                 log.info("Free disk space: ${getFreeSpacePercentage()}%")
             }

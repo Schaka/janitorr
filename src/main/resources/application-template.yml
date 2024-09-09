@@ -70,6 +70,8 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
+    leaving-soon-tv: "Shows (Leaving Soon)"
+    leaving-soon-movies: "Movies (Leaving Soon)"
 
   ## You can only choose one out of Jellyfin or Emby. Emby support is secondary.
   ## User login is only needed if deletion is enabled.
@@ -80,11 +82,15 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
+    leaving-soon-tv: "Shows (Leaving Soon)"
+    leaving-soon-movies: "Movies (Leaving Soon)"
+
   jellyseerr:
     enabled: true
     url: "http://localhost:5055"
     api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
     match-server: false # Enable if you have several Radarr/Sonarr instances set up in Jellyseerr. Janitorr will match them by the host+port supplied in their respective config settings.
+
   jellystat:
     enabled: true
     whole-tv-show: false # Enabling this will make Jellystat consider TV shows as a whole if any episode of any season has been watched

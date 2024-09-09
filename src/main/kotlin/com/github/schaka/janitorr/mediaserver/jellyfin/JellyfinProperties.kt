@@ -10,5 +10,7 @@ data class JellyfinProperties(
         override val apiKey: String,
         override val username: String,
         override val password: String,
-        override val delete: Boolean = true
+        override val delete: Boolean = true,
+        override val leavingSoonTv: String = "Shows (Deleted Soon)",
+        override val leavingSoonMovies: String = "Movies (Deleted Soon)"
 ) : MediaServerProperties

@@ -215,7 +215,7 @@ abstract class AbstractMediaServerRestService(
         val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString
 
         Files.createDirectories(path)
-        val libraryName = "${libraryType.collectionName} (Deleted Soon)"
+        val libraryName = libraryType.collectionName(mediaServerProperties)
 
         // Collections are created via the Collection API, but it just puts them into a BoxSet library called collections
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only

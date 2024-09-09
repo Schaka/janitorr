@@ -1,11 +1,14 @@
 package com.github.schaka.janitorr.mediaserver.library
 
-enum class LibraryType(
-        val collectionType: String,
-        val collectionName: String,
-        val folderName: String) {
+import com.github.schaka.janitorr.mediaserver.MediaServerProperties
+import kotlin.reflect.KProperty1
 
-    MOVIES("Movies", "Movies", "movies"),
-    TV_SHOWS("TvShows", "Shows", "tv")
+enum class LibraryType(
+    val collectionType: String,
+    val collectionName: KProperty1<MediaServerProperties, String>,
+    val folderName: String) {
+
+    MOVIES("Movies", MediaServerProperties::leavingSoonMovies, "movies"),
+    TV_SHOWS("TvShows", MediaServerProperties::leavingSoonTv, "tv")
 
 }

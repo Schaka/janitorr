@@ -203,8 +203,10 @@ abstract class AbstractMediaServerRestService(
         val mediaServerPath = Path.of(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
 
         // Clean up library - consider also deleting the collection in Jellyfin/Emby
-        if (items.isEmpty() && !onlyAddLinks) {
-            FileSystemUtils.deleteRecursively(path)
+        if (items.isEmpty()) {
+            if (!onlyAddLinks) {
+                FileSystemUtils.deleteRecursively(path)
+            }
             return
         }
 
@@ -233,8 +235,7 @@ abstract class AbstractMediaServerRestService(
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data
         if (fileSystemProperties.fromScratch && !onlyAddLinks) {
-            FileSystemUtils.deleteRecursively(path)
-            Files.createDirectories(path)
+            cleanupPath(fileSystemProperties.leavingSoonDir, libraryType, cleanupType)
         }
 
         createLinks(items, path, libraryType)

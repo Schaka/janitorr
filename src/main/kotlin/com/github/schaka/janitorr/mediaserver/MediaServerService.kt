@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
+import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -67,6 +68,12 @@ abstract class MediaServerService {
         val targetFile = targetFolder.resolve(fileOrFolder)
 
         return PathStructure(sourceFolder, sourceFile, targetFolder, targetFile)
+    }
+
+    fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {
+        val path = Path.of(leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        FileSystemUtils.deleteRecursively(path)
+        Files.createDirectories(path)
     }
 
     protected fun createLinks(items: List<LibraryItem>, path: Path, type: LibraryType) {

@@ -47,10 +47,17 @@ class TagBasedCleanupSchedule(
             return
         }
 
+        // initial cleanup of entire tag based directory
+        if (fileSystemProperties.leavingSoonDir != null && fileSystemProperties.fromScratch) {
+            mediaServerService.cleanupPath(fileSystemProperties.leavingSoonDir, TV_SHOWS, CleanupType.TAG)
+            mediaServerService.cleanupPath(fileSystemProperties.leavingSoonDir, MOVIES, CleanupType.TAG)
+        }
+
         for (tag in applicationProperties.tagBasedDeletion.schedules) {
             log.debug("Deleting TV shows and movies with tag: {}", tag)
-            scheduleDelete(TV_SHOWS, tag.expiration, entryFilter = { item -> tagMatches(item, tag) })
-            scheduleDelete(MOVIES, tag.expiration, entryFilter = { item -> tagMatches(item, tag) })
+            // Forcefully only adding links - since we're treating all tags as one equal type of cleanup
+            scheduleDelete(TV_SHOWS, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
+            scheduleDelete(MOVIES, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
         }
     }
 

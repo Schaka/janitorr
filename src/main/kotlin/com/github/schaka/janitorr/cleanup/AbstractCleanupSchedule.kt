@@ -30,7 +30,7 @@ abstract class AbstractCleanupSchedule(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
-    protected fun scheduleDelete(libraryType: LibraryType, expiration: Duration?, entryFilter: (LibraryItem) -> Boolean = { true }) {
+    protected fun scheduleDelete(libraryType: LibraryType, expiration: Duration?, entryFilter: (LibraryItem) -> Boolean = { true }, onlyAddLinks: Boolean = false) {
 
         if (!needToDelete(libraryType)) {
             log.info("Not deleting ${libraryType.collectionName} because minimum disk threshold was not reached.")
@@ -46,8 +46,8 @@ abstract class AbstractCleanupSchedule(
         }
 
         when (libraryType) {
-            TV_SHOWS -> cleanupMediaType(libraryType, sonarrService, expiration, this::deleteTvShows, entryFilter)
-            MOVIES -> cleanupMediaType(libraryType, radarrService, expiration, this::deleteMovies, entryFilter)
+            TV_SHOWS -> cleanupMediaType(libraryType, sonarrService, expiration, this::deleteTvShows, entryFilter, onlyAddLinks)
+            MOVIES -> cleanupMediaType(libraryType, radarrService, expiration, this::deleteMovies, entryFilter, onlyAddLinks)
         }
 
     }
@@ -60,7 +60,9 @@ abstract class AbstractCleanupSchedule(
      */
     private fun cleanupMediaType(libraryType: LibraryType, servarrService: ServarrService, expiration: Duration,
                                  deleteTask: (List<LibraryItem>) -> Unit,
-                                 entryFilter: (LibraryItem) -> Boolean) {
+                                 entryFilter: (LibraryItem) -> Boolean,
+                                 onlyAddLinks: Boolean = false
+                                 ) {
 
         val today = LocalDateTime.now()
         val leavingSoonExpiration = applicationProperties.leavingSoon.toDays()
@@ -70,7 +72,7 @@ abstract class AbstractCleanupSchedule(
         jellystatService.populateWatchHistory(servarrEntries, libraryType)
 
         val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
-        mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon)
+        mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)
 
         val toDeleteMedia = servarrEntries.filter { it.historyAge.plusDays(expirationDays) < today }
         deleteTask(toDeleteMedia)

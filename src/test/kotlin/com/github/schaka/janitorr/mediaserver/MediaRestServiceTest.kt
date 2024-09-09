@@ -35,7 +35,7 @@ internal class MediaRestServiceTest {
     lateinit var applicationProperties: ApplicationProperties
 
     @SpyK
-    var fileSystemProperties: FileSystemProperties = FileSystemProperties("/data/media/leaving-soon", true, true)
+    var fileSystemProperties: FileSystemProperties = FileSystemProperties("/data/media/leaving-soon", "/data/media/leaving-soon", true, true)
 
     @Test
     fun testMovieStructure() {

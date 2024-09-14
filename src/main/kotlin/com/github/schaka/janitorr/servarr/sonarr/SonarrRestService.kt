@@ -2,6 +2,9 @@ package com.github.schaka.janitorr.servarr.sonarr
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
+import com.github.schaka.janitorr.servarr.HistorySort
+import com.github.schaka.janitorr.servarr.HistorySort.MOST_RECENT
+import com.github.schaka.janitorr.servarr.HistorySort.OLDEST
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
@@ -35,13 +38,16 @@ class SonarrRestService(
 
         var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
 
-        var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
+        var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
+
+        var historySort: HistorySort = OLDEST
 
 ) : ServarrService {
 
     init {
         if (sonarrProperties.enabled) {
             upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
+            historySort = sonarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
             keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
             episodeTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.episodeDeletion.tag } ?: episodeTag
         }
@@ -89,7 +95,7 @@ class SonarrRestService(
                     sonarrClient.getHistory(series.id, season.seasonNumber)
                         .filter { it.eventType == "downloadFolderImported" && it.data.droppedPath != null }
                         .map{ mapItem(it, series, allTags, season) }
-                        .sortedWith(byDate(upgradesAllowed))
+                        .sortedWith(byDate(historySort))
                         .firstOrNull()
                 }
             }.filterNotNull()

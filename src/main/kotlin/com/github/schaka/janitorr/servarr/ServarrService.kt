@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.servarr
 
+import com.github.schaka.janitorr.servarr.HistorySort.MOST_RECENT
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import java.time.LocalDateTime
 
@@ -12,9 +13,9 @@ interface ServarrService {
     /**
      * Sort by oldest file. If upgrades are allowed, sort by most recently grabbed files.
      */
-    fun byDate(upgradesAllowed: Boolean): Comparator<LibraryItem> {
+    fun byDate(sort: HistorySort): Comparator<LibraryItem> {
         val comp = compareBy<LibraryItem> { it.importedDate }
-        return if (upgradesAllowed) comp.reversed() else comp
+        return if (sort == MOST_RECENT) comp.reversed() else comp
     }
 
     fun byHistoryMostRecent(): Comparator<HistoryResponse> {

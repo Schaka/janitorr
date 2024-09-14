@@ -2,6 +2,9 @@ package com.github.schaka.janitorr.servarr.radarr
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
+import com.github.schaka.janitorr.servarr.HistorySort
+import com.github.schaka.janitorr.servarr.HistorySort.MOST_RECENT
+import com.github.schaka.janitorr.servarr.HistorySort.OLDEST
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
@@ -31,7 +34,9 @@ class RadarrRestService(
 
         var upgradesAllowed: Boolean = false,
 
-        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
+        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
+
+        var historySort: HistorySort = OLDEST
 
 ) : ServarrService {
 
@@ -43,6 +48,7 @@ class RadarrRestService(
     init {
         if (radarrProperties.enabled) {
             upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
+            historySort = radarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
             keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
         }
     }
@@ -70,7 +76,7 @@ class RadarrRestService(
                                         tags = allTags.filter { tag -> movie.tags.contains(tag.id) }.map { tag -> tag.label }
                                 )
                             }
-                            .sortedWith(byDate(upgradesAllowed))
+                            .sortedWith(byDate(historySort))
                             .firstOrNull()
                 }
     }

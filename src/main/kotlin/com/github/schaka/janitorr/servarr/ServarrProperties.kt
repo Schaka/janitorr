@@ -4,4 +4,5 @@ interface ServarrProperties {
     val enabled: Boolean
     val url: String
     val apiKey: String
+    val determineAgeBy: HistorySort?
 }

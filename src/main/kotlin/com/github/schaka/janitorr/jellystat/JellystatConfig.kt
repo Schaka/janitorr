@@ -3,7 +3,7 @@ package com.github.schaka.janitorr.jellystat
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.jellystat.requests.ItemRequest
 import com.github.schaka.janitorr.jellystat.requests.WatchHistoryResponse
-import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
 @Configuration(proxyBeanMethods = false)
 class JellystatConfig(
         val jellystatClient: JellystatClient,
-        val mediaServerService: MediaServerService
+        val mediaServerService: AbstractMediaServerService
 ) {
 
     companion object {

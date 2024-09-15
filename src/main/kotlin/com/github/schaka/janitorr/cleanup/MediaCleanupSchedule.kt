@@ -4,7 +4,7 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.jellystat.JellystatService
-import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
@@ -21,13 +21,13 @@ import java.time.Duration
 
 @Service
 class MediaCleanupSchedule(
-        mediaServerService: MediaServerService,
-        jellyseerrService: JellyseerrService,
-        jellystatService: JellystatService,
-        fileSystemProperties: FileSystemProperties,
-        applicationProperties: ApplicationProperties,
-        @Sonarr sonarrService: ServarrService,
-        @Radarr radarrService: ServarrService,
+    mediaServerService: AbstractMediaServerService,
+    jellyseerrService: JellyseerrService,
+    jellystatService: JellystatService,
+    fileSystemProperties: FileSystemProperties,
+    applicationProperties: ApplicationProperties,
+    @Sonarr sonarrService: ServarrService,
+    @Radarr radarrService: ServarrService,
 ) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
 
     companion object {

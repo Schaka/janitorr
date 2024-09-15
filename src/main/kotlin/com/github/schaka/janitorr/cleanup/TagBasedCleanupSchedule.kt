@@ -5,7 +5,7 @@ import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.config.TagDeleteSchedule
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.jellystat.JellystatService
-import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
@@ -22,14 +22,14 @@ import org.springframework.stereotype.Service
 
 @Service
 class TagBasedCleanupSchedule(
-        mediaServerService: MediaServerService,
-        jellyseerrService: JellyseerrService,
-        jellystatService: JellystatService,
-        fileSystemProperties: FileSystemProperties,
-        applicationProperties: ApplicationProperties,
-        @Sonarr
+    mediaServerService: AbstractMediaServerService,
+    jellyseerrService: JellyseerrService,
+    jellystatService: JellystatService,
+    fileSystemProperties: FileSystemProperties,
+    applicationProperties: ApplicationProperties,
+    @Sonarr
         sonarrService: ServarrService,
-        @Radarr
+    @Radarr
         radarrService: ServarrService,
 ) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
 

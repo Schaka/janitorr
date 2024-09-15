@@ -3,8 +3,7 @@ package com.github.schaka.janitorr.jellystat
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.jellystat.requests.ItemRequest
 import com.github.schaka.janitorr.jellystat.requests.WatchHistoryResponse
-import com.github.schaka.janitorr.mediaserver.MediaServerService
-import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
@@ -14,10 +13,10 @@ import java.time.LocalDateTime
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
  */
 class JellystatRestService(
-        val jellystatClient: JellystatClient,
-        val jellystatProperties: JellystatProperties,
-        val mediaServerService: MediaServerService,
-        val applicationProperties: ApplicationProperties
+    val jellystatClient: JellystatClient,
+    val jellystatProperties: JellystatProperties,
+    val mediaServerService: AbstractMediaServerService,
+    val applicationProperties: ApplicationProperties
 ) : JellystatService {
 
     companion object {

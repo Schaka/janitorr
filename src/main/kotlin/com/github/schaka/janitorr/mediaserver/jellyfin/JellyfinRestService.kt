@@ -2,7 +2,7 @@ package com.github.schaka.janitorr.mediaserver.jellyfin
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.mediaserver.AbstractMediaServerRestService
+import com.github.schaka.janitorr.mediaserver.BaseMediaServerService
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.library.*
@@ -15,7 +15,7 @@ open class JellyfinRestService(
     applicationProperties: ApplicationProperties,
     fileSystemProperties: FileSystemProperties
 
-) : AbstractMediaServerRestService("Jellyfin", jellyfinClient, jellyfinUserClient, jellyfinProperties, applicationProperties, fileSystemProperties) {
+) : BaseMediaServerService("Jellyfin", jellyfinClient, jellyfinUserClient, jellyfinProperties, applicationProperties, fileSystemProperties) {
 
     override fun listLibraries(): List<VirtualFolderResponse> {
         return mediaServerClient.listLibraries()

@@ -17,7 +17,7 @@ import java.nio.file.Path
  * Keep 2 layers of abstract classes. The time is 100% going to come when Emby will split off from Jellyfin or the other way around.
  * By the point, it'll be much easier to refactor this.
  */
-abstract class AbstractMediaServerRestService(
+abstract class BaseMediaServerService(
 
     val serviceName: String,
     val mediaServerClient: MediaServerClient,
@@ -26,7 +26,7 @@ abstract class AbstractMediaServerRestService(
     val applicationProperties: ApplicationProperties,
     val fileSystemProperties: FileSystemProperties
 
-) : MediaServerService() {
+) : AbstractMediaServerService() {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -186,6 +186,12 @@ abstract class AbstractMediaServerRestService(
             TV_SHOWS -> content.IsSeries || content.Type == "Season" || content.Type == "Series"
         }
     }
+
+    protected abstract fun listLibraries(): List<VirtualFolderResponse>
+
+    protected abstract fun createLibrary(libraryName: String, libraryType: LibraryType, pathForMediaServer: String): VirtualFolderResponse
+
+    protected abstract fun addPathToLibrary(leavingSoonCollection: VirtualFolderResponse, pathForMediaServer: String)
 
     override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
 

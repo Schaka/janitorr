@@ -3,7 +3,7 @@ package com.github.schaka.janitorr.mediaserver.config
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
-import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.Emby
 import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
@@ -42,7 +42,7 @@ class MediaServerConfig(
         embyProperties: EmbyProperties,
         applicationProperties: ApplicationProperties,
         fileSystemProperties: FileSystemProperties
-    ): MediaServerService {
+    ): AbstractMediaServerService {
 
         if (!jellyfinProperties.enabled && !embyProperties.enabled) {
             return MediaServerNoOpService()

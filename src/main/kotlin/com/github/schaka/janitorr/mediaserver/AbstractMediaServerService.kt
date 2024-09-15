@@ -13,7 +13,7 @@ import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
-abstract class MediaServerService {
+abstract class AbstractMediaServerService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -34,12 +34,6 @@ abstract class MediaServerService {
     abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, config: JellystatProperties)
 
     abstract fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
-
-    abstract fun listLibraries(): List<VirtualFolderResponse>
-
-    abstract fun createLibrary(libraryName: String, libraryType: LibraryType, pathForMediaServer: String): VirtualFolderResponse
-
-    abstract fun addPathToLibrary(leavingSoonCollection: VirtualFolderResponse, pathForMediaServer: String)
 
     protected fun isMediaFile(path: String) =
         filePattern.matches(path)

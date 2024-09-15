@@ -2,7 +2,7 @@ package com.github.schaka.janitorr.mediaserver.config
 
 import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.jellystat.JellystatProperties
-import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
  */
-class MediaServerNoOpService : MediaServerService() {
+class MediaServerNoOpService : AbstractMediaServerService() {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

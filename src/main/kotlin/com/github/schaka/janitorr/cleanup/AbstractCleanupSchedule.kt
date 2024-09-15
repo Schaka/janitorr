@@ -4,7 +4,7 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.jellystat.JellystatService
-import com.github.schaka.janitorr.mediaserver.MediaServerService
+import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
@@ -16,14 +16,14 @@ import java.time.Duration
 import java.time.LocalDateTime
 
 abstract class AbstractCleanupSchedule(
-        protected val cleanupType: CleanupType,
-        protected val mediaServerService: MediaServerService,
-        protected val jellyseerrService: JellyseerrService,
-        protected val jellystatService: JellystatService,
-        protected val fileSystemProperties: FileSystemProperties,
-        protected val applicationProperties: ApplicationProperties,
-        protected val sonarrService: ServarrService,
-        protected val radarrService: ServarrService,
+    protected val cleanupType: CleanupType,
+    protected val mediaServerService: AbstractMediaServerService,
+    protected val jellyseerrService: JellyseerrService,
+    protected val jellystatService: JellystatService,
+    protected val fileSystemProperties: FileSystemProperties,
+    protected val applicationProperties: ApplicationProperties,
+    protected val sonarrService: ServarrService,
+    protected val radarrService: ServarrService,
 ) {
 
     companion object {

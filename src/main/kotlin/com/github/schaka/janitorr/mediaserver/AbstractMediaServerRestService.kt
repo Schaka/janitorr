@@ -4,8 +4,6 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellystat.JellystatProperties
-import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService
-import com.github.schaka.janitorr.mediaserver.emby.EmbyRestService.Companion
 import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
@@ -21,12 +19,12 @@ import java.nio.file.Path
  */
 abstract class AbstractMediaServerRestService(
 
-        val serviceName: String,
-        val mediaServerClient: MediaServerClient,
-        val mediaServerUserClient: MediaServerUserClient,
-        val mediaServerProperties: MediaServerProperties,
-        val applicationProperties: ApplicationProperties,
-        val fileSystemProperties: FileSystemProperties
+    val serviceName: String,
+    val mediaServerClient: MediaServerClient,
+    val mediaServerUserClient: MediaServerUserClient,
+    val mediaServerProperties: MediaServerProperties,
+    val applicationProperties: ApplicationProperties,
+    val fileSystemProperties: FileSystemProperties
 
 ) : MediaServerService() {
 
@@ -61,19 +59,19 @@ abstract class AbstractMediaServerRestService(
         for (show: LibraryItem in showsForDeletion) {
             mediaServerShows
                 .firstOrNull { tvShowMatches(show, it) }
-                    // if we find any matches for TV show or season (depending on settings) delete that match
-                    ?.let { mediaServerContent ->
-                        if (!applicationProperties.dryRun) {
-                            try {
-                                mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
-                                log.info("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
-                            } catch (e: Exception) {
-                                log.error("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name, e)
-                            }
-                        } else {
-                            log.info("Found {} {} on $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
+                // if we find any matches for TV show or season (depending on settings) delete that match
+                ?.let { mediaServerContent ->
+                    if (!applicationProperties.dryRun) {
+                        try {
+                            mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
+                            log.info("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
+                        } catch (e: Exception) {
+                            log.error("Deleting {} {} from $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name, e)
                         }
+                    } else {
+                        log.info("Found {} {} on $serviceName", mediaServerContent.SeriesName, mediaServerContent.Name)
                     }
+                }
         }
 
         // TODO: Remove TV shows if all seasons gone - only if wholeShow is turned off
@@ -87,9 +85,9 @@ abstract class AbstractMediaServerRestService(
         val mediaServerShows = getTvLibrary(useSeason)
         for (show: LibraryItem in items) {
             mediaServerShows.firstOrNull { tvShowMatches(show, it, useSeason) }
-                    ?.let { mediaServerContent ->
-                        show.mediaServerId = mediaServerContent.Id
-                    }
+                ?.let { mediaServerContent ->
+                    show.mediaServerId = mediaServerContent.Id
+                }
         }
     }
 
@@ -117,9 +115,9 @@ abstract class AbstractMediaServerRestService(
 
         for (movie: LibraryItem in items) {
             mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
-                    ?.let { mediaServerContent ->
-                        movie.mediaServerId = mediaServerContent.Id
-                    }
+                ?.let { mediaServerContent ->
+                    movie.mediaServerId = mediaServerContent.Id
+                }
         }
     }
 
@@ -128,18 +126,18 @@ abstract class AbstractMediaServerRestService(
 
         for (movie: LibraryItem in items) {
             mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
-                    ?.let { mediaServerContent ->
-                        if (!applicationProperties.dryRun) {
-                            try {
-                                mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
-                                log.info("Deleting {} from $serviceName", mediaServerContent.Name)
-                            } catch (e: Exception) {
-                                log.error("Deleting from $serviceName failed", e)
-                            }
-                        } else {
-                            log.info("Found {} on $serviceName", mediaServerContent.Name)
+                ?.let { mediaServerContent ->
+                    if (!applicationProperties.dryRun) {
+                        try {
+                            mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
+                            log.info("Deleting {} from $serviceName", mediaServerContent.Name)
+                        } catch (e: Exception) {
+                            log.error("Deleting from $serviceName failed", e)
                         }
+                    } else {
+                        log.info("Found {} on $serviceName", mediaServerContent.Name)
                     }
+                }
         }
     }
 
@@ -196,11 +194,14 @@ abstract class AbstractMediaServerRestService(
             return
         }
 
-        val result = mediaServerClient.listLibraries()
+        val result = listLibraries()
         val collectionFilter = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
         val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
         val mediaServerPath = Path.of(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val pathString = mediaServerPath.toUri().path.removeSuffix("/")
+        // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
+        val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString
 
         // Clean up library - consider also deleting the collection in Jellyfin/Emby
         if (items.isEmpty()) {
@@ -210,10 +211,6 @@ abstract class AbstractMediaServerRestService(
             return
         }
 
-        val pathString = mediaServerPath.toUri().path.removeSuffix("/")
-        // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
-        val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString
-
         Files.createDirectories(path)
         val libraryName = libraryType.collectionName(mediaServerProperties)
 
@@ -221,16 +218,14 @@ abstract class AbstractMediaServerRestService(
         // They're also a lot harder (imho) to manage - so we just create a media library that consists only
         var leavingSoonCollection = result.firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
         if (leavingSoonCollection == null) {
-            mediaServerClient.createLibrary(libraryName, libraryType.collectionType, AddLibraryRequest(), listOf(pathForMediaServer))
-            leavingSoonCollection = mediaServerClient.listLibraries().firstOrNull { it.CollectionType?.lowercase() == collectionFilter && it.Name == libraryName }
+            leavingSoonCollection = createLibrary(libraryName, libraryType, pathForMediaServer)
         }
 
         log.trace("Leaving Soon Collection Created/Found: {}", leavingSoonCollection)
 
         // the collection has been found, but maybe our cleanupType specific path hasn't been added to it yet
-        val pathSet = leavingSoonCollection?.Locations?.contains(pathForMediaServer)
-        if (pathSet == false) {
-            mediaServerClient.addPathToLibrary(AddPathRequest(libraryName, PathInfo(pathForMediaServer)))
+        if (!leavingSoonCollection.Locations.contains(pathForMediaServer)) {
+            addPathToLibrary(leavingSoonCollection, pathForMediaServer)
         }
 
         // Clean up entire directory and rebuild from scratch - this can help with clearing orphaned data

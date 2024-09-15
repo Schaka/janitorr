@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
+import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
@@ -19,6 +20,7 @@ abstract class MediaServerService {
 
         @JvmStatic
         protected val seasonPattern = Regex("Season (?<season>\\d+)")
+
         @JvmStatic
         protected val seasonPatternLanguageAgnostic = Regex("(\\w+) (?<season>\\d+)")
         private val filePattern = Regex("^.*\\.(mkv|mp4|avi|webm|mts|m2ts|ts|wmv|mpg|mpeg|mp2|m2v|m4v)\$")
@@ -33,15 +35,21 @@ abstract class MediaServerService {
 
     abstract fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 
+    abstract fun listLibraries(): List<VirtualFolderResponse>
+
+    abstract fun createLibrary(libraryName: String, libraryType: LibraryType, pathForMediaServer: String): VirtualFolderResponse
+
+    abstract fun addPathToLibrary(leavingSoonCollection: VirtualFolderResponse, pathForMediaServer: String)
+
     protected fun isMediaFile(path: String) =
-            filePattern.matches(path)
+        filePattern.matches(path)
 
     internal fun parseMetadataId(value: String?): Int? {
         return value?.let {
             numberPattern.findAll(it)
-                    .map(MatchResult::value)
-                    .map(String::toInt)
-                    .firstOrNull()
+                .map(MatchResult::value)
+                .map(String::toInt)
+                .firstOrNull()
         }
     }
 
@@ -59,7 +67,8 @@ abstract class MediaServerService {
         val itemFilePath = Path.of(it.filePath)
         val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
 
-        val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
+        val fileOrFolder =
+            itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
 
         val sourceFolder = rootPath.resolve(itemFolderName)
         val sourceFile = sourceFolder.resolve(fileOrFolder)
@@ -103,6 +112,7 @@ abstract class MediaServerService {
                             val target = targetSeasonFolder.resolve(fileName)
                             createSymLink(source, target, "episode")
                         }
+
                     } else {
                         log.info("Can't find original season folder - no links to create {}", sourceSeasonFolder)
                     }

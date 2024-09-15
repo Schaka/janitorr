@@ -1,6 +1,8 @@
 import com.google.cloud.tools.jib.api.buildplan.ImageFormat
 import net.nemerosa.versioning.VersioningExtension
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.aot.ProcessAot
@@ -10,14 +12,14 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.3.2"
+    id("org.springframework.boot") version "3.3.3"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.google.cloud.tools.jib") version "3.4.3"
     id("net.nemerosa.versioning") version "3.1.0"
-    id("org.graalvm.buildtools.native") version "0.10.2"
+    id("org.graalvm.buildtools.native") version "0.10.3"
 
-    kotlin("jvm") version "2.0.10"
-    kotlin("plugin.spring") version "2.0.10"
+    kotlin("jvm") version "2.0.20"
+    kotlin("plugin.spring") version "2.0.20"
 
 }
 
@@ -32,7 +34,7 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
 
     implementation("io.github.openfeign:feign-core:13.1")
     implementation("io.github.openfeign:feign-jackson:13.1")
@@ -61,7 +63,7 @@ configure<IdeaModel> {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
+        languageVersion.set(JavaLanguageVersion.of(22))
         vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
@@ -71,14 +73,14 @@ tasks.withType<Test> {
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_21.toString()
-    targetCompatibility = JavaVersion.VERSION_21.toString()
+    sourceCompatibility = JavaVersion.VERSION_22.toString()
+    targetCompatibility = JavaVersion.VERSION_22.toString()
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
+    compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = JavaVersion.VERSION_21.toString()
+        jvmTarget = JVM_22
     }
 }
 
@@ -169,7 +171,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:21-jre-jammy"
+        image = "eclipse-temurin:22-jre-jammy"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")

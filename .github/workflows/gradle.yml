@@ -22,10 +22,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up JDK 21
+      - name: Set up JDK 22
         uses: actions/setup-java@v4
         with:
-          java-version: '21'
+          java-version: '22'
           distribution: 'temurin'
 
       - name: Log in to Docker Hub
@@ -37,7 +37,7 @@ jobs:
       - name: Setup Gradle for a non-wrapper project
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 8.9
+          gradle-version: 8.10.1
 
       - name: Build JVM OCI image
         run: gradle jib
@@ -48,7 +48,7 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build Native OCI Image
-        run: bootBuildImage --publishImage
+        run: gradle bootBuildImage --publishImage
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

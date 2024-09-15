@@ -28,31 +28,27 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
-      - name: Validate Gradle wrapper
-        uses: gradle/wrapper-validation-action@v2
-
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build with Gradle
-        uses: gradle/actions/setup-gradle@v3
+      - name: Setup Gradle for a non-wrapper project
+        uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.9
-          arguments: jib
+
+      - name: Build JVM OCI image
+        run: gradle jib
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build Native Image
-        uses: gradle/actions/setup-gradle@v3
-        with:
-          gradle-version: 8.9
-          arguments: "bootBuildImage --publishImage"
+      - name: Build Native OCI Image
+        run: bootBuildImage --publishImage
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

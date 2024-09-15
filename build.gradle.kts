@@ -149,6 +149,13 @@ tasks.withType<BootBuildImage> {
     tags = project.extra["native.image.tags"] as List<String>
     createdDate = "now"
 
+    // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings
+    environment = mapOf(
+        "BP_NATIVE_IMAGE" to "true",
+        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
+            -march=compatibility
+        """.trimIndent()
+    )
 }
 
 jib {

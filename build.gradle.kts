@@ -1,7 +1,6 @@
 import com.google.cloud.tools.jib.api.buildplan.ImageFormat
 import net.nemerosa.versioning.VersioningExtension
 import org.gradle.plugins.ide.idea.model.IdeaModel
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.dsl.SpringBootExtension
@@ -171,7 +170,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:22-jre-jammy"
+        image = "eclipse-temurin:23-jre-jammy"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")
@@ -183,6 +182,10 @@ jib {
             }
             platform {
                 architecture = "arm64"
+                os = "linux"
+            }
+            platform {
+                architecture = "arm"
                 os = "linux"
             }
         }

@@ -170,7 +170,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:23-jre-jammy"
+        image = "eclipse-temurin:22-jre-jammy"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")
@@ -182,10 +182,6 @@ jib {
             }
             platform {
                 architecture = "arm64"
-                os = "linux"
-            }
-            platform {
-                architecture = "arm"
                 os = "linux"
             }
         }

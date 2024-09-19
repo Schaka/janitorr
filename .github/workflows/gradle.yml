@@ -14,7 +14,7 @@ on:
     tags:
       - '**'
     branches:
-      - 'develop'
+      - 'native-arm'
 
 jobs:
   build:
@@ -40,6 +40,7 @@ jobs:
           gradle-version: 8.10.1
 
       - name: Build JVM OCI image
+        if: "${{github.ref_name != 'native-arm'}}"
         run: gradle jib
         env:
           USERNAME: ${{ github.actor }}
@@ -48,7 +49,19 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build Native OCI Image
+        if: "${{github.ref_name != 'native-arm'}}"
         run: gradle bootBuildImage --publishImage
+        env:
+          USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build Native ARM64 OCI Image
+        uses: docker/setup-qemu-action@v3
+        with:
+            platforms: 'arm64'
+        run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

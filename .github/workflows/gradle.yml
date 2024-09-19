@@ -95,10 +95,11 @@ jobs:
       - name: Combine native images into single manifest
         uses: int128/docker-manifest-create-action@v2
         with:
-          tags: |
+          push: true
+          tags: | 
             ghcr.io/schaka/janitorr:native-${{ steps.extract_branch.outputs.branch }}
             ${{ (startsWith(github.ref, 'refs/tags/v') && 'ghcr.io/schaka/janitorr:native-stable') || '' }}
-          sources: |
+          sources: | 
             ghcr.io/schaka/janitorr:native-amd64-${{ steps.extract_branch.outputs.branch }}
             ghcr.io/schaka/janitorr:native-arm64-${{ steps.extract_branch.outputs.branch }}
           

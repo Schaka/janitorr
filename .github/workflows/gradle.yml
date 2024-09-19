@@ -68,7 +68,7 @@ jobs:
 
       - name: Build Native ARM64 OCI Image
         #if: startsWith(github.ref, 'refs/tags/v')
-        run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64
+        run: gradle bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

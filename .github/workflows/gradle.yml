@@ -34,12 +34,6 @@ jobs:
           distribution: 'temurin'
           cache: 'gradle'
 
-      - name: Extract branch name
-        shell: bash
-        run: >
-          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
-        id: extract_branch
-
       - name: Log in to Docker Hub to pull images without rate limit
         uses: docker/login-action@v3
         with:
@@ -76,7 +70,6 @@ jobs:
           TARGET_PLATFORM: "amd64"
 
       - name: Setup QEMU for ARM64 OCI Image
-        #if: startsWith(github.ref, 'refs/tags/v')
         uses: docker/setup-qemu-action@v3
         with:
           platforms: 'all'
@@ -88,7 +81,6 @@ jobs:
           platforms: 'linux/amd64,linux/arm64'
 
       - name: Build Native ARM64 OCI Image
-        #if: startsWith(github.ref, 'refs/tags/v')
         run: gradle bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
           USERNAME: ${{ github.actor }}
@@ -102,7 +94,7 @@ jobs:
         with:
           push: true
           tags: | 
-            ghcr.io/schaka/janitorr:native-${{ steps.extract_branch.outputs.branch }}
+            ghcr.io/schaka/janitorr:native-${{ github.ref_name }}
             ${{ (startsWith(github.ref, 'refs/tags/v') && 'ghcr.io/schaka/janitorr:native-stable') || '' }}
           sources: | 
             ghcr.io/schaka/janitorr:native-amd64-${{ steps.extract_branch.outputs.branch }}

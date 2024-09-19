@@ -110,7 +110,7 @@ extra {
 
     val containerImageName = "schaka/${project.name}"
     val containerImageTags = mutableSetOf(shortCommit, branch)
-    if (branch.startsWith("v1")) {
+    if (branch.startsWith("v")) {
         containerImageTags.add("stable")
     }
 
@@ -119,12 +119,10 @@ extra {
     project.extra["docker.image.source"] = build.projectSourceRoot()
     project.extra["docker.image.tags"] = containerImageTags
 
-    val nativeBaseTag = "native"
+    val platform = System.getenv("TARGET_PLATFORM") ?: "amd64"
+    val nativeBaseTag = "native-$platform"
     val nativeImageName = "ghcr.io/${containerImageName}:$nativeBaseTag"
-    val nativeImageTags = mutableListOf("$nativeImageName-$branch")
-    if (branch.startsWith("v1")) {
-        nativeImageTags.add("$nativeImageName-stable")
-    }
+    val nativeImageTags = listOf("$nativeImageName-$branch")
 
     project.extra["native.image.name"] = nativeImageName
     project.extra["native.image.tags"] = nativeImageTags

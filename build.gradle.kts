@@ -11,7 +11,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.3.3"
+    id("org.springframework.boot") version "3.4.0-M2"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.google.cloud.tools.jib") version "3.4.3"
     id("net.nemerosa.versioning") version "3.1.0"
@@ -25,6 +25,10 @@ plugins {
 repositories {
     gradlePluginPortal()
     mavenCentral()
+    maven("https://repo.spring.io/snapshot")
+    maven("https://repo.spring.io/milestone")
+    maven("https://repo.spring.io/libs-milestone")
+    maven("https://repo.spring.io/libs-snapshot")
 }
 
 dependencies {
@@ -209,7 +213,6 @@ jib {
                         "org.opencontainers.image.description" to project.description,
                 )
         )
-
 
         // Exclude all "developmentOnly" dependencies, e.g. Spring devtools.
         configurationName.set("productionRuntimeClasspath")

@@ -10,7 +10,12 @@ plugins {
 }
 
 repositories {
+    gradlePluginPortal()
     mavenCentral()
+    maven("https://repo.spring.io/snapshot")
+    maven("https://repo.spring.io/milestone")
+    maven("https://repo.spring.io/snapshot")
+    maven("https://repo.spring.io/milestone")
 }
 
 tasks.withType<JavaCompile> {

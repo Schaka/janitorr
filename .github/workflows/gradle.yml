@@ -14,7 +14,7 @@ on:
     tags:
       - '**'
     branches:
-      - 'native-arm'
+      - 'arm-native'
 
 jobs:
   build:
@@ -40,7 +40,7 @@ jobs:
           gradle-version: 8.10.1
 
       - name: Build JVM OCI image
-        if: "${{github.ref_name != 'native-arm'}}"
+        if: "${{github.ref_name != 'arm-native'}}"
         run: gradle jib
         env:
           USERNAME: ${{ github.actor }}
@@ -49,7 +49,7 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build Native OCI Image
-        if: "${{github.ref_name != 'native-arm'}}"
+        if: "${{github.ref_name != 'arm-native'}}"
         run: gradle bootBuildImage --publishImage
         env:
           USERNAME: ${{ github.actor }}

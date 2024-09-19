@@ -145,6 +145,8 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
+    builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
+    buildpacks = listOf("paketobuildpacks/java-native-image")
     imageName = project.extra["native.image.name"] as String
     version = project.extra["docker.image.version"] as String
     tags = project.extra["native.image.tags"] as List<String>
@@ -153,6 +155,9 @@ tasks.withType<BootBuildImage> {
     // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings
     environment = mapOf(
         "BP_NATIVE_IMAGE" to "true",
+        "BPL_SPRING_AOT_ENABLED" to "true",
+        "BP_JVM_CDS_ENABLED" to "true",
+        "BP_JVM_VERSION" to "22",
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
             -march=compatibility
         """.trimIndent()

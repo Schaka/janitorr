@@ -61,7 +61,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Jellyfin does NOT provide viewing stats like Plex, so we go by file age in the *arrs - unless you provide access to JellyStat
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
 - Only one of Jellyfin or Emby can be enabled at a time
-- **If file system access isn't given, files currently still seeding may be deleted**
+- **If file system access isn't given, files currently still seeding may be deleted by the Sonarr/Radarr**
 
 ### Note to developers
 
@@ -78,20 +78,19 @@ AOT also doesn't work exactly the same as native image deployment and thus is a 
 
 ## Setup
 
-**The old registry at hub.docker.com is deprecated. Please use ghcr.io.**
 Currently, the code is only published as a docker image to [GitHub](https://github.com/Schaka/janitorr/pkgs/container/janitorr).
-If you cannot use Docker, you're out of luck for now.
+If you cannot use Docker, you'll have to compile it yourself from source.
 
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
-history in the *arr apps. By default, it will choose the oldest file in the history. If any of your quality profiles allow for updates, it will
-consider the most recent download when calculating its age.
+history in the *arr apps. By default, it will choose the oldest file in the history. You can determine if you want to calculate age by oldest or most recent download.
+If Jellystat is set up, the most recent watch date overwrites the grab history, if it exists.
 
 To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
 Janitorr looks for can be adjusted in your config file.
 
 ### Setting up Docker
 
-- map /config from within the container to a host folder of your choice
+- follow the mapping for `application.yml` examples below
 - within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from this repository
 - adjust said copy with your own info like *arr, Jellyfin and Jellyseerr API keys and your preferred port
 
@@ -100,9 +99,9 @@ Additionally, make sure the *arrs directories are mapped the same way Janitorr i
 
 Janitorr creates symlinks from whatever directory it receives from the arrs' API into the leaving-soon-dir.
 If Radarr finds movies at `/data/media/movies` Janitorr needs to find them at `/data/media/movies` too.
-You need to ensure links can be created from the source (what's available in the arrs) to the destination (leaving-soon).
-Since Janitorr creates the "Leaving Soon" collection for you with the path given in the config file, it needs to be accessible by Jellyfin.
-If Janitorr thinks the directory can be found at `/somedir/leaving-soon`, Jellyfin needs to find it at `/somedir/leaving-soon` too.
+You need to ensure links can be created from the source (in the arrs' library) to the destination (leaving-soon).
+Since Janitorr creates the "Leaving Soon" collection for you with at path given in the config file.
+If Jellyfin/Emby know this directory under a different path than Janitorr, you can just this in your config file.
 
 ### Docker config
 
@@ -128,6 +127,7 @@ services:
 A native image is also published for every build. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
 If you restart more often than once a week or have a very low powered server, this is now recommended.
 That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
+While I do publish an arm64 version of this image, it is mostly untested.
 It also requires you to map application.yml slightly differently - see below:
 
 ```yml

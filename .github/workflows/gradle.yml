@@ -11,6 +11,11 @@ name: Java CI
 
 on:
   push:
+    paths:
+      - src/**
+      - buildSrc/**
+      - build.gradle.kts
+      - settings.gradle.kts
     tags:
       - '**'
     branches:

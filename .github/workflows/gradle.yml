@@ -97,6 +97,6 @@ jobs:
             ghcr.io/schaka/janitorr:native-${{ github.ref_name }}
             ${{ (startsWith(github.ref, 'refs/tags/v') && 'ghcr.io/schaka/janitorr:native-stable') || '' }}
           sources: | 
-            ghcr.io/schaka/janitorr:native-amd64-${{ steps.extract_branch.outputs.branch }}
-            ghcr.io/schaka/janitorr:native-arm64-${{ steps.extract_branch.outputs.branch }}
+            ghcr.io/schaka/janitorr:native-amd64-${{ github.ref_name }}
+            ghcr.io/schaka/janitorr:native-arm64-${{ github.ref_name }}
           

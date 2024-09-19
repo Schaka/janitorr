@@ -57,10 +57,17 @@ jobs:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-      - name: Build Native ARM64 OCI Image
+      - name: Setup QEMU for ARM64 OCI Image
         uses: docker/setup-qemu-action@v3
         with:
             platforms: 'arm64'
+        env:
+          USERNAME: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build Native ARM64 OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
           USERNAME: ${{ github.actor }}

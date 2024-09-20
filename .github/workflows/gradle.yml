@@ -14,6 +14,7 @@ on:
     paths:
       - src/**
       - buildSrc/**
+      - .github
       - build.gradle.kts
       - settings.gradle.kts
     tags:

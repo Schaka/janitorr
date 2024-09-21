@@ -97,11 +97,23 @@ Janitorr looks for can be adjusted in your config file.
 If using Jellyfin with filesystem access, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
 Additionally, make sure the *arrs directories are mapped the same way Janitorr into Janitorr as well.
 
-Janitorr creates symlinks from whatever directory it receives from the arrs' API into the leaving-soon-dir.
+Janitorr creates symlinks from whatever directory it receives from the arrs' API into the `leaving-soon-dir`.
 If Radarr finds movies at `/data/media/movies` Janitorr needs to find them at `/data/media/movies` too.
 You need to ensure links can be created from the source (in the arrs' library) to the destination (leaving-soon).
-Since Janitorr creates the "Leaving Soon" collection for you with at path given in the config file.
-If Jellyfin/Emby know this directory under a different path than Janitorr, you can just this in your config file.
+By default, both `media-server-leaving-soon-dir` and `leaving-soon-dir` should be identical if your volume mappings are identical.
+
+
+If Janitorr's mapping looks like this:
+`/share_media/media/leaving-soon:/data/media/leaving-soon`
+
+And Jellyfin's like this:
+`/share_media/media/leaving-soon:/library/leaving-soon`
+
+Then your `application.yml` should look like:
+```
+leaving-soon-dir: "/data/media/leaving-soon"
+media-server-leaving-soon-dir: "/library/leaving-soon"
+```
 
 ### Docker config
 

@@ -115,6 +115,8 @@ leaving-soon-dir: "/data/media/leaving-soon"
 media-server-leaving-soon-dir: "/library/leaving-soon"
 ```
 
+**You may also check out [this example](examples/example-compose.yml) of a full stack setup.**
+
 ### Docker config
 
 Before using this, please make sure you've created the `application.yml` file and put it in the correct config directory

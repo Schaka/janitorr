@@ -1,0 +1,97 @@
+version: "3"
+services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - DOTNET_GCHighMemPercent=48
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /appdata/jellyfin:/config
+      - /share_media:/data
+      - /appdata/jellyfin/cache:/cache
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - /appdata/radarr:/config
+      - /share_media:/data
+    ports:
+      - 7878:7878
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    ports:
+      - 5050:5050
+    volumes:
+      - /appdata/jellyseerr:/app/config
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - /appdata/sonarr:/config
+      - /share_media:/data
+    ports:
+      - 8989:8989
+
+  jellystat-db:
+    container_name: jellystat-db
+    image: postgres:15.2
+    user: 1000:1000
+    environment:
+      POSTGRES_DB: 'jfstat'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - /appdata/jellystat/postgres-data:/var/lib/postgresql/data # Mounting the volume
+    networks:
+      - htpc
+    restart: unless-stopped
+
+
+  jellystat:
+    container_name: jellystat
+    image: cyfershepard/jellystat:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      JWT_SECRET: 'fsdf89hjdfs3123'
+    ports:
+      - "3000:3000"
+    volumes:
+      - /appdata/jellystat/config:/app/backend/backup-data # Mounting the volume
+
+    depends_on:
+      - jellystat-db
+
+  janitorr:
+    container_name: janitorr
+    image: ghcr.io/schaka/janitorr:native-stable
+    user: 1000:1000
+    volumes:
+      - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /share_media:/data

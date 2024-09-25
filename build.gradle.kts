@@ -199,7 +199,7 @@ jib {
         jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms256m")
         mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
         ports = listOf("8978")
-        format = ImageFormat.OCI
+        format = ImageFormat.Docker // OCI not yet supported
         volumes = listOf("/config")
 
         labels.set(

@@ -63,6 +63,10 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Only one of Jellyfin or Emby can be enabled at a time
 - **If file system access isn't given, files currently still seeding may be deleted by the Sonarr/Radarr**
 
+### Troubleshooting
+Before you create a new issue, please check previous issues to make sure nobody has faced the same problem before.
+The Wiki also contains a troubleshooting section with commons errors.
+
 ### Note to developers
 
 I currently have to load pretty much the entire library in one REST call to manually match media. While both Jellyfin and Emby have

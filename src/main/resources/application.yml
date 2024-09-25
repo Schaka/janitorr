@@ -8,6 +8,17 @@ spring:
     virtual:
       enabled: true
 
+management:
+  server:
+    port: 8081
+  endpoints:
+    web:
+      base-path: "/"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
 clients:
   sonarr:
     enabled: true

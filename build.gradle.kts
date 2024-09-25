@@ -34,6 +34,7 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-cache")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -148,7 +149,7 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
     builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
-    buildpacks = listOf("paketobuildpacks/java-native-image")
+    buildpacks = listOf("paketobuildpacks/java-native-image", "paketobuildpacks/health-checker")
     imageName = project.extra["native.image.name"] as String
     version = project.extra["docker.image.version"] as String
     tags = project.extra["native.image.tags"] as List<String>
@@ -158,6 +159,7 @@ tasks.withType<BootBuildImage> {
     environment = mapOf(
         "BP_NATIVE_IMAGE" to "true",
         "BPL_SPRING_AOT_ENABLED" to "true",
+        "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
         "BP_JVM_VERSION" to "22",
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
@@ -197,7 +199,7 @@ jib {
         jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms256m")
         mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
         ports = listOf("8978")
-        format = ImageFormat.Docker
+        format = ImageFormat.OCI
         volumes = listOf("/config")
 
         labels.set(

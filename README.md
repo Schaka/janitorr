@@ -140,6 +140,11 @@ services:
     volumes:
       - /appdata/janitorr/config:/config
       - /share_media:/data
+    healthcheck:
+      test: "wget -T5 -qO- http://localhost:8081/health | grep UP || exit 1"
+      start_period: 30s
+      interval: 5s
+      retries: 3
 ```
 
 A native image is also published for every build. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
@@ -158,6 +163,15 @@ services:
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml
       - /share_media:/data
+    environment:
+      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
+      - THC_PATH=/health
+      - THC_PORT=8081
+    healthcheck:
+      test: [ "CMD", "/cnb/process/health-check" ]
+      start_period: 30s
+      interval: 5s
+      retries: 3
 ```
 
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:develop`.

@@ -102,7 +102,7 @@ class RadarrRestService(
     }
 
     private fun deleteMovie(movieId: Int) {
-        if (!applicationProperties.onlyDeleteFiles) {
+        if (!radarrProperties.onlyDeleteFiles) {
             radarrClient.deleteMovie(movieId)
             return
         }

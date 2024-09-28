@@ -159,7 +159,7 @@ class SonarrRestService(
             for (show in affectedShows) {
                 // no seeding check, we just delete everything - checking every single file for seeding isn't feasible
                 if (!applicationProperties.dryRun) {
-                    sonarrClient.deleteSeries(show.id, true)
+                    deleteShow(show)
                 }
                 log.info("Deleting ${show.title} [${show.id}}]")
             }
@@ -169,6 +169,33 @@ class SonarrRestService(
         }
     }
 
+    /**
+     * Deletes entire TV show (or its associated files)
+     */
+    private fun deleteShow(show: SeriesPayload) {
+        if (sonarrProperties.deleteEmptyShows) {
+            sonarrClient.deleteSeries(show.id, true)
+            return
+        }
+
+        // Unmonitor everything
+        unmonitorSeasons(show.id, *show.seasons.map(Season::seasonNumber).toIntArray())
+
+        // then delete each season's episode files
+        for (season in show.seasons) {
+            val episodes = sonarrClient.getAllEpisodes(show.id, season.seasonNumber)
+            for (episode in episodes) {
+                if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                    sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                    log.info("Deleting {} - episode {} ({}) of season {}", show.path, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
+                }
+            }
+        }
+    }
+
+    /**
+     * Removes a season's files if that season is in the relevant items.
+     */
     private fun removeBySeason(items: List<LibraryItem>) {
         // we are always treating seasons as a whole, even if technically episodes could be handled individually
         for (item in items) {

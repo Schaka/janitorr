@@ -10,6 +10,7 @@ import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
 import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
@@ -21,7 +22,7 @@ import java.time.LocalDateTime
 import kotlin.io.path.exists
 
 @Service
-@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, HistoryResponse::class])
+@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, MovieFile::class, HistoryResponse::class])
 class RadarrRestService(
 
         val radarrClient: RadarrClient,
@@ -92,12 +93,23 @@ class RadarrRestService(
 
             if (!applicationProperties.dryRun) {
                 unmonitorMovie(movie.id)
-                radarrClient.deleteMovie(movie.id)
+                deleteMovie(movie.id)
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             } else {
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             }
         }
+    }
+
+    private fun deleteMovie(movieId: Int) {
+        if (!applicationProperties.onlyDeleteFiles) {
+            radarrClient.deleteMovie(movieId)
+            return
+        }
+
+        radarrClient.getMovieFiles(movieId)
+            .map(MovieFile::id)
+            .forEach(radarrClient::deleteMovieFile)
     }
 
     private fun unmonitorMovie(movieId: Int) {

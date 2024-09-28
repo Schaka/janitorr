@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.servarr.radarr
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
 import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import feign.Param
 import feign.RequestLine
@@ -15,6 +16,9 @@ interface RadarrClient {
     @RequestLine("GET /movie")
     fun getAllMovies(): List<MoviePayload>
 
+    @RequestLine("GET /moviefile?movieId={id}")
+    fun getMovieFiles(@Param("id") id: Int): List<MovieFile>
+
     @RequestLine("GET /tag")
     fun getAllTags(): List<Tag>
 
@@ -26,6 +30,9 @@ interface RadarrClient {
 
     @RequestLine("DELETE /movie/{id}?deleteFiles={deleteFiles}")
     fun deleteMovie(@Param("id") id: Int, @Param("deleteFiles") deleteFiles: Boolean = true)
+
+    @RequestLine("DELETE /moviefile/{id}")
+    fun deleteMovieFile(@Param("id") id: Int)
 
     @RequestLine("GET /qualityprofile")
     fun getAllQualityProfiles(): List<QualityProfile>

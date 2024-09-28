@@ -47,7 +47,7 @@ abstract class BaseMediaServerService(
     override fun cleanupTvShows(items: List<LibraryItem>) {
 
         if (!mediaServerProperties.delete) {
-            log.info("Deletion from $serviceName disabled")
+            log.info("Deletion for $serviceName disabled - not deleting any orphaned files")
             return
         }
 
@@ -122,6 +122,12 @@ abstract class BaseMediaServerService(
     }
 
     override fun cleanupMovies(items: List<LibraryItem>) {
+
+        if (!mediaServerProperties.delete) {
+            log.info("Deletion for $serviceName disabled - not deleting any orphaned files")
+            return
+        }
+
         val mediaServerMovies = getMovieLibrary()
 
         for (movie: LibraryItem in items) {

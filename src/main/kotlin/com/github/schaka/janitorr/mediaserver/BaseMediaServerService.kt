@@ -86,7 +86,7 @@ abstract class BaseMediaServerService(
         for (show: LibraryItem in items) {
             mediaServerShows.firstOrNull { tvShowMatches(show, it, useSeason) }
                 ?.let { mediaServerContent ->
-                    show.mediaServerId = mediaServerContent.Id
+                    show.mediaServerIds += mediaServerContent.Id
                 }
         }
     }
@@ -116,7 +116,7 @@ abstract class BaseMediaServerService(
         for (movie: LibraryItem in items) {
             mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
                 ?.let { mediaServerContent ->
-                    movie.mediaServerId = mediaServerContent.Id
+                    movie.mediaServerIds += mediaServerContent.Id
                 }
         }
     }

@@ -33,11 +33,13 @@ class JellystatRestService(
         // TODO: if at all possible, we shouldn't populate the list with media server ids differently, but recognize a season and treat show as a whole as per application properties
         // example: grab show id for season id, get watchHistory based on show instead of season
 
-        for (item in items.filter { it.mediaServerId != null }) {
+        for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val watchHistory = jellystatClient.getRequests(ItemRequest(item.mediaServerId!!))
-                    .filter { it.PlaybackDuration > 60 }
-                    .maxByOrNull { toDate(it.ActivityDateInserted) } // most recent date
+            val watchHistory = item.mediaServerIds
+                .map(::ItemRequest)
+                .flatMap(jellystatClient::getRequests)
+                .filter { it.PlaybackDuration > 60 }
+                .maxByOrNull { toDate(it.ActivityDateInserted) } // most recent date
 
             // only count view if at least one minute of content was watched - could be user adjustable later
             if (watchHistory != null) {
@@ -48,7 +50,7 @@ class JellystatRestService(
         }
 
         if (log.isTraceEnabled) {
-            for (item in items.filter { it.mediaServerId == null }) {
+            for (item in items.filter { it.mediaServerIds.isEmpty() }) {
                 log.trace("Could not find any matching media server id for ${item.filePath} IMDB: ${item.imdbId} TMDB: ${item.tmdbId} TVDB: ${item.tvdbId} Season: ${item.season}")
             }
         }

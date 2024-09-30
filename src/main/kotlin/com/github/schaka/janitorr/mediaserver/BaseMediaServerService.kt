@@ -58,9 +58,9 @@ abstract class BaseMediaServerService(
 
         for (show: LibraryItem in showsForDeletion) {
             mediaServerShows
-                .firstOrNull { tvShowMatches(show, it) }
+                .filter { tvShowMatches(show, it) }
                 // if we find any matches for TV show or season (depending on settings) delete that match
-                ?.let { mediaServerContent ->
+                .forEach { mediaServerContent ->
                     if (!applicationProperties.dryRun) {
                         try {
                             mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
@@ -84,8 +84,9 @@ abstract class BaseMediaServerService(
 
         val mediaServerShows = getTvLibrary(useSeason)
         for (show: LibraryItem in items) {
-            mediaServerShows.firstOrNull { tvShowMatches(show, it, useSeason) }
-                ?.let { mediaServerContent ->
+            mediaServerShows
+                .filter { tvShowMatches(show, it, useSeason) }
+                .forEach { mediaServerContent ->
                     show.mediaServerIds += mediaServerContent.Id
                 }
         }
@@ -95,7 +96,7 @@ abstract class BaseMediaServerService(
         val parentFolders = mediaServerClient.getAllItems()
 
         var mediaServerShows = parentFolders.Items.flatMap { parent ->
-            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type == "Series" }
+            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type.lowercase() == "series" }
         }
 
         // don't treat library season by season, if not necessary
@@ -114,8 +115,9 @@ abstract class BaseMediaServerService(
         val mediaServerMovies = getMovieLibrary()
 
         for (movie: LibraryItem in items) {
-            mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
-                ?.let { mediaServerContent ->
+            mediaServerMovies
+                .filter { mediaMatches(MOVIES, movie, it) }
+                .forEach { mediaServerContent ->
                     movie.mediaServerIds += mediaServerContent.Id
                 }
         }
@@ -131,8 +133,9 @@ abstract class BaseMediaServerService(
         val mediaServerMovies = getMovieLibrary()
 
         for (movie: LibraryItem in items) {
-            mediaServerMovies.firstOrNull { mediaMatches(MOVIES, movie, it) }
-                ?.let { mediaServerContent ->
+            mediaServerMovies
+                .filter { mediaMatches(MOVIES, movie, it) }
+                .forEach { mediaServerContent ->
                     if (!applicationProperties.dryRun) {
                         try {
                             mediaServerUserClient.deleteItemAndFiles(mediaServerContent.Id)
@@ -161,12 +164,12 @@ abstract class BaseMediaServerService(
     // https://api.jellyfin.org/#tag/Configuration/operation/GetConfiguration (UICulture)
     // https://github.com/jellyfin/jellyfin/blob/master/Emby.Server.Implementations/Localization/Core/ca.json
     private fun tvShowMatches(item: LibraryItem, candidate: LibraryContent, matchSeason: Boolean = true): Boolean {
-        val seasonMatchesTitle = candidate.Type == "Season"
+        val seasonMatchesTitle = candidate.Type.lowercase() == "season"
                 // && candidate.Name.contains("Season")
                 // && item.season == seasonPattern.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
                 && item.season == seasonPatternLanguageAgnostic.find(candidate.Name)?.groups?.get("season")?.value?.toInt()
 
-        val seasonMatchesIndex = candidate.Type == "Season" && item.season == candidate.IndexNumber
+        val seasonMatchesIndex = candidate.Type.lowercase() == "season" && item.season == candidate.IndexNumber
 
         return mediaMatches(TV_SHOWS, item, candidate) && if (matchSeason) seasonMatchesTitle || seasonMatchesIndex else true
     }
@@ -188,8 +191,8 @@ abstract class BaseMediaServerService(
 
     private fun mediaTypeMatches(type: LibraryType, content: LibraryContent): Boolean {
         return when (type) {
-            MOVIES -> content.IsMovie || content.Type == "Movie"
-            TV_SHOWS -> content.IsSeries || content.Type == "Season" || content.Type == "Series"
+            MOVIES -> content.IsMovie || content.Type.lowercase() == "movie" || content.Type.lowercase() == "movies"
+            TV_SHOWS -> content.IsSeries || content.Type.lowercase() == "season" || content.Type.lowercase() == "series"
         }
     }
 

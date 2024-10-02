@@ -11,6 +11,7 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
+import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
 import java.nio.file.Path
 

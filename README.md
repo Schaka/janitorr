@@ -123,8 +123,7 @@ media-server-leaving-soon-dir: "/library/leaving-soon"
 
 ### Docker config
 
-Before using this, please make sure you've created the `application.yml` file and put it in the correct config directory
-you intend to map.
+Before using this, please make sure you've created the `application.yml` file and put it in the correct config directory you intend to map.
 The application requires it. You need to supply it, or Janitorr will not start correctly.
 You don't have to publish ANY ports on the host machine.
 
@@ -138,7 +137,7 @@ services:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:stable
     volumes:
-      - /appdata/janitorr/config:/config
+      - /appdata/janitorr/config/application.yml:/workspace/application.yml
       - /share_media:/data
     healthcheck:
       test: "wget -T5 -qO- http://localhost:8081/health | grep UP || exit 1"
@@ -151,7 +150,7 @@ A native image is also published for every build. It keeps a much lower memory a
 If you restart more often than once a week or have a very low powered server, this is now recommended.
 That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
 While I do publish an arm64 version of this image, it is mostly untested.
-It also requires you to map application.yml slightly differently - see below:
+The healthcheck also work slightly differently, see below:
 
 ```yml
 version: '3'

@@ -133,13 +133,13 @@ extra {
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml"
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml"
         )
     )
 }
 
 tasks.withType<ProcessAot> {
-    args("-Dspring.config.additional-location=optional:file:/config/application.yaml")
+    args("-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml")
 }
 
 tasks.withType<BootBuildImage> {

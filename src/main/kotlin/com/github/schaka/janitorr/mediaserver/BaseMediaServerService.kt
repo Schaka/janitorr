@@ -10,6 +10,7 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
+import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -222,6 +223,8 @@ abstract class BaseMediaServerService(
         if (items.isEmpty()) {
             if (!onlyAddLinks) {
                 FileSystemUtils.deleteRecursively(path)
+                Files.createDirectories(path)
+                createEmptyFile(path)
             }
             return
         }
@@ -249,6 +252,23 @@ abstract class BaseMediaServerService(
         }
 
         createLinks(items, path, libraryType)
+        createEmptyFile(path)
+    }
+
+    /**
+     * Jellyfin/Emby require a file inside a library or they won't scan updates to media if all media was deleted.
+     * https://github.com/jellyfin/jellyfin/issues/11913
+     */
+    private fun createEmptyFile(path: Path) {
+        val fileName = "empty-file.media"
+        val file = path.resolve(fileName)
+        try {
+            Files.createFile(file)
+        } catch (e: FileAlreadyExistsException) {
+            log.debug("File already exists: {}", file, e)
+        } catch (e: IOException) {
+            log.warn("Could not create empty file {}", fileName, e)
+        }
     }
 
 }

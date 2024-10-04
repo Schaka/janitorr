@@ -5,7 +5,9 @@ import com.github.schaka.janitorr.jellystat.JellystatClient
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
+import com.github.schaka.janitorr.servarr.RestClientProperties
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.bazarr.BazarrClient
 import com.github.schaka.janitorr.servarr.radarr.RadarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import org.springframework.aot.hint.RuntimeHints
@@ -36,8 +38,10 @@ class JanitorrApplication {
             hints.proxies().registerJdkProxy(MediaServerClient::class.java)
             hints.proxies().registerJdkProxy(MediaServerUserClient::class.java)
             hints.proxies().registerJdkProxy(RadarrClient::class.java)
-            hints.proxies().registerJdkProxy(SonarrClient::class.java)
+            hints.proxies().registerJdkProxy(RadarrClient::class.java)
+            hints.proxies().registerJdkProxy(BazarrClient::class.java)
             hints.proxies().registerJdkProxy(ServarrService::class.java)
+            hints.proxies().registerJdkProxy(RestClientProperties::class.java)
         }
     }
 }

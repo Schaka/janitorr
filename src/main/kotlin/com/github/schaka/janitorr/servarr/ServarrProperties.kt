@@ -1,8 +1,5 @@
 package com.github.schaka.janitorr.servarr
 
-interface ServarrProperties {
-    val enabled: Boolean
-    val url: String
-    val apiKey: String
+interface ServarrProperties : RestClientProperties {
     val determineAgeBy: HistorySort?
 }

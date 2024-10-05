@@ -179,7 +179,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:23-jre-jammy"
+        image = "eclipse-temurin:23-jre-noble"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")

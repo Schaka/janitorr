@@ -17,6 +17,8 @@ import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
 import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
 import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
+import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
+import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -40,8 +42,9 @@ class MediaServerConfig(
     fun mediaServer(
         jellyfinProperties: JellyfinProperties,
         embyProperties: EmbyProperties,
+        bazarrService: BazarrService,
         applicationProperties: ApplicationProperties,
-        fileSystemProperties: FileSystemProperties
+        fileSystemProperties: FileSystemProperties,
     ): AbstractMediaServerService {
 
         if (!jellyfinProperties.enabled && !embyProperties.enabled) {
@@ -53,9 +56,9 @@ class MediaServerConfig(
         }
 
         if (embyProperties.enabled) {
-            return EmbyRestService(embyClient, embyUserClient, embyProperties, applicationProperties, fileSystemProperties)
+            return EmbyRestService(embyClient, embyUserClient, bazarrService, embyProperties, applicationProperties, fileSystemProperties)
         }
 
-        return JellyfinRestService(jellyfinClient, jellyfinUserClient, jellyfinProperties, applicationProperties, fileSystemProperties)
+        return JellyfinRestService(jellyfinClient, jellyfinUserClient, bazarrService, jellyfinProperties, applicationProperties, fileSystemProperties)
     }
 }

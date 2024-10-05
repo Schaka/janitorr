@@ -161,7 +161,7 @@ tasks.withType<BootBuildImage> {
         "BPL_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
-        "BP_JVM_VERSION" to "22",
+        "BP_JVM_VERSION" to "23",
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
             -march=compatibility
         """.trimIndent()
@@ -179,7 +179,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:22-jre-jammy"
+        image = "eclipse-temurin:23-jre-jammy"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")

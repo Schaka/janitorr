@@ -4,5 +4,5 @@ interface BazarrService {
 
     fun getSubtitlesForMovies(movieId: Int): List<BazarrPayload>
 
-    fun getSubtitlesForTv(showId: Int, episodeId: Int): List<BazarrPayload>
+    fun getSubtitlesForTv(showId: Int): List<BazarrPayload>
 }

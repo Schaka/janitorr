@@ -38,7 +38,7 @@ class JanitorrApplication {
             hints.proxies().registerJdkProxy(MediaServerClient::class.java)
             hints.proxies().registerJdkProxy(MediaServerUserClient::class.java)
             hints.proxies().registerJdkProxy(RadarrClient::class.java)
-            hints.proxies().registerJdkProxy(RadarrClient::class.java)
+            hints.proxies().registerJdkProxy(SonarrClient::class.java)
             hints.proxies().registerJdkProxy(BazarrClient::class.java)
             hints.proxies().registerJdkProxy(ServarrService::class.java)
             hints.proxies().registerJdkProxy(RestClientProperties::class.java)

@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
+import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
@@ -24,6 +25,7 @@ abstract class BaseMediaServerService(
     val serviceName: String,
     val mediaServerClient: MediaServerClient,
     val mediaServerUserClient: MediaServerUserClient,
+    val bazarrService: BazarrService,
     val mediaServerProperties: MediaServerProperties,
     val applicationProperties: ApplicationProperties,
     val fileSystemProperties: FileSystemProperties
@@ -252,8 +254,20 @@ abstract class BaseMediaServerService(
             cleanupPath(fileSystemProperties.leavingSoonDir, libraryType, cleanupType)
         }
 
+        populateExtraFiles(libraryType, items)
         createLinks(items, path, libraryType)
         createEmptyFile(path)
+    }
+
+    private fun populateExtraFiles(type: LibraryType, items: List<LibraryItem>) {
+        for (item in items) {
+            val extraFiles = when (type) {
+                MOVIES -> bazarrService.getSubtitlesForMovies(item.id)
+                TV_SHOWS -> bazarrService.getSubtitlesForTv(item.id).filter { it.season == item.season }
+            }.flatMap { it.subtitles }.mapNotNull { it.path }
+
+            item.extraFiles += extraFiles
+        }
     }
 
     /**

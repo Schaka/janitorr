@@ -44,7 +44,7 @@ class BazarrConfig(
             .decoder(JacksonDecoder(mapper))
             .encoder(JacksonEncoder(mapper))
             .requestInterceptor {
-                it.header("X-Api-Key", properties.apiKey)
+                it.header("X-API-KEY", properties.apiKey)
                 it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
             }
             .target(BazarrClient::class.java, "${properties.url}/api")

@@ -10,6 +10,8 @@ import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
+import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
+import com.github.schaka.janitorr.servarr.radarr.RadarrRestService.Companion
 import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
 import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import org.slf4j.LoggerFactory
@@ -36,14 +38,22 @@ class BazarrRestService(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+        const val CACHE_NAME_MOVIES = "bazarr-movie-cache"
+        const val CACHE_NAME_TV = "bazarr-tv-cache"
 
     }
 
+    @Cacheable(CACHE_NAME_MOVIES)
     override fun getSubtitlesForMovies(movieId: Int): List<BazarrPayload> {
-        TODO("Not yet implemented")
+        val result = bazarrClient.getMovieSubtitles(movieId)
+
+        return result.data
     }
 
-    override fun getSubtitlesForTv(showId: Int, episodeId: Int): List<BazarrPayload>  {
-        TODO("Not yet implemented")
+    @Cacheable(CACHE_NAME_TV)
+    override fun getSubtitlesForTv(showId: Int): List<BazarrPayload>  {
+        val result = bazarrClient.getTvSubtitles(showId)
+
+        return result.data
     }
 }

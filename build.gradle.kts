@@ -98,7 +98,7 @@ configure<VersioningExtension> {
 extra {
     val build = getBuild()
     val versioning: VersioningExtension = extensions.getByName<VersioningExtension>("versioning")
-    val branch = versioning.info.branch
+    val branch = versioning.info.branch.replace("/", "-")
     val shortCommit = versioning.info.commit.take(8)
 
     project.extra["build.date-time"] = build.buildDateAndTime
@@ -110,7 +110,7 @@ extra {
     project.extra["build.user"] = build.userName()
 
     val containerImageName = "schaka/${project.name}"
-    val containerImageTags = mutableSetOf(shortCommit, branch).map { it.replace("/", "-") }.toMutableSet()
+    val containerImageTags = mutableSetOf(shortCommit, branch)
     if (branch.startsWith("v")) {
         containerImageTags.add("stable")
     }

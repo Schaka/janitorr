@@ -21,9 +21,16 @@ on:
       - '**'
     branches:
       - 'develop'
-    pull_request:
-      branches:
-        - '**'
+
+  pull_request:
+    paths:
+      - src/**
+      - buildSrc/**
+      - .github/**
+      - build.gradle.kts
+      - settings.gradle.kts
+    branches:
+      - '**'
 
 jobs:
   build:

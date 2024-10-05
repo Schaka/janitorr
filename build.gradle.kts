@@ -110,7 +110,7 @@ extra {
     project.extra["build.user"] = build.userName()
 
     val containerImageName = "schaka/${project.name}"
-    val containerImageTags = mutableSetOf(shortCommit, branch)
+    val containerImageTags = mutableSetOf(shortCommit, branch).map { it.replace("/", "-") }.toMutableSet()
     if (branch.startsWith("v")) {
         containerImageTags.add("stable")
     }

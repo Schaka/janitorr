@@ -267,6 +267,7 @@ abstract class BaseMediaServerService(
             }.flatMap { it.subtitles }.mapNotNull { it.path }
 
             item.extraFiles += extraFiles
+            log.trace("Adding extra files to $type for *arr id ${item.id}: $extraFiles")
         }
     }
 

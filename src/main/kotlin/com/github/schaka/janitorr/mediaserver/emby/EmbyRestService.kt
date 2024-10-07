@@ -10,16 +10,18 @@ import com.github.schaka.janitorr.mediaserver.emby.library.LibraryOptions
 import com.github.schaka.janitorr.mediaserver.emby.library.PathInfo
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
+import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 
 open class EmbyRestService(
 
     @Emby val embyClient: EmbyMediaServerClient,
     @Emby embyUserClient: MediaServerUserClient,
+    bazarrService: BazarrService,
     embyProperties: EmbyProperties,
     applicationProperties: ApplicationProperties,
     fileSystemProperties: FileSystemProperties
 
-) : BaseMediaServerService("Emby", embyClient, embyUserClient, embyProperties, applicationProperties, fileSystemProperties) {
+) : BaseMediaServerService("Emby", embyClient, embyUserClient, bazarrService, embyProperties, applicationProperties, fileSystemProperties) {
 
     override fun listLibraries(): List<VirtualFolderResponse> {
         return embyClient.listLibrariesPage().Items

@@ -24,7 +24,9 @@ data class LibraryItem(
         var seeding: Boolean = false,
         var lastSeen: LocalDateTime? = null,
 
-        val tags: List<String> = listOf()
+        val tags: List<String> = listOf(),
+        // extra files that may be provided and or copied over for leaving soon - like subtitles
+        val extraFiles: MutableList<String> = mutableListOf(),
 )
 {
     val historyAge: LocalDateTime

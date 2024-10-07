@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
@@ -47,12 +48,20 @@ abstract class AbstractMediaServerService {
         }
     }
 
-    protected fun createSymLink(source: Path, target: Path, type: String) {
+    private fun createSymLink(source: Path, target: Path, type: String) {
         if (!Files.exists(target)) {
             log.debug("Creating {} link from {} to {}", type, source, target)
             Files.createSymbolicLink(target, source)
         } else {
             log.debug("{} link already exists from {} to {}", type, source, target)
+        }
+    }
+
+    private fun copyExtraFiles(files: List<String>, target: Path) {
+        for (filePath in files) {
+            val source = Path.of(filePath)
+            Files.copy(target.resolve(source.fileName), target, StandardCopyOption.REPLACE_EXISTING)
+            log.debug("Copying extra files from {} to {}", filePath, target)
         }
     }
 
@@ -105,6 +114,7 @@ abstract class AbstractMediaServerService {
                             val source = sourceSeasonFolder.resolve(fileName)
                             val target = targetSeasonFolder.resolve(fileName)
                             createSymLink(source, target, "episode")
+                            copyExtraFiles(it.extraFiles, target)
                         }
 
                     } else {

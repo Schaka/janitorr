@@ -29,6 +29,10 @@ clients:
     enabled: true
     url: "http://radarr:7878"
     api-key: "radarr-key"
+  bazarr:
+    enabled: false
+    url: "http://bazarr:6767"
+    api-key: "bazarr-key"
   jellyfin:
     enabled: true
     url: "http://jellyfin:8096"

@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
+import com.github.schaka.janitorr.servarr.bazarr.BazarrPayload
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
@@ -262,13 +263,22 @@ abstract class BaseMediaServerService(
     private fun populateExtraFiles(type: LibraryType, items: List<LibraryItem>) {
         for (item in items) {
             val extraFiles = when (type) {
-                MOVIES -> bazarrService.getSubtitlesForMovies(item.id)
-                TV_SHOWS -> bazarrService.getSubtitlesForTv(item.id).filter { it.season == item.season }
+                MOVIES -> gracefulRequest(item.id, bazarrService::getSubtitlesForMovies)
+                TV_SHOWS -> gracefulRequest(item.id, bazarrService::getSubtitlesForTv).filter { it.season == item.season }
             }.flatMap { it.subtitles }.mapNotNull { it.path }
 
             item.extraFiles += extraFiles
             log.trace("Adding extra files to $type for *arr id ${item.id}: $extraFiles")
         }
+    }
+
+    private fun gracefulRequest(id: Int, httpApiCall: (id: Int) -> List<BazarrPayload>): List<BazarrPayload> {
+        try {
+            httpApiCall(id)
+        } catch (e: Exception) {
+            log.debug("Failed to request data from Bazarr", e)
+        }
+        return emptyList()
     }
 
     /**

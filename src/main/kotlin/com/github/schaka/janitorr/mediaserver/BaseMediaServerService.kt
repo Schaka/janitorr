@@ -274,7 +274,7 @@ abstract class BaseMediaServerService(
 
     private fun gracefulRequest(id: Int, httpApiCall: (id: Int) -> List<BazarrPayload>): List<BazarrPayload> {
         try {
-            httpApiCall(id)
+            return httpApiCall(id)
         } catch (e: Exception) {
             log.debug("Failed to request data from Bazarr", e)
         }

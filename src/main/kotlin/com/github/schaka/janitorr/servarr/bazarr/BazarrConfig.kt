@@ -38,7 +38,6 @@ class BazarrConfig(
     }
 
     @Bean
-    @ConditionalOnProperty("clients.radarr.enabled", havingValue = "true", matchIfMissing = false)
     fun bazarrClient(properties: BazarrProperties, mapper: ObjectMapper): BazarrClient {
         return Feign.builder()
             .decoder(JacksonDecoder(mapper))

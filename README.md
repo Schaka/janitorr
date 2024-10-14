@@ -136,6 +136,7 @@ services:
   janitorr:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:stable
+    user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml
       - /share_media:/data
@@ -159,6 +160,7 @@ services:
   janitorr:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:native-stable
+    user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml
       - /share_media:/data

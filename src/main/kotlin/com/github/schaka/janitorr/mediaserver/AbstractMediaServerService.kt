@@ -4,7 +4,6 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
-import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
@@ -134,7 +133,11 @@ abstract class AbstractMediaServerService {
                     }
                 }
             } catch (e: Exception) {
-                log.error("Couldn't find path {}", it.parentPath)
+                if (log.isDebugEnabled){
+                    log.error("Couldn't find path {}", it.parentPath, e)
+                } else {
+                    log.error("Couldn't find path {}", it.parentPath)
+                }
             }
         }
     }

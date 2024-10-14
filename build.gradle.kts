@@ -177,6 +177,7 @@ tasks.withType<BootBuildImage> {
         """.trimIndent(),
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
             -march=compatibility
+            -H:+AddAllCharsets
             -Dsun.jnu.encoding=UTF-8
             -Dfile.encoding=UTF-8
         """.trimIndent()

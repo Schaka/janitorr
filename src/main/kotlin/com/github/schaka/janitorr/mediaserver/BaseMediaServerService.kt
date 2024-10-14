@@ -291,7 +291,7 @@ abstract class BaseMediaServerService(
         try {
             Files.createFile(file)
         } catch (e: FileAlreadyExistsException) {
-            log.debug("File already exists: {}", file, e)
+            log.trace("File already exists: {}", file, e)
         } catch (e: IOException) {
             log.warn("Could not create empty file {}", fileName, e)
         }

@@ -57,9 +57,11 @@ abstract class AbstractMediaServerService {
     }
 
     private fun copyExtraFiles(files: List<String>, target: Path) {
+         // TODO: files already contain the full path, consider only adding the filename to an existing source (folder)
         for (filePath in files) {
             val source = Path.of(filePath)
-            Files.copy(target.resolve(source.fileName), target, StandardCopyOption.REPLACE_EXISTING)
+            val targetFolder = target.parent
+            Files.copy(source, targetFolder, StandardCopyOption.REPLACE_EXISTING)
             log.debug("Copying extra files from {} to {}", filePath, target)
         }
     }
@@ -69,8 +71,8 @@ abstract class AbstractMediaServerService {
         val itemFilePath = Path.of(it.filePath)
         val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
 
-        val fileOrFolder =
-            itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
+        // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
+        val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull()
 
         val sourceFolder = rootPath.resolve(itemFolderName)
         val sourceFile = sourceFolder.resolve(fileOrFolder)
@@ -128,6 +130,7 @@ abstract class AbstractMediaServerService {
                         val target = structure.targetFile
                         Files.createDirectories(structure.targetFolder)
                         createSymLink(source, target, "movie")
+                        copyExtraFiles(it.extraFiles, target)
                     } else {
                         log.info("Can't find original movie folder - no links to create {}", source)
                     }

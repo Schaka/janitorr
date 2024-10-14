@@ -156,7 +156,7 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
     builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
-    buildpacks = listOf("paketobuildpacks/java-native-image", "paketobuildpacks/health-checker")
+    buildpacks = listOf("paketobuildpacks/environment-variables", "paketobuildpacks/java-native-image", "paketobuildpacks/health-checker")
     imageName = project.extra["native.image.name"] as String
     version = project.extra["docker.image.version"] as String
     tags = project.extra["native.image.tags"] as List<String>
@@ -169,6 +169,7 @@ tasks.withType<BootBuildImage> {
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
         "BP_JVM_VERSION" to "23",
+        "BPE_DEFAULT_LANG" to "en_US.UTF-8",
         "BPE_LANG" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         "JAVA_TOOL_OPTIONS" to """

@@ -137,7 +137,7 @@ abstract class AbstractMediaServerService {
                 }
             } catch (e: Exception) {
                 if (log.isDebugEnabled){
-                    log.error("Couldn't find path {}", it.parentPath, e)
+                    log.error("Couldn't find path {} - {}", it.parentPath, it, e)
                 } else {
                     log.error("Couldn't find path {}", it.parentPath)
                 }

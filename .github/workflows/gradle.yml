@@ -76,7 +76,8 @@ jobs:
       - name: Build JVM OCI image
         run: gradle jib -Djib.serialize=true # https://github.com/GoogleContainerTools/jib/issues/4301
         env:
-          LC_ALL: "C.UTF-8"
+          LANG: "en_US.UTF-8"
+          LC_ALL: "en_US.UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
@@ -85,7 +86,8 @@ jobs:
       - name: Build Native OCI Image
         run: gradle bootBuildImage --publishImage --imagePlatform linux/amd64
         env:
-          LC_ALL: "C.UTF-8"
+          LANG: "en_US.UTF-8"
+          LC_ALL: "en_US.UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}

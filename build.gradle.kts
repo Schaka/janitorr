@@ -3,6 +3,7 @@ import net.nemerosa.versioning.VersioningExtension
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.resolve.compatibility
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.aot.ProcessAot
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
@@ -133,13 +134,19 @@ extra {
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml"
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+            "-Dsun.jnu.encoding=UTF-8",
+            "-Dfile.encoding=UTF-8"
         )
     )
 }
 
 tasks.withType<ProcessAot> {
-    args("-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml")
+    args(
+        "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+        "-Dsun.jnu.encoding=UTF-8",
+        "-Dfile.encoding=UTF-8"
+    )
 }
 
 tasks.withType<BootBuildImage> {
@@ -162,8 +169,14 @@ tasks.withType<BootBuildImage> {
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
         "BP_JVM_VERSION" to "23",
+        "JAVA_TOOL_OPTIONS" to """
+            --Dsun.jnu.encoding=UTF-8
+            -Dfile.encoding=UTF-8
+        """.trimIndent(),
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
             -march=compatibility
+            -Dsun.jnu.encoding=UTF-8
+            -Dfile.encoding=UTF-8
         """.trimIndent()
     )
 }
@@ -196,7 +209,12 @@ jib {
         }
     }
     container {
-        jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms256m")
+        jvmFlags = listOf(
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml",
+            "-Dsun.jnu.encoding=UTF-8",
+            "-Dfile.encoding=UTF-8",
+            "-Xms256m",
+        )
         mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
         ports = listOf("8978")
         format = ImageFormat.Docker // OCI not yet supported

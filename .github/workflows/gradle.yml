@@ -96,6 +96,9 @@ jobs:
 
       - name: Setup QEMU for ARM64 OCI Image
         uses: docker/setup-qemu-action@v3
+        env:
+          LANG: "en_US.UTF-8"
+          LC_ALL: "en_US.UTF-8"
         with:
           platforms: 'all'
 
@@ -108,6 +111,8 @@ jobs:
       - name: Build Native ARM64 OCI Image
         run: gradle bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
+          LANG: "en_US.UTF-8"
+          LC_ALL: "en_US.UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}

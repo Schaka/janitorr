@@ -170,7 +170,7 @@ tasks.withType<BootBuildImage> {
         "BP_JVM_CDS_ENABLED" to "true",
         "BP_JVM_VERSION" to "23",
         "JAVA_TOOL_OPTIONS" to """
-            --Dsun.jnu.encoding=UTF-8
+            -Dsun.jnu.encoding=UTF-8
             -Dfile.encoding=UTF-8
         """.trimIndent(),
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """

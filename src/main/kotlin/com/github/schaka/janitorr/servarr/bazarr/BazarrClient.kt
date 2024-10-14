@@ -5,7 +5,7 @@ import feign.RequestLine
 
 interface BazarrClient {
 
-    @RequestLine("GET /movies?start=0&length=-1&radarrid={movieId}")
+    @RequestLine("GET /movies?start=0&length=-1&radarrid[]={movieId}")
     fun getMovieSubtitles(@Param("movieId") movieId: Int): BazarrPage
 
     @RequestLine("GET /episodes?seriesid[]={showId}")

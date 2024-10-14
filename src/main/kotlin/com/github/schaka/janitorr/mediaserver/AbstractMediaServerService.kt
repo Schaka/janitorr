@@ -61,8 +61,9 @@ abstract class AbstractMediaServerService {
         for (filePath in files) {
             val source = Path.of(filePath)
             val targetFolder = target.parent
-            Files.copy(source, targetFolder.resolve(source.fileName), StandardCopyOption.REPLACE_EXISTING)
-            log.debug("Copying extra files from {} to {}", filePath, target)
+            val targetFile = targetFolder.resolve(source.fileName)
+            Files.copy(source, targetFile, StandardCopyOption.REPLACE_EXISTING)
+            log.debug("Copying extra files from {} to {}", filePath, targetFile)
         }
     }
 

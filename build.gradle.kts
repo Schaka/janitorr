@@ -169,8 +169,8 @@ tasks.withType<BootBuildImage> {
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
         "BP_JVM_VERSION" to "23",
-        "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-Dsun.jnu.encoding=UTF-8",
         "BPE_LANG" to "en_US.UTF-8",
+        "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
         "BPE_LC_ALL" to "en_US.UTF-8",
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8"
     )

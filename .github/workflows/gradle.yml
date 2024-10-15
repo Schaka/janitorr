@@ -88,6 +88,7 @@ jobs:
         env:
           LANG: "en_US.UTF-8"
           LC_ALL: "en_US.UTF-8"
+          NATIVE_IMAGE_OPTIONS: "-Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}

@@ -18,8 +18,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import java.nio.file.Path
 import java.time.LocalDateTime
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 @Service
@@ -149,7 +149,7 @@ class SonarrRestService(
                 !(applicationProperties.wholeShowSeedingCheck &&
                         fileSystemProperties.access &&
                         fileSystemProperties.validateSeeding &&
-                        Path.of(it.originalPath).exists())
+                        Path(it.originalPath).exists())
             }
             .map { it.id }
             .distinct()
@@ -200,7 +200,7 @@ class SonarrRestService(
         // we are always treating seasons as a whole, even if technically episodes could be handled individually
         for (item in items) {
 
-            if (fileSystemProperties.access && fileSystemProperties.validateSeeding && Path.of(item.originalPath).exists()) {
+            if (fileSystemProperties.access && fileSystemProperties.validateSeeding && Path(item.originalPath).exists()) {
                 log.info("Can't delete season [still seeding - file exists] ({}), id: {}, imdb: {}", item.originalPath, item.id, item.imdbId)
                 item.seeding = true
                 continue

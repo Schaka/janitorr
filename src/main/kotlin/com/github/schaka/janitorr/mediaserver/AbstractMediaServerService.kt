@@ -10,6 +10,7 @@ import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.StandardCopyOption
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
@@ -59,7 +60,7 @@ abstract class AbstractMediaServerService {
     private fun copyExtraFiles(files: List<String>, target: Path) {
          // TODO: files already contain the full path, consider only adding the filename to an existing source (folder)
         for (filePath in files) {
-            val source = Path.of(filePath)
+            val source = Path(filePath)
             val targetFolder = target.parent
             val targetFile = targetFolder.resolve(source.fileName)
             Files.copy(source, targetFile, StandardCopyOption.REPLACE_EXISTING)
@@ -68,12 +69,12 @@ abstract class AbstractMediaServerService {
     }
 
     internal fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
-        val rootPath = Path.of(it.rootFolderPath)
-        val itemFilePath = Path.of(it.filePath)
+        val rootPath = Path(it.rootFolderPath)
+        val itemFilePath = Path(it.filePath)
         val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
 
         // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
-        val fileOrFolder = itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull()
+        val fileOrFolder = itemFilePath.subtract(Path(it.parentPath)).firstOrNull()
 
         val sourceFolder = rootPath.resolve(itemFolderName)
         val sourceFile = sourceFolder.resolve(fileOrFolder)
@@ -85,7 +86,7 @@ abstract class AbstractMediaServerService {
     }
 
     fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {
-        val path = Path.of(leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val path = Path(leavingSoonDir, libraryType.folderName, cleanupType.folderName)
         FileSystemUtils.deleteRecursively(path)
         Files.createDirectories(path)
     }

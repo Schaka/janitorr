@@ -16,6 +16,7 @@ import java.io.IOException
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.Path
 
 /**
  * Keep 2 layers of abstract classes. The time is 100% going to come when Emby will split off from Jellyfin or the other way around.
@@ -217,8 +218,8 @@ abstract class BaseMediaServerService(
         val result = listLibraries()
         val collectionFilter = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
-        val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
-        val mediaServerPath = Path.of(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val path = Path(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val mediaServerPath = Path(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
         val pathString = mediaServerPath.toUri().path.removeSuffix("/")
         // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
         val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString

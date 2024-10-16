@@ -12,13 +12,12 @@ import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
 import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
-import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
-import java.nio.file.Path
 import java.time.LocalDateTime
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 @Service
@@ -85,7 +84,7 @@ class RadarrRestService(
     override fun removeEntries(items: List<LibraryItem>) {
         for (movie in items) {
 
-            if (fileSystemProperties.access && fileSystemProperties.validateSeeding && Path.of(movie.originalPath).exists()) {
+            if (fileSystemProperties.access && fileSystemProperties.validateSeeding && Path(movie.originalPath).exists()) {
                 log.info("Can't delete movie [still seeding - file exists] ({}), id: {}, imdb: {}", movie.originalPath, movie.id, movie.imdbId)
                 movie.seeding = true
                 continue

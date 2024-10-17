@@ -23,7 +23,6 @@ class ServarrClientConfig {
     }
 
     @Bean
-    @ConditionalOnProperty("clients.radarr.enabled", havingValue = "true", matchIfMissing = false)
     fun radarrClient(properties: RadarrProperties, mapper: ObjectMapper): RadarrClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))
@@ -36,7 +35,6 @@ class ServarrClientConfig {
     }
 
     @Bean
-    @ConditionalOnProperty("clients.sonarr.enabled", havingValue = "true", matchIfMissing = false)
     fun sonarrClient(properties: SonarrProperties, mapper: ObjectMapper): SonarrClient {
         return Feign.builder()
                 .decoder(JacksonDecoder(mapper))

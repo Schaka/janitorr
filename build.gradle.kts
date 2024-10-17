@@ -3,6 +3,7 @@ import net.nemerosa.versioning.VersioningExtension
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jetbrains.kotlin.resolve.compatibility
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.aot.ProcessAot
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
@@ -98,7 +99,7 @@ configure<VersioningExtension> {
 extra {
     val build = getBuild()
     val versioning: VersioningExtension = extensions.getByName<VersioningExtension>("versioning")
-    val branch = versioning.info.branch
+    val branch = versioning.info.branch.replace("/", "-")
     val shortCommit = versioning.info.commit.take(8)
 
     project.extra["build.date-time"] = build.buildDateAndTime
@@ -133,13 +134,19 @@ extra {
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml"
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+            "-Dsun.jnu.encoding=UTF-8",
+            "-Dfile.encoding=UTF-8"
         )
     )
 }
 
 tasks.withType<ProcessAot> {
-    args("-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml")
+    args(
+        "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+        "-Dsun.jnu.encoding=UTF-8",
+        "-Dfile.encoding=UTF-8"
+    )
 }
 
 tasks.withType<BootBuildImage> {
@@ -149,7 +156,7 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
     builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
-    buildpacks = listOf("paketobuildpacks/java-native-image", "paketobuildpacks/health-checker")
+    buildpacks = listOf("paketobuildpacks/environment-variables", "paketobuildpacks/java-native-image", "paketobuildpacks/health-checker")
     imageName = project.extra["native.image.name"] as String
     version = project.extra["docker.image.version"] as String
     tags = project.extra["native.image.tags"] as List<String>
@@ -161,10 +168,12 @@ tasks.withType<BootBuildImage> {
         "BPL_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
-        "BP_JVM_VERSION" to "22",
-        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to """
-            -march=compatibility
-        """.trimIndent()
+        "BP_JVM_VERSION" to "23",
+        "BPE_NATIVE_IMAGE_OPTIONS" to "-Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8",
+        "BPE_LANG" to "en_US.UTF-8",
+        "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
+        "BPE_LC_ALL" to "en_US.UTF-8",
+        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8"
     )
 }
 
@@ -179,7 +188,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:22-jre-jammy"
+        image = "eclipse-temurin:23-jre-noble"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")
@@ -196,7 +205,12 @@ jib {
         }
     }
     container {
-        jvmFlags = listOf("-Dspring.config.additional-location=optional:file:/config/application.yaml", "-Xms256m")
+        jvmFlags = listOf(
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml",
+            "-Dsun.jnu.encoding=UTF-8",
+            "-Dfile.encoding=UTF-8",
+            "-Xms256m",
+        )
         mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
         ports = listOf("8978")
         format = ImageFormat.Docker // OCI not yet supported

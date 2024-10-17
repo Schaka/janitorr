@@ -4,12 +4,13 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
-import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.StandardCopyOption
+import kotlin.io.path.Path
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
@@ -47,7 +48,7 @@ abstract class AbstractMediaServerService {
         }
     }
 
-    protected fun createSymLink(source: Path, target: Path, type: String) {
+    private fun createSymLink(source: Path, target: Path, type: String) {
         if (!Files.exists(target)) {
             log.debug("Creating {} link from {} to {}", type, source, target)
             Files.createSymbolicLink(target, source)
@@ -56,13 +57,24 @@ abstract class AbstractMediaServerService {
         }
     }
 
+    private fun copyExtraFiles(files: List<String>, target: Path) {
+         // TODO: files already contain the full path, consider only adding the filename to an existing source (folder)
+        for (filePath in files) {
+            val source = Path(filePath)
+            val targetFolder = target.parent
+            val targetFile = targetFolder.resolve(source.fileName)
+            Files.copy(source, targetFile, StandardCopyOption.REPLACE_EXISTING)
+            log.debug("Copying extra files from {} to {}", filePath, targetFile)
+        }
+    }
+
     internal fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
-        val rootPath = Path.of(it.rootFolderPath)
-        val itemFilePath = Path.of(it.filePath)
+        val rootPath = Path(it.rootFolderPath)
+        val itemFilePath = Path(it.filePath)
         val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
 
-        val fileOrFolder =
-            itemFilePath.subtract(Path.of(it.parentPath)).firstOrNull() // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
+        // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
+        val fileOrFolder = itemFilePath.subtract(Path(it.parentPath)).firstOrNull()
 
         val sourceFolder = rootPath.resolve(itemFolderName)
         val sourceFile = sourceFolder.resolve(fileOrFolder)
@@ -74,7 +86,7 @@ abstract class AbstractMediaServerService {
     }
 
     fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {
-        val path = Path.of(leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val path = Path(leavingSoonDir, libraryType.folderName, cleanupType.folderName)
         FileSystemUtils.deleteRecursively(path)
         Files.createDirectories(path)
     }
@@ -105,6 +117,7 @@ abstract class AbstractMediaServerService {
                             val source = sourceSeasonFolder.resolve(fileName)
                             val target = targetSeasonFolder.resolve(fileName)
                             createSymLink(source, target, "episode")
+                            copyExtraFiles(it.extraFiles, target)
                         }
 
                     } else {
@@ -119,12 +132,17 @@ abstract class AbstractMediaServerService {
                         val target = structure.targetFile
                         Files.createDirectories(structure.targetFolder)
                         createSymLink(source, target, "movie")
+                        copyExtraFiles(it.extraFiles, target)
                     } else {
                         log.info("Can't find original movie folder - no links to create {}", source)
                     }
                 }
             } catch (e: Exception) {
-                log.error("Couldn't find path {}", it.parentPath)
+                if (log.isDebugEnabled){
+                    log.error("Couldn't find path {} - {}", it.parentPath, it, e)
+                } else {
+                    log.error("Couldn't find path {}", it.parentPath)
+                }
             }
         }
     }

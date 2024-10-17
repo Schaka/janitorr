@@ -8,12 +8,15 @@ import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
+import com.github.schaka.janitorr.servarr.bazarr.BazarrPayload
+import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
 import java.nio.file.FileAlreadyExistsException
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.Path
 
 /**
  * Keep 2 layers of abstract classes. The time is 100% going to come when Emby will split off from Jellyfin or the other way around.
@@ -24,6 +27,7 @@ abstract class BaseMediaServerService(
     val serviceName: String,
     val mediaServerClient: MediaServerClient,
     val mediaServerUserClient: MediaServerUserClient,
+    val bazarrService: BazarrService,
     val mediaServerProperties: MediaServerProperties,
     val applicationProperties: ApplicationProperties,
     val fileSystemProperties: FileSystemProperties
@@ -214,8 +218,8 @@ abstract class BaseMediaServerService(
         val result = listLibraries()
         val collectionFilter = libraryType.collectionType.lowercase()
         // subdirectory (i.e. /leaving-soon/tv/media, /leaving-soon/movies/tag-based
-        val path = Path.of(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
-        val mediaServerPath = Path.of(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val path = Path(fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
+        val mediaServerPath = Path(fileSystemProperties.mediaServerLeavingSoonDir ?: fileSystemProperties.leavingSoonDir, libraryType.folderName, cleanupType.folderName)
         val pathString = mediaServerPath.toUri().path.removeSuffix("/")
         // Windows paths may have a trailing trash - Windows Jellyfin/Emby can't deal with that, this is a bit hacky but makes development easier
         val pathForMediaServer = if (windowsRegex.matches(pathString)) pathString.replaceFirst("/", "") else pathString
@@ -252,8 +256,30 @@ abstract class BaseMediaServerService(
             cleanupPath(fileSystemProperties.leavingSoonDir, libraryType, cleanupType)
         }
 
+        populateExtraFiles(libraryType, items)
         createLinks(items, path, libraryType)
         createEmptyFile(path)
+    }
+
+    private fun populateExtraFiles(type: LibraryType, items: List<LibraryItem>) {
+        for (item in items) {
+            val extraFiles = when (type) {
+                MOVIES -> gracefulRequest(item.id, bazarrService::getSubtitlesForMovies)
+                TV_SHOWS -> gracefulRequest(item.id, bazarrService::getSubtitlesForTv).filter { it.season == item.season }
+            }.flatMap { it.subtitles }.mapNotNull { it.path }
+
+            item.extraFiles += extraFiles
+            log.trace("Adding extra files to $type for *arr id ${item.id} (season ${item.season}): $extraFiles")
+        }
+    }
+
+    private fun gracefulRequest(id: Int, httpApiCall: (id: Int) -> List<BazarrPayload>): List<BazarrPayload> {
+        try {
+            return httpApiCall(id)
+        } catch (e: Exception) {
+            log.debug("Failed to request data from Bazarr", e)
+        }
+        return emptyList()
     }
 
     /**
@@ -266,7 +292,7 @@ abstract class BaseMediaServerService(
         try {
             Files.createFile(file)
         } catch (e: FileAlreadyExistsException) {
-            log.debug("File already exists: {}", file, e)
+            log.trace("File already exists: {}", file, e)
         } catch (e: IOException) {
             log.warn("Could not create empty file {}", fileName, e)
         }

@@ -68,13 +68,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Gradle for a non-wrapper project
+      - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: 8.10.2
 
       - name: Build JVM OCI image
-        run: gradle jib -Djib.serialize=true # https://github.com/GoogleContainerTools/jib/issues/4301
+        run: ./gradlew jib -Djib.serialize=true # https://github.com/GoogleContainerTools/jib/issues/4301
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
 
       - name: Build Native OCI Image
-        run: gradle bootBuildImage --publishImage --imagePlatform linux/amd64
+        run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/amd64
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,7 +102,7 @@ jobs:
           platforms: 'linux/amd64,linux/arm64'
 
       - name: Build Native ARM64 OCI Image
-        run: gradle bootBuildImage --publishImage --imagePlatform linux/arm64
+        run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

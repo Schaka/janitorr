@@ -74,7 +74,7 @@ jobs:
           gradle-version: 8.10.2
 
       - name: Build JVM OCI image
-        run: ./gradlew jib -Djib.serialize=true --info # https://github.com/GoogleContainerTools/jib/issues/4301
+        run: ./gradlew jib -Djib.serialize=true # https://github.com/GoogleContainerTools/jib/issues/4301
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

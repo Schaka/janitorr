@@ -1,12 +1,9 @@
 import com.google.cloud.tools.jib.api.buildplan.ImageFormat
 import net.nemerosa.versioning.VersioningExtension
-import org.gradle.kotlin.dsl.add
-import org.gradle.kotlin.dsl.from
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.resolve.compatibility
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.aot.ProcessAot
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
@@ -21,8 +18,8 @@ plugins {
     id("net.nemerosa.versioning") version "3.1.0"
     id("org.graalvm.buildtools.native") version "0.10.3"
 
-    kotlin("jvm") version "2.0.20"
-    kotlin("plugin.spring") version "2.0.20"
+    kotlin("jvm") version "2.0.21"
+    kotlin("plugin.spring") version "2.0.21"
 
 }
 
@@ -123,6 +120,7 @@ tasks.withType<KotlinCompile> {
     compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = JVM_22
+        javaParameters = true
     }
 }
 

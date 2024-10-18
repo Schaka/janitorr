@@ -48,6 +48,7 @@ class JanitorrApplication {
 }
 
 fun main(args: Array<String>) {
+    Path.of("/home/schaka/nausicaä")
     runApplication<JanitorrApplication>(*args)
 }
 

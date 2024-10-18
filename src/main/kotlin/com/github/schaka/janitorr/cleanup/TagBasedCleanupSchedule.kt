@@ -28,11 +28,10 @@ class TagBasedCleanupSchedule(
     jellystatService: JellystatService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
-    @Sonarr
-        sonarrService: ServarrService,
-    @Radarr
-        radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
+    runOnce: RunOnce,
+    @Sonarr sonarrService: ServarrService,
+    @Radarr radarrService: ServarrService,
+) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService) {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -45,6 +44,7 @@ class TagBasedCleanupSchedule(
 
         if (!applicationProperties.tagBasedDeletion.enabled) {
             log.info("Tag based cleanup disabled, do nothing")
+            runOnce.hasTagBasedCleanupRun = true
             return
         }
 
@@ -60,6 +60,8 @@ class TagBasedCleanupSchedule(
             scheduleDelete(TV_SHOWS, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
             scheduleDelete(MOVIES, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
         }
+
+        runOnce.hasTagBasedCleanupRun = true
     }
 
     private fun tagMatches(item: LibraryItem, tag: TagDeleteSchedule): Boolean {

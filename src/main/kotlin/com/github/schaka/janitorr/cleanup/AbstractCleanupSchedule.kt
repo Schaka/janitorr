@@ -22,6 +22,7 @@ abstract class AbstractCleanupSchedule(
     protected val jellystatService: JellystatService,
     protected val fileSystemProperties: FileSystemProperties,
     protected val applicationProperties: ApplicationProperties,
+    protected val runOnce: RunOnce,
     protected val sonarrService: ServarrService,
     protected val radarrService: ServarrService,
 ) {

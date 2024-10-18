@@ -26,6 +26,7 @@ class WeeklyEpisodeCleanupSchedule(
         val applicationProperties: ApplicationProperties,
         val sonarrProperties: SonarrProperties,
         val sonarrClient: SonarrClient,
+        val runOnce: RunOnce,
 
         var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 ) {
@@ -47,6 +48,7 @@ class WeeklyEpisodeCleanupSchedule(
 
         if (!applicationProperties.episodeDeletion.enabled) {
             log.info("Episode based cleanup disabled, do nothing")
+            runOnce.hasWeeklyEpisodeCleanupRun = true
             return
         }
 
@@ -96,8 +98,7 @@ class WeeklyEpisodeCleanupSchedule(
             }
         }
 
-
-
+        runOnce.hasWeeklyEpisodeCleanupRun = true
     }
 
     private fun parseDate(date: String): LocalDateTime {

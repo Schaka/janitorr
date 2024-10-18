@@ -27,9 +27,10 @@ class MediaCleanupSchedule(
     jellystatService: JellystatService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
+    runOnce: RunOnce,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService) {
+) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService) {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -43,6 +44,7 @@ class MediaCleanupSchedule(
 
         if (!applicationProperties.mediaDeletion.enabled) {
             log.info("Media based cleanup disabled, do nothing")
+            runOnce.hasMediaCleanupRun = true
             return
         }
 
@@ -53,6 +55,8 @@ class MediaCleanupSchedule(
 
         scheduleDelete(TV_SHOWS, seasonExpiration)
         scheduleDelete(MOVIES, movieExpiration)
+
+        runOnce.hasMediaCleanupRun = true
     }
 
     override fun needToDelete(type: LibraryType): Boolean {
@@ -77,6 +81,4 @@ class MediaCleanupSchedule(
         val entry = deletionConditions.entries.filter { freeSpacePercentage < it.key }.minByOrNull { it.key }
         return entry?.value
     }
-
-
 }

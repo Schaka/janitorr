@@ -244,7 +244,7 @@ jib {
     }
     container {
         jvmFlags = listOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml",
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
             "-Dsun.jnu.encoding=UTF-8",
             "-Dfile.encoding=UTF-8",
             "-Xms256m",

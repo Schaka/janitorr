@@ -76,8 +76,6 @@ jobs:
       - name: Build JVM OCI image
         run: gradle jib -Djib.serialize=true # https://github.com/GoogleContainerTools/jib/issues/4301
         env:
-          LANG: "en_US.UTF-8"
-          LC_ALL: "en_US.UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
@@ -86,9 +84,6 @@ jobs:
       - name: Build Native OCI Image
         run: gradle bootBuildImage --publishImage --imagePlatform linux/amd64
         env:
-          LANG: "en_US.UTF-8"
-          LC_ALL: "en_US.UTF-8"
-          NATIVE_IMAGE_OPTIONS: "-Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
@@ -97,9 +92,6 @@ jobs:
 
       - name: Setup QEMU for ARM64 OCI Image
         uses: docker/setup-qemu-action@v3
-        env:
-          LANG: "en_US.UTF-8"
-          LC_ALL: "en_US.UTF-8"
         with:
           platforms: 'all'
 
@@ -112,8 +104,6 @@ jobs:
       - name: Build Native ARM64 OCI Image
         run: gradle bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
-          LANG: "en_US.UTF-8"
-          LC_ALL: "en_US.UTF-8"
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}

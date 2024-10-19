@@ -1,6 +1,12 @@
 server:
   port: 8978
 
+logging:
+  level:
+    com.github.schaka: INFO # Set to debug or trace to get more info about what Janitorr is doing
+  threshold:
+    file: NONE # Set to TRACE to enable file logging
+
 # File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to delete TV shows by season and create "Leaving Soon" collections in Jellyfin
 # Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well

@@ -8,6 +8,18 @@ spring:
     virtual:
       enabled: true
 
+logging:
+  file:
+    path: "/logs"
+    name: "/logs/janitorr.log"
+  logback:
+    rollingpolicy:
+      max-history: 14
+      max-file-size: 100MB
+      clean-history-on-start: true
+  threshold:
+    file: NONE
+
 management:
   server:
     port: 8081

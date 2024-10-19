@@ -7,8 +7,7 @@
 ### Inspiration
 
 This application is heavily inspired by [Maintainerr](https://github.com/jorenn92/Maintainerr).
-If you're within the Plex ecosystem, want an easy to use GUI and more sophisticated functionality, you're better off
-using it instead.
+If you're within the Plex ecosystem, want an easy to use GUI and more sophisticated functionality, you're better off using it instead.
 
 ### Warning
 
@@ -17,18 +16,16 @@ You may enable dry-run mode. This is enabled in the config template by default.
 Unless you disable dry-run mode, nothing will be deleted.
 
 You may check the container logs for Janitorr to observe what the application would do, were you to turn off dry-run
-mode.
-If you don't manage your container via a GUI like portainer, try `docker logs janitorr`.
+mode. Janitorr logs to stdout, so you can view your logs in Docker. It is recommended to enable file logging in your config.
+Make sure `/logs` is mapped into the container, so that Janitorr can write log files to the host and not inside the container.
 
 If you still don't trust Janitorr, you may enable Recycle Bin in the *arrs and disable Jellyfin/Emby.
 This way, no deletes will be triggered on Jellyfin and everthing triggered in the *arrs will only go to the Recycle Bin.
 
-To enable debug logging, add the following lines at the top of your `application.yml`:
+To enable debug logging, change `INFO` following line in `application.yml` to either `DEBUG` or `TRACE`:
 
 ```yml
-logging:
-  level:
-    com.github.schaka: TRACE
+    com.github.schaka: INFO
 ```
 
 ### Introduction
@@ -39,7 +36,7 @@ logging:
 - Do you have a lot of media that never gets watched?
 - Do your users constantly request media, and let it sit there afterward never to be touched again?
 
-You NEED [Maintainerr for Plex](https://github.com/jorenn92/Maintainerr) or Janitorr for Jellyfin and Emby.
+You Janitorr for Jellyfin and Emby.
 It's THE solution for cleaning up your server and freeing up space before you run into issues.
 
 ## Features
@@ -53,32 +50,17 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Season by season removal for TV shows, or optionally the entire show
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 
-### Disclaimer
+### Important notes
 
 - **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
+- Only one of Jellyfin or Emby can be enabled at a time
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
-- Jellyfin does NOT provide viewing stats like Plex, so we go by file age in the *arrs - unless you provide access to JellyStat
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
-- Only one of Jellyfin or Emby can be enabled at a time
-- **If file system access isn't given, files currently still seeding may be deleted by the Sonarr/Radarr**
 
 ### Troubleshooting
 Before you create a new issue, please check previous issues to make sure nobody has faced the same problem before.
-The Wiki also contains a troubleshooting section with commons errors.
-
-### Note to developers
-
-I currently have to load pretty much the entire library in one REST call to manually match media. While both Jellyfin and Emby have
-some (different) filters for your library's content,
-I found both of them to be pretty wonky at best. Some parameters seemed to do nothing, others weren't marked as required
-when they were or results were unpredictable when an invalid value was supplied.
-This is also one area where Jellyfin and Emby tend to be quite different.
-
-For those more familiar with Java/Kotlin, GraalVM and Spring:
-The reason the code looks a little messy and doesn't let Spring's magic run wild with `@ConditonalOnProperty` is because native images don't support this (yet).
-Proxies are very limited and creating a `@Bean` inside a `@Config` doesn't produce working proxies for things like `@PostConstruct` and `@Cacheable` half the time.
-AOT also doesn't work exactly the same as native image deployment and thus is a lot harder to debug.
+[The Wiki](https://github.com/Schaka/janitorr/wiki) also contains a troubleshooting section with commons errors.
 
 ## Setup
 
@@ -126,6 +108,7 @@ media-server-leaving-soon-dir: "/library/leaving-soon"
 Before using this, please make sure you've created the `application.yml` file and put it in the correct config directory you intend to map.
 The application requires it. You need to supply it, or Janitorr will not start correctly.
 You don't have to publish ANY ports on the host machine.
+If you're seeing any problems, consult [the Wiki](https://github.com/Schaka/janitorr/wiki/Troubleshooting).
 
 An example of a `docker-compose.yml` may look like this:
 
@@ -139,6 +122,7 @@ services:
     user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /appdata/janitorr/logs:/logs
       - /share_media:/data
     healthcheck:
       test: "wget -T5 -qO- http://localhost:8081/health | grep UP || exit 1"
@@ -150,7 +134,7 @@ services:
 A native image is also published for every build. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
 If you restart more often than once a week or have a very low powered server, this is now recommended.
 That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
-While I do publish an arm64 version of this image, it is mostly untested.
+**While I do publish an arm64 version of this image, it is mostly untested.**
 The healthcheck also work slightly differently, see below:
 
 ```yml
@@ -163,6 +147,7 @@ services:
     user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /appdata/janitorr/logs:/logs
       - /share_media:/data
     environment:
       # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks

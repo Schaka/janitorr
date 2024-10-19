@@ -45,3 +45,4 @@ out/
 application-local.yml
 application-seedbox.yml
 docker-compose.yml
+logs

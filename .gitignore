@@ -44,3 +44,4 @@ out/
 # Local
 application-local.yml
 application-seedbox.yml
+docker-compose.yml

@@ -169,7 +169,7 @@ services:
       - THC_PATH=/health
       - THC_PORT=8081
     healthcheck:
-      test: [ "CMD", "/cnb/process/health-check" ]
+      test: [ "CMD", "/workspace/health-check" ]
       start_period: 30s
       interval: 5s
       retries: 3

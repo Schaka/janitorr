@@ -9,9 +9,9 @@ import kotlin.system.exitProcess
 @Component
 class RunOnce(
     val applicationProperties: ApplicationProperties,
-    var hasMediaCleanupRun: Boolean,
-    var hasTagBasedCleanupRun: Boolean,
-    var hasWeeklyEpisodeCleanupRun: Boolean
+    var hasMediaCleanupRun: Boolean = false,
+    var hasTagBasedCleanupRun: Boolean = false,
+    var hasWeeklyEpisodeCleanupRun: Boolean = false
 ) {
 
     companion object {

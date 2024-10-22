@@ -12,7 +12,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.4.0-SNAPSHOT"
+    id("org.springframework.boot") version "3.4.0-M3"
     id("io.spring.dependency-management") version "1.1.6"
     id("com.google.cloud.tools.jib") version "3.4.3"
     id("net.nemerosa.versioning") version "3.1.0"

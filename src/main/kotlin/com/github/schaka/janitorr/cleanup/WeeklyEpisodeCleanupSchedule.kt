@@ -14,7 +14,6 @@ import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
-import sun.jvm.hotspot.HelloWorld.e
 import java.time.LocalDate
 import java.time.LocalDateTime
 

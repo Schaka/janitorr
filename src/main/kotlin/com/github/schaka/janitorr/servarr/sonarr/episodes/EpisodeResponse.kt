@@ -10,5 +10,6 @@ data class EpisodeResponse(
         val folder: String?,
         val episodeFile: EpisodeFile?,
         val path: String?,
+        val airDate: String?,
         val hasFile: Boolean
 )

@@ -14,6 +14,8 @@ import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
+import sun.jvm.hotspot.HelloWorld.e
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
@@ -57,7 +59,11 @@ class WeeklyEpisodeCleanupSchedule(
 
         for (show in series) {
             val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
-            val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber).toMutableList()
+            val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
+                .filter { it.airDate != null }
+                .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
+                .toMutableList()
+
             val episodesHistory = sonarrClient.getHistory(show.id, latestSeason.seasonNumber)
                     .sortedBy { parseDate(it.date)}
                     .distinctBy { it.episodeId }
@@ -85,13 +91,12 @@ class WeeklyEpisodeCleanupSchedule(
                 val leftoverEpisodes = episodes.sortedByDescending { it.episodeNumber }.take(applicationProperties.episodeDeletion.maxEpisodes)
                 episodes.removeAll(leftoverEpisodes) // remove the most recent episodes from the list, as we want to keep those
 
-                for (episode in leftoverEpisodes) {
+                for (episode in episodes) {
                     log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because there are too many episodes")
 
                     if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                         if (!applicationProperties.dryRun) {
                             sonarrClient.deleteEpisodeFile(episode.episodeFileId)
-                            episodes.remove(episode)
                         }
                     }
                 }

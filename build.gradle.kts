@@ -167,7 +167,7 @@ extra {
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
             "-Dsun.jnu.encoding=UTF-8",
             "-Dfile.encoding=UTF-8"
         )
@@ -176,7 +176,7 @@ tasks.withType<BootRun> {
 
 tasks.withType<ProcessAot> {
     args(
-        "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+        "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
         "-Dsun.jnu.encoding=UTF-8",
         "-Dfile.encoding=UTF-8"
     )
@@ -242,7 +242,7 @@ jib {
     }
     container {
         jvmFlags = listOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml",
+            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
             "-Dsun.jnu.encoding=UTF-8",
             "-Dfile.encoding=UTF-8",
             "-Xms256m",

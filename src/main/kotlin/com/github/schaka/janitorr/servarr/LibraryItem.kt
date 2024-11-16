@@ -27,8 +27,16 @@ data class LibraryItem(
         val tags: List<String> = listOf(),
         // extra files that may be provided and or copied over for leaving soon - like subtitles
         val extraFiles: MutableList<String> = mutableListOf(),
+
+
 )
 {
     val historyAge: LocalDateTime
-        get() = lastSeen ?: importedDate
+        get(): LocalDateTime {
+                if (lastSeen?.isAfter(importedDate) == true) {
+                    return lastSeen!!
+                }
+                return importedDate
+        }
+
 }

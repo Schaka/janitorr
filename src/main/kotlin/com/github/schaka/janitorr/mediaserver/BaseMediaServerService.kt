@@ -4,9 +4,11 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellystat.JellystatProperties
-import com.github.schaka.janitorr.mediaserver.library.*
+import com.github.schaka.janitorr.mediaserver.library.LibraryContent
+import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
+import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.bazarr.BazarrPayload
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
@@ -99,9 +101,9 @@ abstract class BaseMediaServerService(
     }
 
     private fun getTvLibrary(bySeason: Boolean = true): List<LibraryContent> {
-        val parentFolders = mediaServerClient.getAllItems()
+        val parentFolders = mediaServerClient.getAllItems().Items.filter { it.Type != "ManualPlaylistsFolder" && it.Name != "Playlists" }
 
-        var mediaServerShows = parentFolders.Items.flatMap { parent ->
+        var mediaServerShows = parentFolders.flatMap { parent ->
             mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type.lowercase() == "series" }
         }
 
@@ -157,9 +159,9 @@ abstract class BaseMediaServerService(
     }
 
     private fun getMovieLibrary(): List<LibraryContent> {
-        val parentFolders = mediaServerClient.getAllItems()
+        val parentFolders = mediaServerClient.getAllItems().Items.filter { it.Type != "ManualPlaylistsFolder" && it.Name != "Playlists" }
 
-        val mediaServerMovies = parentFolders.Items.flatMap {
+        val mediaServerMovies = parentFolders.flatMap {
             mediaServerClient.getAllMovies(it.Id).Items
         }
 

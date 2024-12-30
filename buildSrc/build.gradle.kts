@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 group = "com.github.schaka.janitorr"
 
 plugins {
-    kotlin("jvm") version "2.0.21"
+    kotlin("jvm") version "2.1.0"
     `kotlin-dsl` version "5.1.2"
     `embedded-kotlin` version "5.1.2"
 }

@@ -20,7 +20,7 @@ interface JellyseerrClient {
     @RequestLine("GET /settings/radarr")
     fun getRadarrServers(): List<ServarrSettings>
 
-    @RequestLine("GET /settings/radarr")
+    @RequestLine("GET /settings/sonarr")
     fun getSonarrServers(): List<ServarrSettings>
 
 

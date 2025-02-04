@@ -10,7 +10,7 @@ import feign.RequestLine
  */
 interface JellystatClient {
 
-    @RequestLine("POST /getItemHistory?page=0&size=100000")
+    @RequestLine("POST /getItemHistory?page=1&size=100000")
     fun getRequests(request: ItemRequest): JellystatPage<WatchHistoryResponse>
 
 }

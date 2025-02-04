@@ -36,8 +36,10 @@ class JellystatRestService(
         for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
             val watchHistory = item.mediaServerIds
+                .asSequence()
                 .map(::ItemRequest)
-                .flatMap(jellystatClient::getRequests)
+                .map(jellystatClient::getRequests)
+                .flatMap { page -> page.results }
                 .filter { it.PlaybackDuration > 60 }
                 .maxByOrNull { toDate(it.ActivityDateInserted) } // most recent date
 

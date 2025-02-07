@@ -14,19 +14,10 @@ If you're within the Plex ecosystem, want an easy to use GUI and more sophistica
 Please use at your own risk.
 You may enable dry-run mode. This is enabled in the config template by default.
 Unless you disable dry-run mode, nothing will be deleted.
-
-You may check the container logs for Janitorr to observe what the application would do, were you to turn off dry-run
-mode. Janitorr logs to stdout, so you can view your logs in Docker. It is recommended to enable file logging in your config.
-Make sure `/logs` is mapped into the container, so that Janitorr can write log files to the host and not inside the container.
+Refer to the logging section to see what actions Janitorr will take.
 
 If you still don't trust Janitorr, you may enable Recycle Bin in the *arrs and disable Jellyfin/Emby.
 This way, no deletes will be triggered on Jellyfin and everthing triggered in the *arrs will only go to the Recycle Bin.
-
-To enable debug logging, change `INFO` following line in `application.yml` to either `DEBUG` or `TRACE`:
-
-```yml
-    com.github.schaka: INFO
-```
 
 ### Introduction
 
@@ -36,18 +27,16 @@ To enable debug logging, change `INFO` following line in `application.yml` to ei
 - Do you have a lot of media that never gets watched?
 - Do your users constantly request media, and let it sit there afterward never to be touched again?
 
-You Janitorr for Jellyfin and Emby.
+Then you need Janitorr for Jellyfin and Emby.
 It's THE solution for cleaning up your server and freeing up space before you run into issues.
 
 ## Features
 
-- Dry-run mode to investigate changes before committing to any deletion
-- Remote deletion, disk space aware deletion as well as tag based delete schedules supported
+- Remote deletion, disk space aware deletion as well as tag based delete schedules
 - Exclude items from deletion via tags in Sonarr/Radarr
-- Configure expiration times for your media in the *arrs and optionally, if media can be found in JellyStat
+- Configure expiration times for your media in the *arrs - optionally via Jellystat
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
-- Unmonitor and delete media from *arr
-- Season by season removal for TV shows, or optionally the entire show
+- Season by season removal for TV shows, removing entire shows or only keep a minimum number of episodes for weekly shows
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 
 ### Important notes
@@ -56,7 +45,19 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Only one of Jellyfin or Emby can be enabled at a time
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
+- For media to be picked up, it needs to have been downloaded by the *arrs
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
+
+### Logging
+You may check the container logs for Janitorr to observe what the application wants to do.
+Janitorr logs to stdout, so you can view your logs in Docker. It is recommended to enable file logging in your config instead.
+If file logging is enabled, please make sure `/logs` is mapped into the container, so that Janitorr can write log files to the host and not inside the container.
+
+To enable debug logging, change `INFO` following line in `application.yml` to either `DEBUG` or `TRACE`:
+
+```yml
+    com.github.schaka: INFO
+```
 
 ### Troubleshooting
 Before you create a new issue, please check previous issues to make sure nobody has faced the same problem before.
@@ -68,7 +69,7 @@ Currently, the code is only published as a docker image to [GitHub](https://gith
 If you cannot use Docker, you'll have to compile it yourself from source.
 
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
-history in the *arr apps. By default, it will choose the oldest file in the history. You can determine if you want to calculate age by oldest or most recent download.
+history in the *arr apps. By default, it will choose the oldest file in the history.
 If Jellystat is set up, the most recent watch date overwrites the grab history, if it exists.
 
 To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
@@ -80,12 +81,15 @@ Janitorr looks for can be adjusted in your config file.
 - within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from this repository
 - adjust said copy with your own info like *arr, Jellyfin and Jellyseerr API keys and your preferred port
 
-If using Jellyfin with filesystem access, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
-Additionally, make sure the *arrs directories are mapped the same way Janitorr into Janitorr as well.
+If using Jellyfin with **filesystem access**, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
+Additionally, make sure the *arrs directories are mapped into your container the same way for Janitorr as well.
+Janitorr receives info about where files are located by the *arrs - so the path needs to be available to both.
 
 Janitorr creates symlinks from whatever directory it receives from the arrs' API into the `leaving-soon-dir`.
 If Radarr finds movies at `/data/media/movies` Janitorr needs to find them at `/data/media/movies` too.
-You need to ensure links can be created from the source (in the arrs' library) to the destination (leaving-soon).
+You need to ensure links can be created from the source (in the *arrs' library) to the destination (leaving-soon).
+
+The only exception is your `leaving-soon-dir`. If Jellyfin and Janitorr know this directory under different paths, you can just this.
 By default, both `media-server-leaving-soon-dir` and `leaving-soon-dir` should be identical if your volume mappings are identical.
 
 

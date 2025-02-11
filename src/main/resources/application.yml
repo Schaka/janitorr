@@ -32,6 +32,10 @@ management:
         enabled: true
 
 clients:
+  default:
+    connect-timeout: 60s
+    read-timeout: 60s
+
   sonarr:
     enabled: true
     url: "http://sonarr:8989"

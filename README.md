@@ -50,10 +50,10 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.
-Janitorr logs to stdout, so you can view your logs in Docker. It is recommended to enable file logging in your config instead.
+Janitorr logs to stdout, so you can view your logs in Docker. However, it is recommended to enable file logging in your config instead.
 If file logging is enabled, please make sure `/logs` is mapped into the container, so that Janitorr can write log files to the host and not inside the container.
 
-To enable debug logging, change `INFO` following line in `application.yml` to either `DEBUG` or `TRACE`:
+To enable debug logging, change `INFO` in the following line in `application.yml` to either `DEBUG` or `TRACE`:
 
 ```yml
     com.github.schaka: INFO
@@ -62,6 +62,8 @@ To enable debug logging, change `INFO` following line in `application.yml` to ei
 ### Troubleshooting
 Before you create a new issue, please check previous issues to make sure nobody has faced the same problem before.
 [The Wiki](https://github.com/Schaka/janitorr/wiki) also contains a troubleshooting section with commons errors.
+
+If you have any questions, consult the [FAQ section](https://github.com/Schaka/janitorr/wiki/FAQ) before starting a [new discussion](https://github.com/Schaka/janitorr/discussions).
 
 ## Setup
 

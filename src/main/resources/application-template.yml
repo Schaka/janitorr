@@ -68,7 +68,7 @@ clients:
     enabled: true
     url: "http://localhost:7878"
     api-key: "cd0912f129d348c9b69bb20d49fcbe44"
-    only-delete-files: true # NOT RECOMMENDED - When set to true, Janitorr will only delete your media files but keep the entries in Radarr
+    only-delete-files: false # NOT RECOMMENDED - When set to true, Janitorr will only delete your media files but keep the entries in Radarr
     determine-age-by: most_recent # Optional property, use 'most_recent' or 'oldest' - remove this line if Janitorr should determine by upgrades enabled for your profile
   bazarr:
     enabled: false # Only used if you want to copy over subtitle files managed by Bazarr

@@ -18,8 +18,8 @@ interface ServarrService {
         return if (sort == MOST_RECENT) comp.reversed() else comp
     }
 
-    fun byHistoryMostRecent(): Comparator<HistoryResponse> {
+    fun byHistory(sort: HistorySort): Comparator<HistoryResponse> {
         val comp = compareBy<HistoryResponse> { LocalDateTime.parse(it.date.substring(0, it.date.length - 1)) }
-        return comp.reversed()
+        return if (sort == MOST_RECENT) comp.reversed() else comp
     }
 }

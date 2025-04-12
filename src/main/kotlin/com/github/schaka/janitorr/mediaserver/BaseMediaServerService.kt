@@ -213,7 +213,7 @@ abstract class BaseMediaServerService(
     override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
 
         // Only do this, if we can get access to the file system to create a link structure
-        if (!fileSystemProperties.access || fileSystemProperties.leavingSoonDir == null) {
+        if (!fileSystemProperties.access || !mediaServerProperties.leavingSoonType.isAllowedForLibraryType(libraryType) ) {
             return
         }
 
@@ -271,7 +271,7 @@ abstract class BaseMediaServerService(
             }.flatMap { it.subtitles }.mapNotNull { it.path }
 
             item.extraFiles += extraFiles
-            log.trace("Adding extra files to $type for *arr id ${item.id} (season ${item.season}): $extraFiles")
+            log.trace("Adding extra files to {} for *arr id {} (season {}): {}", type, item.id, item.season, extraFiles)
         }
     }
 

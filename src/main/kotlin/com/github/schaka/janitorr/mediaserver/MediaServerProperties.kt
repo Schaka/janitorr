@@ -9,4 +9,5 @@ interface MediaServerProperties {
     val delete: Boolean
     val leavingSoonTv: String
     val leavingSoonMovies: String
+    val leavingSoonType: LeavingSoonType
 }

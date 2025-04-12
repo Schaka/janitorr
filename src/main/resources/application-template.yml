@@ -63,7 +63,7 @@ clients:
     url: "http://localhost:8989"
     api-key: "4ed7f4d0e8584d65aa2d47d944077ff6"
     delete-empty-shows: true # Delete empty shows if deleting by season. Otherwise leaves Sonarr entries behind.
-    determine-age-by: most_recent # Optional property, use 'most_recent' or 'oldest' - remove this line if Janitorr should determine by upgrades enabled for your profile
+    determine-age-by: MOST_RECENT # Optional property, use 'most_recent' or 'oldest' - remove this line if Janitorr should determine by upgrades enabled for your profile
   radarr:
     enabled: true
     url: "http://localhost:7878"
@@ -86,6 +86,7 @@ clients:
     delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
+    leaving-soon-type: MOVIES_AND_TV
 
   ## You can only choose one out of Jellyfin or Emby. Emby support is secondary.
   ## User login is only needed if deletion is enabled.
@@ -98,6 +99,7 @@ clients:
     delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
+    leaving-soon-type: MOVIES_AND_TV
 
   jellyseerr:
     enabled: true

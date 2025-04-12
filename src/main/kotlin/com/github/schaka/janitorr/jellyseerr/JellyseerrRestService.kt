@@ -113,7 +113,7 @@ class JellyseerrRestService(
             .build()
 
         val settingServerUri = UriComponentsBuilder
-            .fromHttpUrl(servarrProperties.url)
+            .fromUriString(servarrProperties.url)
             .path("") // force empty path for reliable match
             .build().toUri()
 

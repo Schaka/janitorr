@@ -49,7 +49,7 @@ class TagBasedCleanupSchedule(
         }
 
         // initial cleanup of entire tag based directory
-        if (fileSystemProperties.leavingSoonDir != null && fileSystemProperties.fromScratch) {
+        if (fileSystemProperties.fromScratch) {
             mediaServerService.cleanupPath(fileSystemProperties.leavingSoonDir, TV_SHOWS, CleanupType.TAG)
             mediaServerService.cleanupPath(fileSystemProperties.leavingSoonDir, MOVIES, CleanupType.TAG)
         }

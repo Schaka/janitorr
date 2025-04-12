@@ -81,7 +81,7 @@ class SonarrRestService(
 
                 // just fake the date so all seasons are treated as being the same age
                 val latestDate = parseDate(latestEpisode.date)
-                log.trace("Treat TV show as a whole - overwriting season import date - IMDB: ${libItem.imdbId} imported at $latestDate")
+                log.trace("Treat TV show as a whole - overwriting season import date - IMDB: {} imported at {}", libItem.imdbId, latestDate)
                 libItem.copy(importedDate = latestDate, lastSeen = latestDate)
             }
     }

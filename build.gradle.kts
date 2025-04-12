@@ -12,14 +12,14 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.4.2"
+    id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.google.cloud.tools.jib") version "3.4.4"
+    id("com.google.cloud.tools.jib") version "3.4.5"
     id("net.nemerosa.versioning") version "3.1.0"
-    id("org.graalvm.buildtools.native") version "0.10.5"
+    id("org.graalvm.buildtools.native") version "0.10.6"
 
-    kotlin("jvm") version "2.1.0"
-    kotlin("plugin.spring") version "2.1.0"
+    kotlin("jvm") version "2.1.20"
+    kotlin("plugin.spring") version "2.1.20"
 
 }
 
@@ -37,16 +37,16 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-    implementation("io.github.openfeign:feign-core:13.1")
-    implementation("io.github.openfeign:feign-jackson:13.1")
-    implementation("io.github.openfeign:feign-httpclient:13.1")
+    implementation("io.github.openfeign:feign-core:13.6")
+    implementation("io.github.openfeign:feign-jackson:13.6")
+    implementation("io.github.openfeign:feign-httpclient:13.5")
 
     implementation("org.slf4j:jcl-over-slf4j")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("io.mockk:mockk:1.14.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }

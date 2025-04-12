@@ -54,7 +54,7 @@ fun Project.collectReportFiles(include: String): String {
 fun Project.subprojectTasks(taskName: String): List<TaskProvider<DefaultTask>> {
     return subprojects
             .map { subproject: Project ->
-                subproject.tasks.named(taskName, org.gradle.api.DefaultTask::class.java)
+                subproject.tasks.named(taskName, DefaultTask::class.java)
             }
 }
 

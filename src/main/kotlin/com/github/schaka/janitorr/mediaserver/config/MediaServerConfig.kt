@@ -17,7 +17,6 @@ import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
 import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
 import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
-import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean

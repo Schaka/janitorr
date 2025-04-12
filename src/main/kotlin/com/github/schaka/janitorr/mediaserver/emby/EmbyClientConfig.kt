@@ -1,7 +1,6 @@
 package com.github.schaka.janitorr.mediaserver.emby
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import feign.Feign
 import feign.RequestInterceptor

@@ -111,8 +111,8 @@ abstract class BaseMediaServerService(
         if (bySeason) {
             mediaServerShows = mediaServerShows.flatMap { show ->
                 val seasons = mediaServerClient.getAllSeasons(show.Id).Items
-                seasons.forEach { it.ProviderIds = show.ProviderIds } // we want IDs for the entire show to match, not season IDs (only available from tvdb)
-                seasons
+                seasons.forEach { it.ProviderIds = show.ProviderIds } // we want metadata (IMDB, TMDB) IDs for the entire show to match, not season IDs (only available from TDVB)
+                return@flatMap seasons
             }
         }
 

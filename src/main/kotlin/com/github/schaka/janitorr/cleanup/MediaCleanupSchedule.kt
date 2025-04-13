@@ -3,7 +3,7 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
-import com.github.schaka.janitorr.jellystat.JellystatService
+import com.github.schaka.janitorr.jellystat.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -24,7 +24,7 @@ import java.time.Duration
 class MediaCleanupSchedule(
     mediaServerService: AbstractMediaServerService,
     jellyseerrService: JellyseerrService,
-    jellystatService: JellystatService,
+    jellystatService: StatsService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
     runOnce: RunOnce,

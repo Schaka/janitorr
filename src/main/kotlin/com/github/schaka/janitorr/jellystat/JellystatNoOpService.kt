@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
  */
-class JellystatNoOpService : JellystatService {
+class JellystatNoOpService : StatsService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

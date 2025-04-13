@@ -22,7 +22,7 @@ class JellystatConfig(
     }
 
     @Bean
-    fun jellystatService(jellystatProperties: JellystatProperties, applicationProperties: ApplicationProperties): JellystatService {
+    fun jellystatService(jellystatProperties: JellystatProperties, applicationProperties: ApplicationProperties): StatsService {
         return if (jellystatProperties.enabled) JellystatRestService(jellystatClient, jellystatProperties, mediaServerService, applicationProperties) else JellystatNoOpService()
     }
 

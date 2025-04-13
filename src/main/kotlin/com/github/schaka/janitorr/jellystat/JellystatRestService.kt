@@ -17,7 +17,7 @@ class JellystatRestService(
     val jellystatProperties: JellystatProperties,
     val mediaServerService: AbstractMediaServerService,
     val applicationProperties: ApplicationProperties
-) : JellystatService {
+) : StatsService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

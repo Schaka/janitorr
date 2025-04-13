@@ -3,7 +3,7 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
-import com.github.schaka.janitorr.jellystat.JellystatService
+import com.github.schaka.janitorr.jellystat.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -19,7 +19,7 @@ abstract class AbstractCleanupSchedule(
     protected val cleanupType: CleanupType,
     protected val mediaServerService: AbstractMediaServerService,
     protected val jellyseerrService: JellyseerrService,
-    protected val jellystatService: JellystatService,
+    protected val jellystatService: StatsService,
     protected val fileSystemProperties: FileSystemProperties,
     protected val applicationProperties: ApplicationProperties,
     protected val runOnce: RunOnce,

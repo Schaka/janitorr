@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.jellystat.requests
+package com.github.schaka.janitorr.stats.jellystat.requests
 
 data class WatchHistoryResponse(
         val Id: String,

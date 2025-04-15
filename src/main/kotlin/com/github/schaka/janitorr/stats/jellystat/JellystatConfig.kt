@@ -1,10 +1,12 @@
-package com.github.schaka.janitorr.jellystat
+package com.github.schaka.janitorr.stats.jellystat
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.jellystat.requests.ItemRequest
-import com.github.schaka.janitorr.jellystat.requests.JellystatPage
-import com.github.schaka.janitorr.jellystat.requests.WatchHistoryResponse
+import com.github.schaka.janitorr.stats.jellystat.requests.ItemRequest
+import com.github.schaka.janitorr.stats.jellystat.requests.JellystatPage
+import com.github.schaka.janitorr.stats.jellystat.requests.WatchHistoryResponse
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
+import com.github.schaka.janitorr.stats.StatsNoOpService
+import com.github.schaka.janitorr.stats.StatsService
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
@@ -23,7 +25,7 @@ class JellystatConfig(
 
     @Bean
     fun jellystatService(jellystatProperties: JellystatProperties, applicationProperties: ApplicationProperties): StatsService {
-        return if (jellystatProperties.enabled) JellystatRestService(jellystatClient, jellystatProperties, mediaServerService, applicationProperties) else JellystatNoOpService()
+        return if (jellystatProperties.enabled) JellystatRestService(jellystatClient, jellystatProperties, mediaServerService, applicationProperties) else StatsNoOpService()
     }
 
 }

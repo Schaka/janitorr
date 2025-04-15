@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.jellystat
+package com.github.schaka.janitorr.stats
 
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem

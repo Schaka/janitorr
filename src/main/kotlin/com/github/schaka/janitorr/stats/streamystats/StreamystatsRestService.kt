@@ -1,20 +1,21 @@
-package com.github.schaka.janitorr.jellystat
+package com.github.schaka.janitorr.stats.streamystats
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.jellystat.requests.ItemRequest
-import com.github.schaka.janitorr.jellystat.requests.WatchHistoryResponse
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
+import com.github.schaka.janitorr.stats.StatsService
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryResponse
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
  */
-class JellystatRestService(
-    val jellystatClient: JellystatClient,
-    val jellystatProperties: JellystatProperties,
+class StreamystatsRestService(
+    val streamystatsClient: StreamystatsClient,
+    val streamystatsProperties: StreamystatsProperties,
     val mediaServerService: AbstractMediaServerService,
     val applicationProperties: ApplicationProperties
 ) : StatsService {
@@ -28,25 +29,24 @@ class JellystatRestService(
         // e.g. each season item can be populated with its TV show mediaserver id
         // watch age is determined by the matched mediaserver id
         // TODO: find a better way - passing properties to an unrelated component couples them unnecessarily
-        mediaServerService.populateMediaServerIds(items, type, jellystatProperties)
+        mediaServerService.populateMediaServerIds(items, type, streamystatsProperties)
 
         // TODO: if at all possible, we shouldn't populate the list with media server ids differently, but recognize a season and treat show as a whole as per application properties
         // example: grab show id for season id, get watchHistory based on show instead of season
 
         for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val watchHistory = item.mediaServerIds
-                .asSequence()
-                .map(::ItemRequest)
-                .map(jellystatClient::getRequests)
-                .flatMap { page -> page.results }
-                .filter { it.PlaybackDuration > 60 }
-                .maxByOrNull { toDate(it.ActivityDateInserted) } // most recent date
+            val response = item.mediaServerIds.map(streamystatsClient::getRequests)
+
+            val watchHistory = response
+                .flatMap { it.statistics.watchHistory }
+                .filter { it.playDuration > 60 }
+                .maxByOrNull { toDate(it.startTime) } // most recent date
 
             // only count view if at least one minute of content was watched - could be user adjustable later
             if (watchHistory != null) {
-                item.lastSeen = toDate(watchHistory.ActivityDateInserted)
-                logWatchInfo(item, watchHistory)
+                item.lastSeen = toDate(watchHistory.startTime)
+                logWatchInfo(item, watchHistory, response[0])
             }
 
         }
@@ -58,17 +58,17 @@ class JellystatRestService(
         }
     }
 
-    private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryResponse?) {
-        if (watchHistory?.SeasonId != null) {
-            val season = "${watchHistory.NowPlayingItemName} ${item.season}"
-            log.debug("Updating history - user {} watched {} at {}", watchHistory.UserName, season, watchHistory.ActivityDateInserted)
+    private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryEntry?, response: WatchHistoryResponse?) {
+        if (response?.item?.seasonName != null) {
+            val season = "${response.item.seriesName} ${item.season}"
+            log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, season, watchHistory?.startTime)
         } else {
-            log.debug("Updating history - user {} watched {} at {}", watchHistory?.UserName, watchHistory?.NowPlayingItemName, watchHistory?.ActivityDateInserted)
+            log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, response?.item?.name, watchHistory?.startTime)
         }
     }
 
     private fun toDate(date: String): LocalDateTime {
-        return LocalDateTime.parse(date.substring(0, date.length - 1))
+        return LocalDateTime.parse(date.split("T")[0])
     }
 
 }

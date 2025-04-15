@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.jellystat
+package com.github.schaka.janitorr.stats.jellystat
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import feign.Feign

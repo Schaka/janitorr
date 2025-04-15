@@ -1,7 +1,7 @@
 package com.github.schaka.janitorr
 
 import com.github.schaka.janitorr.jellyseerr.JellyseerrClient
-import com.github.schaka.janitorr.jellystat.JellystatClient
+import com.github.schaka.janitorr.stats.jellystat.JellystatClient
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient

@@ -2,8 +2,8 @@ package com.github.schaka.janitorr.mediaserver.config
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
+import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.Emby
 import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
@@ -50,7 +50,7 @@ class MediaServerConfig(
             return MediaServerNoOpService()
         }
 
-        if (!jellyfinProperties.enabled && !embyProperties.enabled) {
+        if (jellyfinProperties.enabled && embyProperties.enabled) {
             throw IllegalStateException("Both Emby and Jellyfin CANNOT be enabled!")
         }
 

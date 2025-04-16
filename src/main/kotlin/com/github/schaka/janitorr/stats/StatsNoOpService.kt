@@ -14,8 +14,7 @@ class StatsNoOpService : StatsService {
     }
 
     override fun populateWatchHistory(items: List<LibraryItem>, type: LibraryType) {
-        log.info("Streamystats not in use, no requests found.")
+        log.info("No statistics service enabled, no requests found.")
     }
-
 
 }

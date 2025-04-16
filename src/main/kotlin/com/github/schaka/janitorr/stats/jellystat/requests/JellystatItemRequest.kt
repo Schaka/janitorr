@@ -1,5 +1,5 @@
 package com.github.schaka.janitorr.stats.jellystat.requests
 
-data class ItemRequest(
+data class JellystatItemRequest(
         val itemid: String
 )

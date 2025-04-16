@@ -1,8 +1,8 @@
 package com.github.schaka.janitorr.stats.jellystat
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.stats.jellystat.requests.ItemRequest
-import com.github.schaka.janitorr.stats.jellystat.requests.WatchHistoryResponse
+import com.github.schaka.janitorr.stats.jellystat.requests.JellystatItemRequest
+import com.github.schaka.janitorr.stats.jellystat.requests.JellyStatHistoryResponse
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -38,7 +38,7 @@ class JellystatRestService(
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
             val watchHistory = item.mediaServerIds
                 .asSequence()
-                .map(::ItemRequest)
+                .map(::JellystatItemRequest)
                 .map(jellystatClient::getRequests)
                 .flatMap { page -> page.results }
                 .filter { it.PlaybackDuration > 60 }
@@ -59,7 +59,7 @@ class JellystatRestService(
         }
     }
 
-    private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryResponse?) {
+    private fun logWatchInfo(item: LibraryItem, watchHistory: JellyStatHistoryResponse?) {
         if (watchHistory?.SeasonId != null) {
             val season = "${watchHistory.NowPlayingItemName} ${item.season}"
             log.debug("Updating history - user {} watched {} at {}", watchHistory.UserName, season, watchHistory.ActivityDateInserted)

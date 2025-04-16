@@ -1,6 +1,6 @@
 package com.github.schaka.janitorr.stats.jellystat.requests
 
-data class WatchHistoryResponse(
+data class JellyStatHistoryResponse(
         val Id: String,
         val ActivityDateInserted: String,
         val NowPlayingItemName: String?,

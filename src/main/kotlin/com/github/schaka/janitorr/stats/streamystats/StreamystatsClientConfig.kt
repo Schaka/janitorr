@@ -6,7 +6,6 @@ import feign.RequestInterceptor
 import feign.RequestTemplate
 import feign.jackson.JacksonDecoder
 import feign.jackson.JacksonEncoder
-import org.apache.http.cookie.Cookie
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -47,7 +46,7 @@ class StreamystatsClientConfig {
 
             if (lastUpdate.plusMinutes(30).isBefore(LocalDateTime.now())) {
                 val userInfo = getUserInfo(properties)
-                accessToken = (userInfo.headers.get("Set-Cookie")
+                accessToken = (userInfo.headers["Set-Cookie"]
                     ?.flatMap { it.split(";") }
                     ?.firstOrNull { it.contains("streamystats-token") }
                     ?: throw IllegalStateException("Header missing streamystats-token"))

@@ -6,7 +6,7 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
-import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryResponse
+import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
@@ -58,7 +58,7 @@ class StreamystatsRestService(
         }
     }
 
-    private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryEntry?, response: WatchHistoryResponse?) {
+    private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryEntry?, response: StreamystatsHistoryResponse?) {
         if (response?.item?.seasonName != null) {
             val season = "${response.item.seriesName} ${item.season}"
             log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, season, watchHistory?.startTime)

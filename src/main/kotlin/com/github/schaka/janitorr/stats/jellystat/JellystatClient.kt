@@ -1,8 +1,8 @@
 package com.github.schaka.janitorr.stats.jellystat
 
-import com.github.schaka.janitorr.stats.jellystat.requests.ItemRequest
+import com.github.schaka.janitorr.stats.jellystat.requests.JellystatItemRequest
 import com.github.schaka.janitorr.stats.jellystat.requests.JellystatPage
-import com.github.schaka.janitorr.stats.jellystat.requests.WatchHistoryResponse
+import com.github.schaka.janitorr.stats.jellystat.requests.JellyStatHistoryResponse
 import feign.RequestLine
 
 /**
@@ -11,6 +11,6 @@ import feign.RequestLine
 interface JellystatClient {
 
     @RequestLine("POST /getItemHistory?page=1&size=100000")
-    fun getRequests(request: ItemRequest): JellystatPage<WatchHistoryResponse>
+    fun getRequests(request: JellystatItemRequest): JellystatPage<JellyStatHistoryResponse>
 
 }

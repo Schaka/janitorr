@@ -1,6 +1,6 @@
 package com.github.schaka.janitorr.stats.streamystats
 
-import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryResponse
+import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
 import feign.Param
 import feign.RequestLine
 
@@ -10,6 +10,6 @@ import feign.RequestLine
 interface StreamystatsClient {
 
     @RequestLine("GET /items/{itemId}")
-    fun getRequests(@Param("itemId") itemId: String): WatchHistoryResponse
+    fun getRequests(@Param("itemId") itemId: String): StreamystatsHistoryResponse
 
 }

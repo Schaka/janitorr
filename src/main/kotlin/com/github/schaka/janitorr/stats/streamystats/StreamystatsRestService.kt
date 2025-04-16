@@ -8,7 +8,9 @@ import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
 import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
 import org.slf4j.LoggerFactory
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
@@ -68,8 +70,9 @@ class StreamystatsRestService(
         }
     }
 
+    //TODO: parse actual format
     private fun toDate(date: String): LocalDateTime {
-        return LocalDateTime.parse(date.split("T")[0])
+        return LocalDateTime.of(LocalDate.parse(date.split("T")[0]), LocalTime.of(0, 0, 0))
     }
 
 }

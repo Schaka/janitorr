@@ -20,7 +20,6 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.context.annotation.ImportRuntimeHints
 import org.springframework.scheduling.annotation.EnableAsync
 import org.springframework.scheduling.annotation.EnableScheduling
-import java.nio.file.Path
 
 @EnableConfigurationProperties
 @EnableAsync
@@ -48,7 +47,5 @@ class JanitorrApplication {
 }
 
 fun main(args: Array<String>) {
-    Path.of("/home/schaka/nausicaä")
     runApplication<JanitorrApplication>(*args)
 }
-

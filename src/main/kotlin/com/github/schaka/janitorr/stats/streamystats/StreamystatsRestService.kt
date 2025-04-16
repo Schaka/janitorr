@@ -7,6 +7,8 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
 import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryItem
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryStatistics
 import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -38,11 +40,18 @@ class StreamystatsRestService(
 
         for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val response = item.mediaServerIds.map(streamystatsClient::getRequests)
+            val response = item.mediaServerIds.map {
+                try {
+                    return@map streamystatsClient.getRequests(it)
+                } catch (e: Exception) {
+                    log.warn("Stats via Streamystats not found", e)
+                }
+                return@map null
+            }
 
             val watchHistory = response
-                .filter { it.statistics.lastWatched != null }
-                .flatMap { it.statistics.watchHistory }
+                .filter { it != null && it.statistics.lastWatched != null }
+                .flatMap { it!!.statistics.watchHistory }
                 .filter { it.playDuration > 60 }
                 .maxByOrNull { toDate(it.startTime) } // most recent date
 

@@ -39,16 +39,6 @@ class StatsConfig(
     }
 
     @Bean
-    fun streamystatsService(streamystatsProperties: StreamystatsProperties, applicationProperties: ApplicationProperties): StatsService {
-        return if (streamystatsProperties.enabled) StreamystatsRestService(
-            streamystatsClient,
-            streamystatsProperties,
-            mediaServerService,
-            applicationProperties
-        ) else StatsNoOpService()
-    }
-
-    @Bean
     fun statsService(
         jellystatProperties: JellystatProperties,
         streamystatsProperties: StreamystatsProperties,

@@ -5,8 +5,8 @@ import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.stats.StatsService
-import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
 import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
@@ -39,6 +39,7 @@ class StreamystatsRestService(
             val response = item.mediaServerIds.map(streamystatsClient::getRequests)
 
             val watchHistory = response
+                .filter { it.statistics.lastWatched != null }
                 .flatMap { it.statistics.watchHistory }
                 .filter { it.playDuration > 60 }
                 .maxByOrNull { toDate(it.startTime) } // most recent date
@@ -59,8 +60,8 @@ class StreamystatsRestService(
     }
 
     private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryEntry?, response: StreamystatsHistoryResponse?) {
-        if (response?.item?.seasonName != null) {
-            val season = "${response.item.seriesName} ${item.season}"
+        if (response?.item?.type == "Season") {
+            val season = "${response.item.seriesName} ${response.item.name}"
             log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, season, watchHistory?.startTime)
         } else {
             log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, response?.item?.name, watchHistory?.startTime)

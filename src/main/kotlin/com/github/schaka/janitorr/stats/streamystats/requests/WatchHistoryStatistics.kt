@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 
 data class WatchHistoryStatistics(
     @JsonProperty("last_watched")
-    val lastWatched: String,
+    val lastWatched: String?,
     @JsonProperty("watch_history")
-    val watchHistory: List<WatchHistoryEntry>,
+    val watchHistory: List<WatchHistoryEntry> = listOf(),
 )

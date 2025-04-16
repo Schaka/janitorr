@@ -1,21 +1,19 @@
 package com.github.schaka.janitorr.stats.streamystats
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.stats.jellystat.requests.ItemRequest
-import com.github.schaka.janitorr.stats.jellystat.requests.JellystatPage
-import com.github.schaka.janitorr.stats.jellystat.requests.WatchHistoryResponse
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.stats.StatsNoOpService
 import com.github.schaka.janitorr.stats.StatsService
-import com.github.schaka.janitorr.stats.jellystat.JellystatClient
-import com.github.schaka.janitorr.stats.jellystat.JellystatProperties
-import com.github.schaka.janitorr.stats.jellystat.JellystatRestService
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryItem
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryResponse
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryStatistics
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-@RegisterReflectionForBinding(classes = [ItemRequest::class, WatchHistoryResponse::class, JellystatPage::class])
+@RegisterReflectionForBinding(classes = [WatchHistoryResponse::class, WatchHistoryItem::class, WatchHistoryStatistics::class, WatchHistoryEntry::class])
 @Configuration(proxyBeanMethods = false)
 class StreamystatsConfig(
     val streamystatsClient: StreamystatsClient,

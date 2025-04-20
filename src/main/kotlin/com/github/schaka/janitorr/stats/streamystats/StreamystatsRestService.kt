@@ -13,6 +13,8 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
@@ -79,9 +81,9 @@ class StreamystatsRestService(
         }
     }
 
-    //TODO: parse actual format
     private fun toDate(date: String): LocalDateTime {
-        return LocalDateTime.of(LocalDate.parse(date.split("T")[0]), LocalTime.of(0, 0, 0))
+        // 2025-04-16T05:27:15Z
+        return LocalDateTime.parse(date.substring(0, date.length - 1), ISO_LOCAL_DATE_TIME)
     }
 
 }

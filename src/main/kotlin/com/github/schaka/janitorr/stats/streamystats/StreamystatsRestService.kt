@@ -42,14 +42,7 @@ class StreamystatsRestService(
 
         for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val response = item.mediaServerIds.map {
-                try {
-                    return@map streamystatsClient.getRequests(it)
-                } catch (e: Exception) {
-                    log.warn("Stats via Streamystats not found", e)
-                }
-                return@map null
-            }
+            val response = item.mediaServerIds.map(::gracefulQuery)
 
             val watchHistory = response
                 .filter { it != null && it.statistics.lastWatched != null }
@@ -70,6 +63,19 @@ class StreamystatsRestService(
                 log.trace("Could not find any matching media server id for ${item.filePath} IMDB: ${item.imdbId} TMDB: ${item.tmdbId} TVDB: ${item.tvdbId} Season: ${item.season}")
             }
         }
+    }
+
+    private fun gracefulQuery(jellyfinId: String): StreamystatsHistoryResponse? {
+        try {
+            return streamystatsClient.getRequests(jellyfinId)
+        } catch (e: Exception) {
+            if (log.isTraceEnabled) {
+                log.warn("Stats via Streamystats not found for Jellyfin ID: {}", jellyfinId)
+            } else {
+                log.warn("Stats via Streamystats not found for Jellyfin ID: {}", jellyfinId, e)
+            }
+        }
+        return null
     }
 
     private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryEntry?, response: StreamystatsHistoryResponse?) {

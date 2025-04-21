@@ -107,8 +107,15 @@ clients:
     api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
     match-server: false # Enable if you have several Radarr/Sonarr instances set up in Jellyseerr. Janitorr will match them by the host+port supplied in their respective config settings.
 
-  jellystat:
+  jellystat: # Only one, Jellystat or Streamystats can be used
     enabled: true
     whole-tv-show: false # Enabling this will make Jellystat consider TV shows as a whole if any episode of any season has been watched
     url: "http://jellystat:3000"
     api-key: "jellystat-key"
+
+  streamystats: # Only one, Streamystats or Jellystat can be used
+    enabled: false
+    whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
+    url: "http://streamystats:3000"
+    username: Janitorr
+    password: janitorr

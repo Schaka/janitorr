@@ -31,7 +31,7 @@ class JellystatRestService(
         // TODO: find a better way - passing properties to an unrelated component couples them unnecessarily
         mediaServerService.populateMediaServerIds(items, type, jellystatProperties)
 
-        // TODO: if at all possible, we shouldn't populate the list with media server ids differently, but recognize a season and treat show as a whole as per application properties
+        // TODO: if at all possible, we shouldn't populate the list of media server ids differently, but recognize a season and treat show as a whole as per application properties
         // example: grab show id for season id, get watchHistory based on show instead of season
 
         for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {

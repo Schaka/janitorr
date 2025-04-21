@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.Period
 
 abstract class AbstractCleanupSchedule(
     protected val cleanupType: CleanupType,
@@ -77,6 +78,10 @@ abstract class AbstractCleanupSchedule(
 
         val toDeleteMedia = servarrEntries.filter { it.historyAge.plusDays(expirationDays) < today }
         deleteTask(toDeleteMedia)
+
+        if (log.isTraceEnabled) {
+            servarrEntries.filter { it.historyAge.plusDays(expirationDays) >= today }.forEach( ::logKeep)
+        }
     }
 
     protected fun getFreeSpacePercentage(): Double {
@@ -104,6 +109,16 @@ abstract class AbstractCleanupSchedule(
         jellyseerrService.cleanupRequests(deletedShows)
         mediaServerService.cleanupTvShows(deletedShows)
         mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
+    }
+
+    private fun logKeep(item: LibraryItem) {
+        val today = LocalDateTime.now()
+        log.trace("{} - IMDB ({}) not selected for deletion - downloaded {} - watched {} - age: {}",
+            item.libraryPath,
+            item.imdbId,
+            item.importedDate,
+            item.lastSeen,
+            Duration.between(today, item.lastSeen))
     }
 
 }

@@ -37,12 +37,12 @@ clients:
     read-timeout: 60s
 
   sonarr:
-    enabled: true
+    enabled: false
     url: "http://sonarr:8989"
     api-key: "sonarr-key"
     delete-empty-shows: true
   radarr:
-    enabled: true
+    enabled: false
     url: "http://radarr:7878"
     api-key: "radarr-key"
   bazarr:
@@ -50,7 +50,7 @@ clients:
     url: "http://bazarr:6767"
     api-key: "bazarr-key"
   jellyfin:
-    enabled: true
+    enabled: false
     url: "http://jellyfin:8096"
     api-key: "jellyfin-key"
     username: "janitorr"
@@ -62,10 +62,15 @@ clients:
     username: "janitorr"
     password: "janitorr"
   jellyseerr:
-    enabled: true
+    enabled: false
     url: "http://jellyseerr:5055"
     api-key: "jellyseerr-key"
   jellystat:
-    enabled: true
+    enabled: false
     url: "http://jellystat:3000"
     api-key: "jellystat-key"
+  streamystats:
+    enabled: false
+    url: "http://streamystats:3000"
+    username: "streamystats"
+    password: "streamystats"

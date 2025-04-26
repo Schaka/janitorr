@@ -117,8 +117,8 @@ abstract class AbstractCleanupSchedule(
             item.libraryPath,
             item.imdbId,
             item.importedDate,
-            item.lastSeen,
-            Duration.between(today, item.lastSeen))
+            item.lastSeen ?: LocalDateTime.MIN,
+            Duration.between(today, item.historyAge))
     }
 
 }

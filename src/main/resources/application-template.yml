@@ -33,7 +33,7 @@ application:
       # If filesystem access is not given, disk percentage can't be determined. As a result, Janitorr will always choose the largest expiration time.
       5: 15d # 15 days
       10: 30d # 1 month - if a movie's files on your system are older than this, they will be deleted
-      15: 30d # 2 months
+      15: 60d # 2 months
       20: 90d # 3 months
     season-expiration:
       5: 15d # 15 days

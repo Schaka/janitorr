@@ -65,7 +65,7 @@ class StreamystatsClientConfig {
             val login = RestTemplate()
             val headers = HttpHeaders()
             headers.set(CONTENT_TYPE, "text/plain;charset=UTF-8")
-            headers.set("Next-Action", "f8be693f8ad21105acbf6b03f935735a81ceacbd") // doesn't work without this
+            headers.set("Next-Action", "7fe938d0bde421c9e6ee3a79e0c1f1f0d75d31fe6b") // doesn't work without this
 
             // TODO: dynamic serverId
             val loginInfo = """

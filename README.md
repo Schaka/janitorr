@@ -1,12 +1,12 @@
 # Janitorr - Cleans up your media library
 
 <p align="center">
-    <img src="logos/janitorr_icon.png" width=384>
+    <img src="images/logos/janitorr_icon.png" width=384>
 </p>
 
 ### Inspiration
 
-This application is heavily inspired by [Maintainerr](https://github.com/jorenn92/Maintainerr).
+This application is heavily inspired by (but not a fork of) [Maintainerr](https://github.com/jorenn92/Maintainerr).
 If you're within the Plex ecosystem, want an easy to use GUI and more sophisticated functionality, you're better off using it instead.
 
 ### Warning
@@ -35,9 +35,11 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Remote deletion, disk space aware deletion as well as tag based delete schedules
 - Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in the *arrs - optionally via Jellystat
-- Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
 - Season by season removal for TV shows, removing entire shows or only keep a minimum number of episodes for weekly shows
 - Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
+- Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
+
+<img src="images/leaving_soon_01.png" width=60%>
 
 ### Important notes
 
@@ -45,7 +47,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Only one of Jellyfin or Emby can be enabled at a time
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
-- For media to be picked up, it needs to have been downloaded by the *arrs
+- **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
 
 ### Logging

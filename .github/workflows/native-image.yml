@@ -97,6 +97,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build-native-x86, build-native-aarch64]
     steps:
+
+      - name: Log into GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Export branch name
         uses: mad9000/actions-find-and-replace-string@5
         id: branch_name

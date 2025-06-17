@@ -7,7 +7,7 @@
 # To get a newer version, you will need to update the SHA.
 # You can also reference a tag or branch, but the action may change without warning.
 
-name: Java CI
+name: Native x86 image
 
 on:
   push:
@@ -33,7 +33,7 @@ on:
       - '**'
 
 jobs:
-  build:
+  build-native-x86:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,14 +46,6 @@ jobs:
           java-version: '23'
           distribution: 'temurin'
           cache: 'gradle'
-
-      - name: Export branch name
-        uses: mad9000/actions-find-and-replace-string@5
-        id: branch_name
-        with:
-          source: ${{ github.ref_name }}
-          find: '/'
-          replace: '-'
 
       - name: Log in to Docker Hub to pull images without rate limit
         uses: docker/login-action@v3
@@ -73,14 +65,6 @@ jobs:
         with:
           gradle-version: 8.13
 
-      - name: Build JVM OCI image
-        run: ./gradlew jib -Djib.serialize=true # https://github.com/GoogleContainerTools/jib/issues/4301
-        env:
-          USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-
       - name: Build Native OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/amd64
         env:
@@ -89,26 +73,6 @@ jobs:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           TARGET_PLATFORM: "amd64"
-
-      - name: Setup QEMU for ARM64 OCI Image
-        uses: docker/setup-qemu-action@v3
-        with:
-          platforms: 'all'
-
-      - name: Set up Docker Buildx for ARM64 OCI Image
-        uses: docker/setup-buildx-action@v3
-        with:
-          install: true
-          platforms: 'linux/amd64,linux/arm64'
-
-      - name: Build Native ARM64 OCI Image
-        run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64
-        env:
-          USERNAME: ${{ github.actor }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-          TARGET_PLATFORM: "arm64"
 
       - name: Combine native images into single manifest
         uses: int128/docker-manifest-create-action@v2

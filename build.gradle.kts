@@ -88,13 +88,6 @@ tasks.withType<Test> {
     useJUnitPlatform()
 }
 
-tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_22.toString()
-    targetCompatibility = JavaVersion.VERSION_22.toString()
-
-    finalizedBy("copyPatches")
-}
-
 /*
  * Hack required until
  * - https://github.com/paketo-buildpacks/native-image/issues/344
@@ -103,16 +96,22 @@ tasks.withType<JavaCompile> {
  *
  * We're copying over patches to the JDK and forcing them into the native image at build time.
  */
+tasks.withType<ProcessResources> {
+    dependsOn("copyPatches")
+}
+
 tasks.register<Copy>("copyPatches") {
-    dependsOn("build")
-    mustRunAfter("compileJava")
+    dependsOn("compileJava")
 
     from(layout.buildDirectory.dir("classes/java/main"))
     include("**/*.*")
     into(layout.buildDirectory.dir("resources/main/java.base"))
 }
 
-tasks.register("buildPatchedNativeImage")
+tasks.withType<JavaCompile> {
+    sourceCompatibility = JavaVersion.VERSION_22.toString()
+    targetCompatibility = JavaVersion.VERSION_22.toString()
+}
 
 tasks.withType<KotlinCompile> {
     compilerOptions {

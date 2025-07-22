@@ -9,7 +9,4 @@ interface StreamystatsClient {
     @RequestLine("GET /get-item-details/{itemId}")
     fun getRequests(@Param("itemId") itemId: String): StreamystatsHistoryResponse
 
-    @RequestLine("GET /get-item-details/{itemId}")
-    fun getRequestsDebug(@Param("itemId") itemId: String): Map<Object, Object>
-
 }

@@ -4,12 +4,12 @@ import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistor
 import feign.Param
 import feign.RequestLine
 
-/**
- * https://jellystat.server.com/swagger/
- */
 interface StreamystatsClient {
 
-    @RequestLine("GET /items/{itemId}")
+    @RequestLine("GET /get-item-details/{itemId}")
     fun getRequests(@Param("itemId") itemId: String): StreamystatsHistoryResponse
+
+    @RequestLine("GET /get-item-details/{itemId}")
+    fun getRequestsDebug(@Param("itemId") itemId: String): Map<Object, Object>
 
 }

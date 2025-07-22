@@ -72,5 +72,4 @@ clients:
   streamystats:
     enabled: false
     url: "http://streamystats:3000"
-    username: "streamystats"
-    password: "streamystats"
+    api-key: "jellystat-key"

@@ -7,13 +7,8 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
 import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
-import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryItem
-import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryStatistics
 import org.slf4j.LoggerFactory
-import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
 /**
@@ -45,14 +40,14 @@ class StreamystatsRestService(
             val response = item.mediaServerIds.map(::gracefulQuery)
 
             val watchHistory = response
-                .filter { it != null && it.statistics.lastWatched != null }
-                .flatMap { it!!.statistics.watchHistory }
-                .filter { it.playDuration > 60 }
-                .maxByOrNull { toDate(it.startTime) } // most recent date
+                .filter { it != null && it.lastWatched != null }
+                .flatMap { it!!.watchHistory }
+                .filter { it.watchDuration > 60 }
+                .maxByOrNull { toDate(it.watchDate) } // most recent date
 
             // only count view if at least one minute of content was watched - could be user adjustable later
             if (watchHistory != null) {
-                item.lastSeen = toDate(watchHistory.startTime)
+                item.lastSeen = toDate(watchHistory.watchDate)
                 logWatchInfo(item, watchHistory, response[0])
             }
 
@@ -81,9 +76,9 @@ class StreamystatsRestService(
     private fun logWatchInfo(item: LibraryItem, watchHistory: WatchHistoryEntry?, response: StreamystatsHistoryResponse?) {
         if (response?.item?.type == "Season") {
             val season = "${response.item.seriesName} ${response.item.name}"
-            log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, season, watchHistory?.startTime)
+            log.debug("Updating history - user {} watched {} at {}", watchHistory?.user?.name, season, watchHistory?.watchDate)
         } else {
-            log.debug("Updating history - user {} watched {} at {}", watchHistory?.userName, response?.item?.name, watchHistory?.startTime)
+            log.debug("Updating history - user {} watched {} at {}", watchHistory?.user?.name, response?.item?.name, watchHistory?.watchDate)
         }
     }
 

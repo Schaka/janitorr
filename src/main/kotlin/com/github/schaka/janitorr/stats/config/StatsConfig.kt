@@ -17,14 +17,14 @@ import com.github.schaka.janitorr.stats.streamystats.StreamystatsRestService
 import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
 import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryEntry
 import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryItem
-import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryStatistics
+import com.github.schaka.janitorr.stats.streamystats.requests.WatchHistoryUser
 import org.slf4j.LoggerFactory
 import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @RegisterReflectionForBinding(classes = [
-    StreamystatsHistoryResponse::class, WatchHistoryItem::class, WatchHistoryStatistics::class, WatchHistoryEntry::class,
+    StreamystatsHistoryResponse::class, WatchHistoryItem::class, WatchHistoryUser::class, WatchHistoryEntry::class,
     JellystatItemRequest::class, JellyStatHistoryResponse::class, JellystatPage::class
 ])
 @Configuration(proxyBeanMethods = false)

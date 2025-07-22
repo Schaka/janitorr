@@ -43,8 +43,10 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ### Important notes
 
+- Janitorr does **not** delete items after they were watched. Look into [Jellyfin Media Cleaner](https://github.com/shemanaev/jellyfin-plugin-media-cleaner) for that.
 - **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
 - Only one of Jellyfin or Emby can be enabled at a time
+- Only one of Jellystat or Streamystats can be enabled at a time
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
 - **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
@@ -74,7 +76,7 @@ If you cannot use Docker, you'll have to compile it yourself from source.
 
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
 history in the *arr apps. By default, it will choose the oldest file in the history.
-If Jellystat is set up, the most recent watch date overwrites the grab history, if it exists.
+If Jellystat or Streamystats is set up, the most recent watch date overwrites the grab history, if it exists.
 
 To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
 Janitorr looks for can be adjusted in your config file.
@@ -173,8 +175,8 @@ The development version of the native image is available as `ghcr.io/schaka/jani
 
 
 ## JetBrains
-Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.
+Thank you to [<img src="logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.
 
-* [<img src="images/logos/idea.svg" alt="Idea" width="32"> IntelliJ Idea](https://www.jetbrains.com/idea/)
-* [<img src="images/logos/webstorm.svg" alt="WebStorm" width="32"> WebStorm](http://www.jetbrains.com/webstorm/)
-* [<img src="images/logos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)
+* [<img src="logos/idea.svg" alt="Idea" width="32"> IntelliJ Idea](https://www.jetbrains.com/idea/)
+* [<img src="logos/webstorm.svg" alt="WebStorm" width="32"> WebStorm](http://www.jetbrains.com/webstorm/)
+* [<img src="logos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)

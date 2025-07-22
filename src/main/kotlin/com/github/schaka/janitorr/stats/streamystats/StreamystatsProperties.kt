@@ -8,6 +8,5 @@ data class StreamystatsProperties(
         override val enabled: Boolean,
         override val url: String,
         override val wholeTvShow: Boolean = false,
-        val username: String,
-        val password: String,
+        val apiKey: String,
 ) : StatsClientProperties

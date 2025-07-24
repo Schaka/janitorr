@@ -68,6 +68,32 @@ internal class MediaRestServiceTest {
     }
 
     @Test
+    fun testExtendedMovieStructure() {
+
+        val movie = LibraryItem(
+            1,
+            LocalDateTime.now().minusDays(14),
+            "/data/torrents/movies/movie-folder/movie.mkv",
+            "/data/media/movies/m/movie [imdb-812543]/movie.mkv",
+
+            "/data/media/movies/m/movie [imdb-812543]",
+            "/data/media/movies",
+            "/data/media/movies/m/movie [imdb-812543]/movie.mkv",
+
+            "812543"
+
+        )
+
+        val path = Path.of(fileSystemProperties.leavingSoonDir, "movies")
+        val structure = jellyfinRestService.pathStructure(movie, path)
+
+        assertEquals(Path.of("/data/media/movies/m/movie [imdb-812543]"), structure.sourceFolder)
+        assertEquals(Path.of("/data/media/movies/m/movie [imdb-812543]/movie.mkv"), structure.sourceFile)
+        assertEquals(Path.of("/data/media/leaving-soon/movies/m/movie [imdb-812543]"), structure.targetFolder)
+        assertEquals(Path.of("/data/media/leaving-soon/movies/m/movie [imdb-812543]/movie.mkv"), structure.targetFile)
+    }
+
+    @Test
     fun testTvStructure() {
 
         val episode = LibraryItem(

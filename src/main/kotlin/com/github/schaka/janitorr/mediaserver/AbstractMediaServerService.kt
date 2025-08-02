@@ -1,7 +1,6 @@
 package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.cleanup.CleanupType
-import com.github.schaka.janitorr.stats.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -69,18 +68,42 @@ abstract class AbstractMediaServerService {
     internal fun pathStructure(it: LibraryItem, leavingSoonParentPath: Path): PathStructure {
         val rootPath = Path(it.rootFolderPath)
         val itemFilePath = Path(it.filePath)
-        val itemFolderName = itemFilePath.subtract(rootPath).firstOrNull()
+        val fileName = itemFilePath.last()
+
+        // this can contain any amount of subfolders that a movie or TV show may be placed under
+        val itemFolderName = itemFilePath
+            .subtract(rootPath)
+            .reduce(this::combinePaths)
+            .subtract(fileName)
+            .reduce(this::combinePaths)
 
         // contains filename and folder before it e.g. (Season 05) (ShowName-Episode01.mkv) or MovieName2013.mkv
         val fileOrFolder = itemFilePath.subtract(Path(it.parentPath)).firstOrNull()
+        val duplicateFolder = itemFolderName.last() == fileOrFolder
 
-        val sourceFolder = rootPath.resolve(itemFolderName)
+        val sourceFolder = if (duplicateFolder) removePath(rootPath.resolve(itemFolderName), fileOrFolder) else rootPath.resolve(itemFolderName)
         val sourceFile = sourceFolder.resolve(fileOrFolder)
 
-        val targetFolder = leavingSoonParentPath.resolve(itemFolderName)
+        val targetFolder = if (duplicateFolder) removePath(leavingSoonParentPath.resolve(itemFolderName), fileOrFolder) else leavingSoonParentPath.resolve(itemFolderName)
         val targetFile = targetFolder.resolve(fileOrFolder)
 
         return PathStructure(sourceFolder, sourceFile, targetFolder, targetFile)
+    }
+
+    fun combinePaths(a: Path, b: Path): Path {
+        return a.resolve(b)
+    }
+
+    fun removePath(source: Path, toRemove: Path): Path {
+        val newPath = source.subtract(toRemove).reduce(this::combinePaths)
+
+        if (source.isAbsolute && !newPath.isAbsolute) {
+            return newPath.toAbsolutePath()
+        }
+        if (newPath.root != source.root) {
+            return source.root.resolve(newPath)
+        }
+        return newPath
     }
 
     fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {

@@ -43,7 +43,6 @@ internal class MediaRestServiceTest {
 
     @Test
     fun testMovieStructure() {
-
         val movie = LibraryItem(
                 1,
                 LocalDateTime.now().minusDays(14),
@@ -68,8 +67,32 @@ internal class MediaRestServiceTest {
     }
 
     @Test
-    fun testTvStructure() {
+    fun testExtendedMovieStructure() {
+        val movie = LibraryItem(
+            1,
+            LocalDateTime.now().minusDays(14),
+            "/data/torrents/movies/movie-folder/movie.mkv",
+            "/data/media/movies/m/movie [imdb-812543]/movie.mkv",
 
+            "/data/media/movies/m/movie [imdb-812543]",
+            "/data/media/movies",
+            "/data/media/movies/m/movie [imdb-812543]/movie.mkv",
+
+            "812543"
+
+        )
+
+        val path = Path.of(fileSystemProperties.leavingSoonDir, "movies")
+        val structure = jellyfinRestService.pathStructure(movie, path)
+
+        assertEquals(Path.of("/data/media/movies/m/movie [imdb-812543]"), structure.sourceFolder)
+        assertEquals(Path.of("/data/media/movies/m/movie [imdb-812543]/movie.mkv"), structure.sourceFile)
+        assertEquals(Path.of("/data/media/leaving-soon/movies/m/movie [imdb-812543]"), structure.targetFolder)
+        assertEquals(Path.of("/data/media/leaving-soon/movies/m/movie [imdb-812543]/movie.mkv"), structure.targetFile)
+    }
+
+    @Test
+    fun testTvStructure() {
         val episode = LibraryItem(
                 1,
                 LocalDateTime.now().minusDays(14),
@@ -91,6 +114,31 @@ internal class MediaRestServiceTest {
         assertEquals(Path.of("/data/media/tv/tv-show [imdb-812543]/season 01"), structure.sourceFile)
         assertEquals(Path.of("/data/media/leaving-soon/tv/tv-show [imdb-812543]"), structure.targetFolder)
         assertEquals(Path.of("/data/media/leaving-soon/tv/tv-show [imdb-812543]/season 01"), structure.targetFile)
+    }
+
+    @Test
+    fun testExtendedTvStructure() {
+        val episode = LibraryItem(
+            1,
+            LocalDateTime.now().minusDays(14),
+            "/data/torrents/tv/tv-show-folder-season 01/ep01.mkv",
+            "/data/media/tv/t/tv-show [imdb-812543]/season 01/ep01.mkv",
+
+            "/data/media/tv/t/tv-show [imdb-812543]",
+            "/data/media/tv",
+            "/data/media/tv/t/tv-show [imdb-812543]/season 01/ep01.mkv",
+
+            "812543"
+
+        )
+
+        val path = Path.of(fileSystemProperties.leavingSoonDir, "tv")
+        val structure = jellyfinRestService.pathStructure(episode, path)
+
+        assertEquals(Path.of("/data/media/tv/t/tv-show [imdb-812543]"), structure.sourceFolder)
+        assertEquals(Path.of("/data/media/tv/t/tv-show [imdb-812543]/season 01"), structure.sourceFile)
+        assertEquals(Path.of("/data/media/leaving-soon/tv/t/tv-show [imdb-812543]"), structure.targetFolder)
+        assertEquals(Path.of("/data/media/leaving-soon/tv/t/tv-show [imdb-812543]/season 01"), structure.targetFile)
     }
 
     @Test

@@ -8,6 +8,7 @@ on:
       - .github/**
       - build.gradle.kts
       - settings.gradle.kts
+      - gradle.properties
     tags:
       - '**'
     branches:

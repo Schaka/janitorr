@@ -2,6 +2,7 @@ import com.google.cloud.tools.jib.api.buildplan.ImageFormat
 import net.nemerosa.versioning.VersioningExtension
 import org.gradle.kotlin.dsl.invoke
 import org.gradle.plugins.ide.idea.model.IdeaModel
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.dsl.SpringBootExtension
@@ -12,14 +13,14 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.4.4"
+    id("org.springframework.boot") version "3.5.5"
     id("io.spring.dependency-management") version "1.1.7"
     id("com.google.cloud.tools.jib") version "3.4.5"
     id("net.nemerosa.versioning") version "3.1.0"
-    id("org.graalvm.buildtools.native") version "0.10.6"
+    id("org.graalvm.buildtools.native") version "0.11.0"
 
-    kotlin("jvm") version "2.1.20"
-    kotlin("plugin.spring") version "2.1.20"
+    kotlin("jvm") version "2.2.10"
+    kotlin("plugin.spring") version "2.2.10"
 
 }
 
@@ -46,7 +47,7 @@ dependencies {
     implementation("org.slf4j:jcl-over-slf4j")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.14.0")
+    testImplementation("io.mockk:mockk:1.14.5")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
@@ -79,7 +80,7 @@ sourceSets {
 
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(23))
+        languageVersion.set(JavaLanguageVersion.of(24))
         vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
@@ -109,14 +110,14 @@ tasks.register<Copy>("copyPatches") {
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_22.toString()
-    targetCompatibility = JavaVersion.VERSION_22.toString()
+    sourceCompatibility = JavaVersion.VERSION_24.toString()
+    targetCompatibility = JavaVersion.VERSION_24.toString()
 }
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = JVM_22
+        jvmTarget = JvmTarget.JVM_24
         javaParameters = true
     }
 }
@@ -223,7 +224,7 @@ jib {
         }
     }
     from {
-        image = "eclipse-temurin:23-jre-noble"
+        image = "eclipse-temurin:24-jre-noble"
         auth {
             username = System.getenv("DOCKERHUB_USER")
             password = System.getenv("DOCKERHUB_PASSWORD")
@@ -252,14 +253,14 @@ jib {
         volumes = listOf("/config")
 
         labels.set(
-                mapOf(
+                mapOf<String, String>(
                         "org.opencontainers.image.created" to "${project.extra["build.date"]}T${project.extra["build.time"]}",
                         "org.opencontainers.image.revision" to project.extra["build.revision"] as String,
                         "org.opencontainers.image.version" to project.version as String,
                         "org.opencontainers.image.title" to project.name,
                         "org.opencontainers.image.authors" to "Schaka <schaka@github.com>",
                         "org.opencontainers.image.source" to project.extra["docker.image.source"] as String,
-                        "org.opencontainers.image.description" to project.description,
+                        "org.opencontainers.image.description" to project.description!!,
                 )
         )
 

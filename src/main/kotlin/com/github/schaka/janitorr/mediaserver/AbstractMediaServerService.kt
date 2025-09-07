@@ -97,12 +97,10 @@ abstract class AbstractMediaServerService {
     fun removePath(source: Path, toRemove: Path): Path {
         val newPath = source.subtract(toRemove).reduce(this::combinePaths)
 
-        if (source.isAbsolute && !newPath.isAbsolute) {
-            return newPath.toAbsolutePath()
-        }
         if (newPath.root != source.root) {
             return source.root.resolve(newPath)
         }
+
         return newPath
     }
 

@@ -7,6 +7,7 @@ import com.github.schaka.janitorr.servarr.HistorySort.MOST_RECENT
 import com.github.schaka.janitorr.servarr.HistorySort.OLDEST
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.history.SonarrHistoryResponse
@@ -174,7 +175,7 @@ class SonarrRestService(
      */
     private fun deleteShow(show: SeriesPayload) {
         if (sonarrProperties.deleteEmptyShows) {
-            sonarrClient.deleteSeries(show.id, true)
+            sonarrClient.deleteSeries(show.id, true, sonarrProperties.importExclusions)
             return
         }
 
@@ -190,6 +191,10 @@ class SonarrRestService(
                     log.info("Deleting {} - episode {} ({}) of season {}", show.path, episode.episodeNumber, episode.episodeFileId, episode.seasonNumber)
                 }
             }
+        }
+
+        if (sonarrProperties.importExclusions) {
+            sonarrClient.addToImportExclusion(SonarrImportListExclusion("${show.title} by Janitorr", show.tvdbId))
         }
     }
 
@@ -275,7 +280,7 @@ class SonarrRestService(
             }
 
             if (noFiles) {
-                sonarrClient.deleteSeries(show.id, true)
+                sonarrClient.deleteSeries(show.id, true, sonarrProperties.importExclusions)
                 log.info("Deleting ${show.title} [${show.id}] - All seasons were unused")
             }
         }

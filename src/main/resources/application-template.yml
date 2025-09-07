@@ -64,12 +64,14 @@ clients:
     api-key: "4ed7f4d0e8584d65aa2d47d944077ff6"
     delete-empty-shows: true # Delete empty shows if deleting by season. Otherwise leaves Sonarr entries behind.
     determine-age-by: MOST_RECENT # Optional property, use 'most_recent' or 'oldest' - remove this line if Janitorr should determine by upgrades enabled for your profile
+    import-exclusions: false # Add media to import list exclusion via tvdb id when deleting the entire show - does not add show to exclusion list, if only one season is deleted
   radarr:
     enabled: true
     url: "http://localhost:7878"
     api-key: "cd0912f129d348c9b69bb20d49fcbe44"
     only-delete-files: false # NOT RECOMMENDED - When set to true, Janitorr will only delete your media files but keep the entries in Radarr
     determine-age-by: most_recent # Optional property, use 'most_recent' or 'oldest' - remove this line if Janitorr should determine by upgrades enabled for your profile
+    import-exclusions: false # Add media to import list exclusion via tvdb id when deleting
   bazarr:
     enabled: false # Only used if you want to copy over subtitle files managed by Bazarr
     url: "http://localhost:6767"

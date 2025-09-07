@@ -7,6 +7,7 @@ import com.github.schaka.janitorr.servarr.HistorySort.MOST_RECENT
 import com.github.schaka.janitorr.servarr.HistorySort.OLDEST
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
@@ -93,6 +94,7 @@ class RadarrRestService(
             if (!applicationProperties.dryRun) {
                 unmonitorMovie(movie.id)
                 deleteMovie(movie.id)
+                addToExclusionList( movie )
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             } else {
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
@@ -100,9 +102,15 @@ class RadarrRestService(
         }
     }
 
+    private fun addToExclusionList(item: LibraryItem) {
+        if (radarrProperties.importExclusions && item.tmdbId != null)  {
+            radarrClient.addToImportExclusion(SonarrImportListExclusion("IMDB: ${item.imdbId} by Janitorr", item.tmdbId))
+        }
+    }
+
     private fun deleteMovie(movieId: Int) {
         if (!radarrProperties.onlyDeleteFiles) {
-            radarrClient.deleteMovie(movieId)
+            radarrClient.deleteMovie(movieId, true, radarrProperties.importExclusions)
             return
         }
 

@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.servarr.radarr
 
+import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
@@ -28,12 +29,15 @@ interface RadarrClient {
     @RequestLine("PUT /movie/{id}")
     fun updateMovie(@Param("id") id: Int, payload: MoviePayload)
 
-    @RequestLine("DELETE /movie/{id}?deleteFiles={deleteFiles}")
-    fun deleteMovie(@Param("id") id: Int, @Param("deleteFiles") deleteFiles: Boolean = true)
+    @RequestLine("DELETE /movie/{id}?deleteFiles={deleteFiles}&addImportExclusion={addImportExclusion}")
+    fun deleteMovie(@Param("id") id: Int, @Param("deleteFiles") deleteFiles: Boolean = true, @Param("addImportExclusion") addImportExclusion: Boolean = false)
 
     @RequestLine("DELETE /moviefile/{id}")
     fun deleteMovieFile(@Param("id") id: Int)
 
     @RequestLine("GET /qualityprofile")
     fun getAllQualityProfiles(): List<QualityProfile>
+
+    @RequestLine("POST /importlistexclusion")
+    fun addToImportExclusion(exclusion: SonarrImportListExclusion)
 }

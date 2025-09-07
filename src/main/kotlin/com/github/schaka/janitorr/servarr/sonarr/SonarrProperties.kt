@@ -10,5 +10,6 @@ data class SonarrProperties(
     override val url: String,
     override val apiKey: String,
     override val determineAgeBy: HistorySort? = null,
+    override val importExclusions: Boolean = false,
     val deleteEmptyShows: Boolean = true
 ) : ServarrProperties

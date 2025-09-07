@@ -10,5 +10,6 @@ data class RadarrProperties(
     override val url: String,
     override val apiKey: String,
     override val determineAgeBy: HistorySort? = null,
+    override val importExclusions: Boolean = false,
     val onlyDeleteFiles: Boolean = false,
 ) : ServarrProperties

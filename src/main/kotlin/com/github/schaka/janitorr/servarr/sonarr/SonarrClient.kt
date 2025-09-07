@@ -1,5 +1,6 @@
 package com.github.schaka.janitorr.servarr.sonarr
 
+import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.SonarrHistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
@@ -28,8 +29,8 @@ interface SonarrClient {
     @RequestLine("GET /tag")
     fun getAllTags(): List<Tag>
 
-    @RequestLine("DELETE /series/{id}?deleteFiles={files}&addImportListExclusion={blacklist}")
-    fun deleteSeries(@Param("id") id: Int, @Param("files") files: Boolean = false, @Param("blacklist") blacklist: Boolean = false)
+    @RequestLine("DELETE /series/{id}?deleteFiles={files}&addImportListExclusion={addImportListExclusion}")
+    fun deleteSeries(@Param("id") id: Int, @Param("files") files: Boolean = false, @Param("addImportListExclusion") addImportListExclusion: Boolean = false)
 
     @RequestLine("GET /episode?seriesId={seriesId}&seasonNumber={seasonNumber}&episodeIds={ids}")
     fun getAllEpisodes(@Param("seriesId") seriesId: Int, @Param("seasonNumber") seasonNumber: Int, @Param("ids") ids: List<Int>? = null): List<EpisodeResponse>
@@ -43,5 +44,7 @@ interface SonarrClient {
     @RequestLine("GET /qualityprofile")
     fun getAllQualityProfiles(): List<QualityProfile>
 
+    @RequestLine("POST /importlistexclusion")
+    fun addToImportExclusion(exclusion: SonarrImportListExclusion)
 
 }

@@ -27,21 +27,21 @@ import kotlin.io.path.exists
 @RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, SeriesPayload::class, HistoryResponse::class, SonarrHistoryResponse::class, EpisodeResponse::class])
 class SonarrRestService(
 
-        val sonarrClient: SonarrClient,
+    val sonarrClient: SonarrClient,
 
-        val fileSystemProperties: FileSystemProperties,
+    val fileSystemProperties: FileSystemProperties,
 
-        val applicationProperties: ApplicationProperties,
+    val applicationProperties: ApplicationProperties,
 
-        val sonarrProperties: SonarrProperties,
+    val sonarrProperties: SonarrProperties,
 
-        var upgradesAllowed: Boolean = false,
+    var upgradesAllowed: Boolean = false,
 
-        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
+    var keepTags: List<Tag> = listOf(),
 
-        var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
+    var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
 
-        var historySort: HistorySort = OLDEST
+    var historySort: HistorySort = OLDEST
 
 ) : ServarrService {
 
@@ -49,7 +49,7 @@ class SonarrRestService(
         if (sonarrProperties.enabled) {
             upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
             historySort = sonarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
-            keepTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
+            keepTags = sonarrClient.getAllTags().filter { applicationProperties.exclusionTags.contains(it.label) }
             episodeTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.episodeDeletion.tag } ?: episodeTag
         }
     }
@@ -89,7 +89,7 @@ class SonarrRestService(
 
     private fun getEntriesPerSeason(allTags: List<Tag>): List<LibraryItem> {
         val history = sonarrClient.getAllSeries()
-            .filter { !it.tags.contains(keepTag.id) }
+            .filter { !it.tags.any { episodeTagId -> keepTags.any { kTag -> kTag.id == episodeTagId } } }
             .filter { !it.tags.contains(episodeTag.id) }
             .flatMap { series ->
                 series.seasons.map { season ->

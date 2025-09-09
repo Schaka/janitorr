@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.NestedConfigurationProperty
 import java.time.Duration
 
-@ConfigurationProperties(prefix = "application")
+@ConfigurationProperties(prefix = "application", ignoreUnknownFields = false)
 data class ApplicationProperties(
         @NestedConfigurationProperty
         val mediaDeletion: MediaDeletion,
@@ -17,5 +17,5 @@ data class ApplicationProperties(
         val wholeTvShow: Boolean = false,
         val wholeShowSeedingCheck: Boolean = false,
         val leavingSoon: Duration = Duration.ofDays(14),
-        val exclusionTag: String = "janitorr_keep"
+        val exclusionTags: List<String> = listOf("janitorr_keep")
 )

@@ -18,7 +18,9 @@ application:
   whole-tv-show: false
   whole-show-seeding-check: false
   leaving-soon: 14d
-  exclusion-tag: "janitorr_keep"
+  exclusion-tags: # Set these tags to your movies or TV shows in the *arrs to exclude media from being cleaned up
+    - "janitorr_keep"
+    - "janitorr_keep_too"
 
   media-deletion:
     enabled: false

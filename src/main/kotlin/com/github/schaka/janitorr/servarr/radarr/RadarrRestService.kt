@@ -25,19 +25,19 @@ import kotlin.io.path.exists
 @RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, MovieFile::class, HistoryResponse::class])
 class RadarrRestService(
 
-        val radarrClient: RadarrClient,
+    val radarrClient: RadarrClient,
 
-        val applicationProperties: ApplicationProperties,
+    val applicationProperties: ApplicationProperties,
 
-        val fileSystemProperties: FileSystemProperties,
+    val fileSystemProperties: FileSystemProperties,
 
-        val radarrProperties: RadarrProperties,
+    val radarrProperties: RadarrProperties,
 
-        var upgradesAllowed: Boolean = false,
+    var upgradesAllowed: Boolean = false,
 
-        var keepTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set"),
+    var keepTags: List<Tag> = listOf(),
 
-        var historySort: HistorySort = OLDEST
+    var historySort: HistorySort = OLDEST
 
 ) : ServarrService {
 
@@ -50,7 +50,7 @@ class RadarrRestService(
         if (radarrProperties.enabled) {
             upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
             historySort = radarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
-            keepTag = radarrClient.getAllTags().firstOrNull { it.label == applicationProperties.exclusionTag } ?: keepTag
+            keepTags = radarrClient.getAllTags().filter { applicationProperties.exclusionTags.contains(it.label) }
         }
     }
 
@@ -59,7 +59,7 @@ class RadarrRestService(
         val allTags = radarrClient.getAllTags()
 
         return radarrClient.getAllMovies()
-                .filter { !it.tags.contains(keepTag.id) }
+            .filter { !it.tags.any { movieTagId -> keepTags.any { kTag -> kTag.id == movieTagId } } }
                 .mapNotNull { movie ->
                     radarrClient.getHistory(movie.id)
                             .filter { movie.movieFile != null && it.eventType == "downloadFolderImported" && it.data.droppedPath != null }

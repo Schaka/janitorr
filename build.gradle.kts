@@ -19,8 +19,8 @@ plugins {
     id("net.nemerosa.versioning") version "3.1.0"
     id("org.graalvm.buildtools.native") version "0.11.0"
 
-    kotlin("jvm") version "2.2.10"
-    kotlin("plugin.spring") version "2.2.10"
+    kotlin("jvm") version "2.2.20"
+    kotlin("plugin.spring") version "2.2.20"
 
 }
 
@@ -116,7 +116,7 @@ tasks.withType<JavaCompile> {
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict")
+        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xannotation-default-target=param-property")
         jvmTarget = JvmTarget.JVM_24
         javaParameters = true
     }

@@ -1,5 +1,5 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 
 group = "com.github.schaka.janitorr"
 
@@ -17,13 +17,13 @@ repositories {
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_22.toString()
-    targetCompatibility = JavaVersion.VERSION_22.toString()
+    sourceCompatibility = JavaVersion.VERSION_24.toString()
+    targetCompatibility = JavaVersion.VERSION_24.toString()
 }
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = JVM_22
+        jvmTarget = JvmTarget.JVM_24
     }
 }

@@ -57,7 +57,7 @@ jobs:
         with:
           gradle-version: 9.1.0
 
-      - name: Build Native OCI Image
+      - name: Build JVM OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/amd64
         env:
           USERNAME: ${{ github.actor }}
@@ -86,7 +86,7 @@ jobs:
         with:
           gradle-version: 9.1.0
 
-      - name: Build Native ARM64 OCI Image
+      - name: Build JVM ARM64 OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64
         env:
           USERNAME: ${{ github.actor }}
@@ -116,7 +116,7 @@ jobs:
           find: '/'
           replace: '-'
 
-      - name: Combine jvm images into single manifest
+      - name: Combine JVM images into single manifest
         uses: int128/docker-manifest-create-action@v2
         with:
           push: true

@@ -1,8 +1,6 @@
 logging:
   level:
     com.github.schaka: INFO
-  threshold:
-    file: NONE
 
 file-system:
   access: false

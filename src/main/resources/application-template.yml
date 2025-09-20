@@ -1,15 +1,13 @@
-server:
-  port: 8978
-
 logging:
   level:
-    com.github.schaka: INFO # Set to debug or trace to get more info about what Janitorr is doing
-  threshold:
-    file: NONE # Set to TRACE to enable file logging
+    com.github.schaka: INFO # Set to DEBUG or TRACE to get more info about what Janitorr is doing
+  file: # Delete this line and the one below it, to disable file logging
+    name: "/logs/janitorr.log"
 
-# File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to delete TV shows by season and create "Leaving Soon" collections in Jellyfin
+# File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to create "Leaving Soon" collections in Jellyfin
 # Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well
+# If you don't want to or can't give file access, you can delete this entire block
 file-system:
   access: true
   validate-seeding: true # validates seeding by checking if the original file exists and skips deletion - turning this off will send a delete to the *arrs even if a torrent may still be active
@@ -90,7 +88,7 @@ clients:
     delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
-    leaving-soon-type: MOVIES_AND_TV
+    leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE
 
   ## You can only choose one out of Jellyfin or Emby. Emby support is secondary.
   ## User login is only needed if deletion is enabled.
@@ -103,7 +101,7 @@ clients:
     delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
-    leaving-soon-type: MOVIES_AND_TV
+    leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE
 
   jellyseerr:
     enabled: true

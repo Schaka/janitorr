@@ -46,7 +46,7 @@ class SonarrRestService(
 ) : ServarrService {
 
     init {
-        if (sonarrProperties.enabled) {
+        if (sonarrProperties.enabled && !applicationProperties.trainingRun) {
             upgradesAllowed = sonarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
             historySort = sonarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
             keepTags = sonarrClient.getAllTags().filter { applicationProperties.exclusionTags.contains(it.label) }

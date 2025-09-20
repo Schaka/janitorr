@@ -14,6 +14,7 @@ data class ApplicationProperties(
         val episodeDeletion: EpisodeDeletion,
         val runOnce: Boolean = false,
         val dryRun: Boolean = false,
+        val trainingRun: Boolean = false,
         val wholeTvShow: Boolean = false,
         val wholeShowSeedingCheck: Boolean = false,
         val leavingSoon: Duration = Duration.ofDays(14),

@@ -47,7 +47,7 @@ class RadarrRestService(
         const val CACHE_NAME = "radarr-cache"
     }
     init {
-        if (radarrProperties.enabled) {
+        if (radarrProperties.enabled && !applicationProperties.trainingRun) {
             upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
             historySort = radarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
             keepTags = radarrClient.getAllTags().filter { applicationProperties.exclusionTags.contains(it.label) }

@@ -1,9 +1,7 @@
-import com.google.cloud.tools.jib.api.buildplan.ImageFormat
+
 import net.nemerosa.versioning.VersioningExtension
-import org.gradle.kotlin.dsl.invoke
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_22
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.aot.ProcessAot
@@ -13,11 +11,10 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.5.5"
+    id("org.springframework.boot") version "3.5.6"
+    id("org.springframework.boot.aot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
-    id("com.google.cloud.tools.jib") version "3.4.5"
     id("net.nemerosa.versioning") version "3.1.0"
-    id("org.graalvm.buildtools.native") version "0.11.0"
 
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.spring") version "2.2.20"
@@ -35,7 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("com.github.ben-manes.caffeine:caffeine")
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.2")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
@@ -65,48 +62,15 @@ configure<IdeaModel> {
     }
 }
 
-// Required until GraalVM/Paketo builders receive a fix
-sourceSets {
-    main {
-        java {
-            srcDir("src/main")
-            srcDir("src/java.base")
-        }
-        kotlin {
-            srcDir("src/kotlin")
-        }
-    }
-}
-
 kotlin {
     jvmToolchain {
-        languageVersion.set(JavaLanguageVersion.of(24))
+        languageVersion.set(JavaLanguageVersion.of(25))
         vendor.set(JvmVendorSpec.ADOPTIUM)
     }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-/*
- * Hack required until
- * - https://github.com/paketo-buildpacks/native-image/issues/344
- * - https://github.com/oracle/graal/issues/9879
- * are fixed.
- *
- * We're copying over patches to the JDK and forcing them into the native image at build time.
- */
-tasks.withType<ProcessResources> {
-    dependsOn("copyPatches")
-}
-
-tasks.register<Copy>("copyPatches") {
-    dependsOn("compileJava")
-
-    from(layout.buildDirectory.dir("classes/java/main"))
-    include("**/*.*")
-    into(layout.buildDirectory.dir("resources/main/java.base"))
 }
 
 tasks.withType<JavaCompile> {
@@ -143,42 +107,32 @@ extra {
     project.extra["build.branch"] = branch
     project.extra["build.user"] = build.userName()
 
-    val containerImageName = "schaka/${project.name}"
-    val containerImageTags = mutableSetOf(shortCommit, branch)
-    if (branch.startsWith("v")) {
-        containerImageTags.add("stable")
-    }
+    val containerImageName = "ghcr.io/schaka/${project.name}"
+
+    val imageType = System.getenv("IMAGE_TYPE") ?: "jvm"
+    val platform = System.getenv("TARGET_PLATFORM") ?: "amd64"
+    val baseTag = "$imageType-$platform"
+
+    val containerImageTags = listOf("$containerImageName:$baseTag", "$containerImageName:$baseTag-$shortCommit", "$containerImageName:$baseTag-$branch")
 
     project.extra["docker.image.name"] = containerImageName
     project.extra["docker.image.version"] = branch
     project.extra["docker.image.source"] = build.projectSourceRoot()
     project.extra["docker.image.tags"] = containerImageTags
 
-    val platform = System.getenv("TARGET_PLATFORM") ?: "amd64"
-    val nativeBaseTag = "native-$platform"
-    val nativeImageName = "ghcr.io/${containerImageName}:$nativeBaseTag"
-    val nativeImageTags = listOf("$nativeImageName-$branch")
-
-    project.extra["native.image.name"] = nativeImageName
-    project.extra["native.image.tags"] = nativeImageTags
-
 }
 
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
-            "-Dsun.jnu.encoding=UTF-8",
-            "-Dfile.encoding=UTF-8"
+            "-Dspring.config.additional-location=optional:/config/application.yml",
         )
     )
 }
 
 tasks.withType<ProcessAot> {
     args(
-        "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
-        "-Dsun.jnu.encoding=UTF-8",
-        "-Dfile.encoding=UTF-8"
+        "-Dspring.config.additional-location=optional:/config/application.yml",
     )
 }
 
@@ -188,83 +142,35 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
-    builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
+    // "paketobuildpacks/builder-noble-java-tiny" has issues with locale, we can work around that by patching the JDK, but I'd rather not
+    builder = "paketobuildpacks/ubuntu-noble-builder-buildpackless"
     buildpacks = listOf(
         "paketobuildpacks/environment-variables",
-        "paketobuildpacks/java-native-image",
-        "paketobuildpacks/health-checker"
+        "paketobuildpacks/adoptium",
+        "paketobuildpacks/java",
+        "./buildpacks/aot-cache",
+        "paketobuildpacks/health-checker",
     )
-    imageName = project.extra["native.image.name"] as String
+    imageName = project.extra["docker.image.name"] as String
     version = project.extra["docker.image.version"] as String
-    tags = project.extra["native.image.tags"] as List<String>
+    tags = project.extra["docker.image.tags"] as List<String>
     createdDate = "now"
 
-    // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings
     environment = mapOf(
-        "BP_NATIVE_IMAGE" to "true",
-        "BPL_SPRING_AOT_ENABLED" to "true",
+        "BP_NATIVE_IMAGE" to "false",
+        "BP_JVM_CDS_ENABLED" to "false",
+        "BP_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
-        "BP_JVM_CDS_ENABLED" to "true",
-        "BP_JVM_VERSION" to "24", // Note. Requires 24 because the builder only supports the latest 2 LTS and the very latest major version
-        "BPE_LANG" to "en_US.UTF-8",
-        "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
+        "BP_JVM_VERSION" to "25", // JDK required, because we need the executable to run our AOTCache buildpack
+        "BP_JVM_TYPE" to "JDK",
+        "LC_ALL" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
-        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets -J--patch-module=java.base=/workspace/BOOT-INF/classes/java.base"
+        // these values are logged correctly during build time without BPE_ prefix but then not applied at runtime, so we set environment variables for the JVM
+        "BPE_BPL_JVM_THREAD_COUNT" to "50",
+        "BPE_BPL_JVM_HEAD_ROOM" to "5",
+        "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
+        "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
+        "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
+        "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:ReservedCodeCacheSize=50M -Xss300K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
     )
-}
-
-jib {
-    to {
-        image = "ghcr.io/${project.extra["docker.image.name"]}"
-        tags = project.extra["docker.image.tags"] as Set<String>
-
-        auth {
-            username = System.getenv("USERNAME")
-            password = System.getenv("GITHUB_TOKEN")
-        }
-    }
-    from {
-        image = "eclipse-temurin:24-jre-noble"
-        auth {
-            username = System.getenv("DOCKERHUB_USER")
-            password = System.getenv("DOCKERHUB_PASSWORD")
-        }
-        platforms {
-            platform {
-                architecture = "amd64"
-                os = "linux"
-            }
-            platform {
-                architecture = "arm64"
-                os = "linux"
-            }
-        }
-    }
-    container {
-        jvmFlags = listOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
-            "-Dsun.jnu.encoding=UTF-8",
-            "-Dfile.encoding=UTF-8",
-            "-Xms256m",
-        )
-        mainClass = "com.github.schaka.janitorr.JanitorrApplicationKt"
-        ports = listOf("8978")
-        format = ImageFormat.Docker // OCI not yet supported
-        volumes = listOf("/config")
-
-        labels.set(
-                mapOf<String, String>(
-                        "org.opencontainers.image.created" to "${project.extra["build.date"]}T${project.extra["build.time"]}",
-                        "org.opencontainers.image.revision" to project.extra["build.revision"] as String,
-                        "org.opencontainers.image.version" to project.version as String,
-                        "org.opencontainers.image.title" to project.name,
-                        "org.opencontainers.image.authors" to "Schaka <schaka@github.com>",
-                        "org.opencontainers.image.source" to project.extra["docker.image.source"] as String,
-                        "org.opencontainers.image.description" to project.description!!,
-                )
-        )
-
-        // Exclude all "developmentOnly" dependencies, e.g. Spring devtools.
-        configurationName.set("productionRuntimeClasspath")
-    }
 }

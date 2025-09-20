@@ -9,12 +9,8 @@ import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.history.HistoryResponse
-import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
-import com.github.schaka.janitorr.servarr.radarr.movie.MoviePayload
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
@@ -22,7 +18,6 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 @Service
-@RegisterReflectionForBinding(classes = [QualityProfile::class, Tag::class, MoviePayload::class, MovieFile::class, HistoryResponse::class])
 class RadarrRestService(
 
     val radarrClient: RadarrClient,
@@ -47,7 +42,7 @@ class RadarrRestService(
         const val CACHE_NAME = "radarr-cache"
     }
     init {
-        if (radarrProperties.enabled) {
+        if (radarrProperties.enabled && !applicationProperties.trainingRun) {
             upgradesAllowed = radarrClient.getAllQualityProfiles().any { it.items.isNotEmpty() && it.upgradeAllowed }
             historySort = radarrProperties.determineAgeBy ?: if (upgradesAllowed) MOST_RECENT else OLDEST
             keepTags = radarrClient.getAllTags().filter { applicationProperties.exclusionTags.contains(it.label) }

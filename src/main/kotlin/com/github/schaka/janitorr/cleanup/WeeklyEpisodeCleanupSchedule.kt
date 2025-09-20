@@ -3,15 +3,13 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
-import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
@@ -21,8 +19,8 @@ import java.time.LocalDateTime
  * This class works differently than the other schedules because it covers one special use case.
  * TV shows only (mostly daily episodes), regarding only the latest season or x amount of latest episodes.
  */
+@Profile("!leyden")
 @Service
-@RegisterReflectionForBinding(classes = [Tag::class,HistoryResponse::class, EpisodeResponse::class])
 class WeeklyEpisodeCleanupSchedule(
         val applicationProperties: ApplicationProperties,
         val sonarrProperties: SonarrProperties,
@@ -37,7 +35,7 @@ class WeeklyEpisodeCleanupSchedule(
     }
 
     init {
-        if (sonarrProperties.enabled) {
+        if (sonarrProperties.enabled && !applicationProperties.trainingRun) {
             episodeTag = sonarrClient.getAllTags().firstOrNull { it.label == applicationProperties.episodeDeletion.tag } ?: episodeTag
         }
     }

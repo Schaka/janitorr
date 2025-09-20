@@ -90,7 +90,7 @@ services:
 
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:native-stable
+    image: ghcr.io/schaka/janitorr:jvm-stable
     user: 1000:1000
     volumes:
       - /appdata/janitorr/config/application.yml:/workspace/application.yml

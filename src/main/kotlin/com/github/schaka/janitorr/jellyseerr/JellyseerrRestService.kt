@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import org.apache.http.client.utils.URIBuilder
 import org.slf4j.LoggerFactory
+import org.springframework.core.env.Environment
 import org.springframework.web.util.UriComponentsBuilder
 
 class JellyseerrRestService(
@@ -18,7 +19,7 @@ class JellyseerrRestService(
     val radarrProperties: RadarrProperties,
     val applicationProperties: ApplicationProperties,
     var sonarrServers: List<ServarrSettings> = listOf(),
-    var radarrServers: List<ServarrSettings> = listOf()
+    var radarrServers: List<ServarrSettings> = listOf(),
 
 ) : JellyseerrService {
 
@@ -27,7 +28,7 @@ class JellyseerrRestService(
     }
 
     init {
-        if (jellyseerrProperties.enabled) {
+        if (jellyseerrProperties.enabled && !applicationProperties.trainingRun) {
             sonarrServers = jellyseerrClient.getSonarrServers()
             radarrServers = jellyseerrClient.getRadarrServers()
         }

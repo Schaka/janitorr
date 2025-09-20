@@ -2,10 +2,12 @@ package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import kotlin.system.exitProcess
 
+@Profile("!leyden")
 @Component
 class RunOnce(
     val applicationProperties: ApplicationProperties,

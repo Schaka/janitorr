@@ -123,40 +123,15 @@ If you're seeing any problems, consult [the Wiki](https://github.com/Schaka/jani
 An example of a `docker-compose.yml` may look like this:
 
 ```yml
-version: '3'
-
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:stable
+    image: ghcr.io/schaka/janitorr:jvm-stable
     user: 1000:1000 # Replace with your user who should own your application.yml file
+    mem_limit: 256M # is used to dynamically calculate heap size
+    mem_swappiness: 0
     volumes:
-      - /appdata/janitorr/config/application.yml:/workspace/application.yml
-      - /appdata/janitorr/logs:/logs
-      - /share_media:/data
-    healthcheck:
-      test: "wget -T5 -qO- http://localhost:8081/health | grep UP || exit 1"
-      start_period: 30s
-      interval: 5s
-      retries: 3
-```
-
-A native image is also published for every build. It keeps a much lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
-If you restart more often than once a week or have a very low powered server, this is now recommended.
-That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
-**While I do publish an arm64 version of this image, it is mostly untested.**
-The healthcheck also work slightly differently, see below:
-
-```yml
-version: '3'
-
-services:
-  janitorr:
-    container_name: janitorr
-    image: ghcr.io/schaka/janitorr:native-stable
-    user: 1000:1000 # Replace with your user who should own your application.yml file
-    volumes:
-      - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /appdata/janitorr/config/application.yml:/config/application.yml
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
     environment:
@@ -170,8 +145,7 @@ services:
       retries: 3
 ```
 
-To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:develop`.
-The development version of the native image is available as `ghcr.io/schaka/janitorr:native-develop`.
+To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
 
 
 ## JetBrains

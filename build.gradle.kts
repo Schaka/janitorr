@@ -13,6 +13,7 @@ plugins {
     id("idea")
     id("org.springframework.boot") version "3.5.6"
     id("io.spring.dependency-management") version "1.1.7"
+    id("org.springframework.boot.aot") version "3.5.6"
     id("net.nemerosa.versioning") version "3.1.0"
     id("org.graalvm.buildtools.native") version "0.11.0"
 
@@ -180,11 +181,11 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
     val isNative = System.getenv("IMAGE_TYPE") != "jvm"
-    val javaBuildPack = if (isNative ) "paketobuildpacks/java-native-image" else "paketobuildpacks/java"
+    val javaBuildPack = if (isNative ) "urn:cnb:builder:paketo-buildpacks/java-native-image" else "urn:cnb:builder:paketo-buildpacks/java"
 
-    builder = "paketobuildpacks/builder-jammy-buildpackless-tiny"
+    builder = "paketobuildpacks/builder-noble-java-tiny"
     buildpacks = listOf(
-        "paketobuildpacks/environment-variables",
+        "urn:cnb:builder:paketo-buildpacks/environment-variables",
         javaBuildPack,
         "paketobuildpacks/health-checker",
     )
@@ -220,7 +221,7 @@ tasks.withType<BootBuildImage> {
         "BPE_BPL_JVM_THREAD_COUNT" to "50",
         "BPE_BPL_JVM_HEAD_ROOM" to "5",
         "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
-        "BPE_JAVA_TOOL_OPTIONS" to "-Dspring.config.additional-location=optional:/config/application.yml -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -XX:ReservedCodeCacheSize=50M -Xss300K",
+        "BPE_JAVA_TOOL_OPTIONS" to "-Dspring.aot.enabled=true -Dspring.config.additional-location=optional:/config/application.yml -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -XX:ReservedCodeCacheSize=50M -Xss300K",
     )
 
     // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings

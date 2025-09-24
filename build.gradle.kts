@@ -158,7 +158,7 @@ extra {
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yml",
+            "-Dspring.config.additional-location=optional:/config/application.yml",
             "-Dsun.jnu.encoding=UTF-8",
             "-Dfile.encoding=UTF-8"
         )
@@ -167,7 +167,7 @@ tasks.withType<BootRun> {
 
 tasks.withType<ProcessAot> {
     args(
-        "-Dspring.config.additional-location=optional:file:/config/application.yml",
+        "-Dspring.config.additional-location=optional:/config/application.yml",
         "-Dsun.jnu.encoding=UTF-8",
         "-Dfile.encoding=UTF-8"
     )
@@ -211,14 +211,16 @@ tasks.withType<BootBuildImage> {
         "BP_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_VERSION" to "25",
+        "BP_JVM_TYPE" to "JRE",
         "BPE_LANG" to "en_US.UTF-8",
         "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
         "BPE_LC_CTYPE" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
-        "BPL_JVM_THREAD_COUNT" to "50",
-        "BPL_JVM_HEAD_ROOM" to "5",
-        "BPL_JVM_LOADED_CLASS_COUNT" to "15000",
-        "JAVA_TOOL_OPTIONS" to "-Dspring.config.additional-location=optional:file:/config/application.yml -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -XX:ReservedCodeCacheSize=50M -Xss300K",
+        // these values are logged correctly during build time without BPE_ prefix but then not applied at runtime, so we set environment variables for the JVM
+        "BPE_BPL_JVM_THREAD_COUNT" to "50",
+        "BPE_BPL_JVM_HEAD_ROOM" to "5",
+        "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
+        "BPE_JAVA_TOOL_OPTIONS" to "-Dspring.config.additional-location=optional:/config/application.yml -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -XX:ReservedCodeCacheSize=50M -Xss300K",
     )
 
     // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings

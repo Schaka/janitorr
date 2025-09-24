@@ -133,7 +133,7 @@ services:
     mem_limit: 256M # is used to dynamically calculate heap size
     mem_swappiness: 0
     volumes:
-      - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /appdata/janitorr/config/application.yml:/config/application.yml
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
     environment:
@@ -162,7 +162,7 @@ services:
     image: ghcr.io/schaka/janitorr:native-stable
     user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
-      - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /appdata/janitorr/config/application.yml:/config/config.yml
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
     environment:

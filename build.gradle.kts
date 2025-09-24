@@ -158,7 +158,7 @@ extra {
 tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
-            "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
+            "-Dspring.config.additional-location=optional:file:/config/application.yml",
             "-Dsun.jnu.encoding=UTF-8",
             "-Dfile.encoding=UTF-8"
         )
@@ -167,7 +167,7 @@ tasks.withType<BootRun> {
 
 tasks.withType<ProcessAot> {
     args(
-        "-Dspring.config.additional-location=optional:file:/config/application.yaml,optional:file:/workspace/application.yaml,optional:file:/workspace/application.yml",
+        "-Dspring.config.additional-location=optional:file:/config/application.yml",
         "-Dsun.jnu.encoding=UTF-8",
         "-Dfile.encoding=UTF-8"
     )
@@ -215,9 +215,10 @@ tasks.withType<BootBuildImage> {
         "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
         "BPE_LC_CTYPE" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
-        "BPL_JVM_THREAD_COUNT" to "50",
-        "BPL_JVM_TYPE" to "JRE",
-        "BPL_JVM_HEAD_ROOM" to "5",
+        "BPE_BPL_JVM_THREAD_COUNT" to "50",
+        "BPE_BPL_JVM_HEAD_ROOM" to "5",
+        "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
+        "BPE_JAVA_TOOL_OPTIONS" to "-Dspring.config.additional-location=optional:file:/config/application.yml -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -XX:ReservedCodeCacheSize=50M -Xss300K",
     )
 
     // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings

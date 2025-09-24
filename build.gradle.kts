@@ -195,19 +195,20 @@ tasks.withType<BootBuildImage> {
 
     val nativeArguments = mapOf(
         "BP_NATIVE_IMAGE" to "true",
+        "BPL_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_VERSION" to "24", // Note. Requires 24 because the builder only supports the latest 2 LTS and the very latest major version
         "BPE_LANG" to "en_US.UTF-8",
         "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
         "BPE_LC_CTYPE" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
-        "BPL_SPRING_AOT_ENABLED" to "true",
-        "BP_JVM_CDS_ENABLED" to "true",
         "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets -J--patch-module=java.base=/workspace/BOOT-INF/classes/java.base",
     )
 
     val jvmArguments = mapOf(
         "BP_NATIVE_IMAGE" to "false",
+        "BP_JVM_CDS_ENABLED" to "true",
+        "BP_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_VERSION" to "25",
         "BPE_LANG" to "en_US.UTF-8",

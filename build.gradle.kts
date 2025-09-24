@@ -199,7 +199,7 @@ tasks.withType<BootBuildImage> {
         "BP_JVM_VERSION" to "24", // Note. Requires 24 because the builder only supports the latest 2 LTS and the very latest major version
         "BPE_LANG" to "en_US.UTF-8",
         "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
-        "BPE_LC_TYPE" to "en_US.UTF-8",
+        "BPE_LC_CTYPE" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         "BPL_SPRING_AOT_ENABLED" to "true",
         "BP_JVM_CDS_ENABLED" to "true",
@@ -212,7 +212,7 @@ tasks.withType<BootBuildImage> {
         "BP_JVM_VERSION" to "25",
         "BPE_LANG" to "en_US.UTF-8",
         "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
-        "BPE_LC_TYPE" to "en_US.UTF-8",
+        "BPE_LC_CTYPE" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         "BPL_JVM_THREAD_COUNT" to "50",
         "BPL_JVM_TYPE" to "JRE",

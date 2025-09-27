@@ -128,7 +128,7 @@ services:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:jvm-stable
     user: 1000:1000 # Replace with your user who should own your application.yml file
-    mem_limit: 256M # is used to dynamically calculate heap size
+    mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended - higher for very large libraries
     mem_swappiness: 0
     volumes:
       - /appdata/janitorr/config/application.yml:/config/application.yml

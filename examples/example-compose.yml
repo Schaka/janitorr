@@ -90,8 +90,20 @@ services:
 
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:native-stable
-    user: 1000:1000
+    image: ghcr.io/schaka/janitorr:jvm-stable
+    user: 1000:1000 # Replace with your user who should own your application.yml file
+    mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended
+    mem_swappiness: 0
     volumes:
-      - /appdata/janitorr/config/application.yml:/workspace/application.yml
+      - /appdata/janitorr/config/application.yml:/config/application.yml
+      - /appdata/janitorr/logs:/logs
       - /share_media:/data
+    environment:
+      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
+      - THC_PATH=/health
+      - THC_PORT=8081
+    healthcheck:
+      test: [ "CMD", "/workspace/health-check" ]
+      start_period: 30s
+      interval: 5s
+      retries: 3

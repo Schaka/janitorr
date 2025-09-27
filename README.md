@@ -128,7 +128,7 @@ services:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:jvm-stable
     user: 1000:1000 # Replace with your user who should own your application.yml file
-    mem_limit: 256M # is used to dynamically calculate heap size
+    mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended - higher for very large libraries
     mem_swappiness: 0
     volumes:
       - /appdata/janitorr/config/application.yml:/config/application.yml
@@ -149,8 +149,8 @@ To get the latest build as found in the development branch, grab the following i
 
 
 ## JetBrains
-Thank you to [<img src="logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.
+Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.
 
-* [<img src="logos/idea.svg" alt="Idea" width="32"> IntelliJ Idea](https://www.jetbrains.com/idea/)
-* [<img src="logos/webstorm.svg" alt="WebStorm" width="32"> WebStorm](http://www.jetbrains.com/webstorm/)
-* [<img src="logos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)
+* [<img src="images/logos/idea.svg" alt="Idea" width="32"> IntelliJ Idea](https://www.jetbrains.com/idea/)
+* [<img src="images/logos/webstorm.svg" alt="WebStorm" width="32"> WebStorm](http://www.jetbrains.com/webstorm/)
+* [<img src="imageslogos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)

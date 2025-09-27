@@ -7,6 +7,7 @@ if [[ -z "${BP_NATIVE_IMAGE:-}" || "${BP_NATIVE_IMAGE}" == "true" ]]; then
 fi
 
 LAYER_DIR="/workspace/aot-cache"
+export LC_ALL=en_US.UTF-8
 
 cd /workspace
 mkdir -p "${LAYER_DIR}"

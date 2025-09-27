@@ -1,5 +1,5 @@
+
 import net.nemerosa.versioning.VersioningExtension
-import org.gradle.kotlin.dsl.invoke
 import org.gradle.plugins.ide.idea.model.IdeaModel
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -63,19 +63,6 @@ configure<IdeaModel> {
     }
 }
 
-// Required until GraalVM/Paketo builders receive a fix
-sourceSets {
-    main {
-        java {
-            srcDir("src/main")
-            srcDir("src/java.base")
-        }
-        kotlin {
-            srcDir("src/kotlin")
-        }
-    }
-}
-
 kotlin {
     jvmToolchain {
         languageVersion.set(JavaLanguageVersion.of(25))
@@ -85,26 +72,6 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-/*
- * Hack required until
- * - https://github.com/paketo-buildpacks/native-image/issues/344
- * - https://github.com/oracle/graal/issues/9879
- * are fixed.
- *
- * We're copying over patches to the JDK and forcing them into the native image at build time.
- */
-tasks.withType<ProcessResources> {
-    dependsOn("copyPatches")
-}
-
-tasks.register<Copy>("copyPatches") {
-    dependsOn("compileJava")
-
-    from(layout.buildDirectory.dir("classes/java/main"))
-    include("**/*.*")
-    into(layout.buildDirectory.dir("resources/main/java.base"))
 }
 
 tasks.withType<JavaCompile> {
@@ -160,8 +127,6 @@ tasks.withType<BootRun> {
     jvmArgs(
         arrayOf(
             "-Dspring.config.additional-location=optional:/config/application.yml",
-            "-Dsun.jnu.encoding=UTF-8",
-            "-Dfile.encoding=UTF-8"
         )
     )
 }
@@ -169,8 +134,6 @@ tasks.withType<BootRun> {
 tasks.withType<ProcessAot> {
     args(
         "-Dspring.config.additional-location=optional:/config/application.yml",
-        "-Dsun.jnu.encoding=UTF-8",
-        "-Dfile.encoding=UTF-8"
     )
 }
 
@@ -181,12 +144,18 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
     val isNative = System.getenv("IMAGE_TYPE") != "jvm"
-    val javaBuildPack = if (isNative ) "urn:cnb:builder:paketo-buildpacks/java-native-image" else "urn:cnb:builder:paketo-buildpacks/java"
+    val javaBuildPack = if (isNative ) "paketobuildpacks/java-native-image" else "paketobuildpacks/java"
     val javaVendor = if (isNative ) "paketobuildpacks/graalvm" else "paketobuildpacks/adoptium"
 
-    builder = "paketobuildpacks/builder-noble-java-tiny"
+    // the java-tiny image has locale issues, documented here: https://github.com/paketo-buildpacks/native-image/issues/344
+    // ironically, it works for native images as long as we pass LC_ALL=en_US.UTF-8 during build time
+    // if the native image is built with those parameters, they will be available at runtime, no matter what
+    builder = "paketobuildpacks/ubuntu-noble-builder-buildpackless"
+    if (isNative) {
+        runImage = "paketobuildpacks/ubuntu-noble-run-tiny"
+    }
     buildpacks = listOf(
-        "urn:cnb:builder:paketo-buildpacks/environment-variables",
+        "paketobuildpacks/environment-variables",
         javaVendor,
         javaBuildPack,
         "./buildpacks/aot-cache",
@@ -201,31 +170,29 @@ tasks.withType<BootBuildImage> {
         "BP_NATIVE_IMAGE" to "true",
         "BPL_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
-        "BP_JVM_VERSION" to "25", // Note. Requires 25 because the builder only supports the latest 2 LTS and the very latest major version
-        "BPE_LANG" to "en_US.UTF-8",
-        "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
-        "BPE_LC_CTYPE" to "en_US.UTF-8",
+        "BP_JVM_VERSION" to "25",
         "BPE_LC_ALL" to "en_US.UTF-8",
+        "LC_ALL" to "en_US.UTF-8",
         "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
-        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets -J--patch-module=java.base=/workspace/BOOT-INF/classes/java.base",
+        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets",
     )
 
     val jvmArguments = mapOf(
         "BP_NATIVE_IMAGE" to "false",
-        "BP_JVM_CDS_ENABLED" to "true",
+        "BP_JVM_CDS_ENABLED" to "false",
         "BP_SPRING_AOT_ENABLED" to "true",
         "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_VERSION" to "25", // JDK required, because we need the executable to run our AOTCache buildpack
         "BP_JVM_TYPE" to "JDK",
-        "BPE_LANG" to "en_US.UTF-8",
-        "BPE_LANGUAGE" to "LANGUAGE=en_US:en",
-        "BPE_LC_CTYPE" to "en_US.UTF-8",
+        "LC_ALL" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         // these values are logged correctly during build time without BPE_ prefix but then not applied at runtime, so we set environment variables for the JVM
         "BPE_BPL_JVM_THREAD_COUNT" to "50",
         "BPE_BPL_JVM_HEAD_ROOM" to "5",
         "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
-        "BPE_APPEND_JAVA_TOOL_OPTIONS" to " -Dspring.aot.enabled=true -Dspring.config.additional-location=optional:/config/application.yml -Dsun.jnu.encoding=UTF-8 -Dfile.encoding=UTF-8 -XX:ReservedCodeCacheSize=50M -Xss300K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
+        "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
+        "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
+        "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:ReservedCodeCacheSize=50M -Xss300K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
     )
 
     // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings

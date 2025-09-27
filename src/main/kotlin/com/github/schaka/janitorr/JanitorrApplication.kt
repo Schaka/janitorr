@@ -12,8 +12,10 @@ import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.stats.StatsClientProperties
 import com.github.schaka.janitorr.stats.jellystat.JellystatClient
 import com.github.schaka.janitorr.stats.streamystats.StreamystatsClient
+import org.springframework.aot.hint.MemberCategory
 import org.springframework.aot.hint.RuntimeHints
 import org.springframework.aot.hint.RuntimeHintsRegistrar
+import org.springframework.aot.hint.TypeReference
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -47,6 +49,11 @@ class JanitorrApplication {
 
             hints.proxies().registerJdkProxy(RestClientProperties::class.java)
             hints.proxies().registerJdkProxy(StatsClientProperties::class.java)
+
+            // Hack to make Caffeine Cache work until reachability metadata gets updated
+            hints.reflection().registerType(
+                TypeReference.of("com.github.benmanes.caffeine.cache.SSA"),
+                MemberCategory.PUBLIC_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_PUBLIC_METHODS)
         }
     }
 }

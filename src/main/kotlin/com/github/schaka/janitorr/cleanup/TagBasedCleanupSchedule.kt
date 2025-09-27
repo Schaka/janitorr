@@ -18,9 +18,11 @@ import com.github.schaka.janitorr.servarr.sonarr.Sonarr
 import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
+import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
+@Profile("!leyden")
 @Service
 class TagBasedCleanupSchedule(
     mediaServerService: AbstractMediaServerService,

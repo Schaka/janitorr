@@ -1,0 +1,71 @@
+application:
+  training-run: true
+  dry-run: false
+
+  media-deletion:
+    enabled: true
+    movie-expiration:
+      5: 15d 
+      10: 30d 
+      15: 60d 
+      20: 90d 
+    season-expiration:
+      5: 15d 
+      10: 20d 
+      15: 60d 
+      20: 120d 
+
+  tag-based-deletion:
+    enabled: true
+    minimum-free-disk-percent: 100
+    schedules:
+      - tag: 5 - demo
+        expiration: 30d
+      - tag: 10 - demo
+        expiration: 7d
+
+  episode-deletion: 
+    enabled: true
+    tag: janitorr_daily 
+    max-episodes: 10 
+    max-age: 30d 
+
+clients:
+  sonarr:
+    enabled: true
+    url: "http://localhost:8989"
+    api-key: "4ed7f4d0e8584d65aa2d47d944077ff6"
+    delete-empty-shows: true 
+    determine-age-by: MOST_RECENT 
+    import-exclusions: false 
+  radarr:
+    enabled: true
+    url: "http://localhost:7878"
+    api-key: "cd0912f129d348c9b69bb20d49fcbe44"
+    only-delete-files: false 
+    determine-age-by: most_recent 
+    import-exclusions: false 
+  bazarr:
+    enabled: false 
+    url: "http://localhost:6767"
+    api-key: "cd0912f129d348c9b69bb20d49fcbe55"
+  jellyfin:
+    enabled: true
+    url: "http://localhost:8096"
+    api-key: "4da8d93992804489ba2d1f0e31b8316c"
+    username: Janitorr
+    password: janitorr
+    delete: true 
+    leaving-soon-tv: "Shows (Leaving Soon)"
+    leaving-soon-movies: "Movies (Leaving Soon)"
+    leaving-soon-type: MOVIES_AND_TV
+  jellyseerr:
+    enabled: true
+    url: "http://localhost:5055"
+    api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
+    match-server: false
+  jellystat: 
+    enabled: true
+    whole-tv-show: false 
+    url: "http://jellystat:3000"
+    api-key: "jellystat-key"

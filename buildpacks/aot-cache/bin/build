@@ -25,9 +25,9 @@ echo "Creating AOT cache at $LAYER_DIR"
 #     org.springframework.boot.loader.launch.JarLauncher
 
 # Java 25, single step instead of split in 2
-java -cp "." -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info -Dspring.aot.enabled=true -Dspring.profiles.active=leyden \
+java -cp "." -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info \
      -XX:AOTCacheOutput=$LAYER_DIR/janitorr.aot \
-     -Dspring.context.exit=onRefresh org.springframework.boot.loader.launch.JarLauncher
+     -Dspring.aot.enabled=true -Dspring.profiles.active=leyden -Dspring.context.exit=onRefresh org.springframework.boot.loader.launch.JarLauncher
 
 # Layer metadata (launch = available at runtime)
 cat > "${LAYER_DIR}.toml" <<EOL

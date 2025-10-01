@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janitorr Management UI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧹 Janitorr Management</h1>
+            <p class="subtitle">Manage and manually launch cleanup functions</p>
+        </header>
+
+        <section class="status-section">
+            <h2>System Status</h2>
+            <div id="statusContainer" class="status-grid">
+                <div class="status-item">
+                    <span class="status-label">Dry Run Mode:</span>
+                    <span id="dryRunStatus" class="status-value">Loading...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Run Once Mode:</span>
+                    <span id="runOnceStatus" class="status-value">Loading...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Media Deletion:</span>
+                    <span id="mediaEnabledStatus" class="status-value">Loading...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Tag-Based Deletion:</span>
+                    <span id="tagEnabledStatus" class="status-value">Loading...</span>
+                </div>
+                <div class="status-item">
+                    <span class="status-label">Episode Deletion:</span>
+                    <span id="episodeEnabledStatus" class="status-value">Loading...</span>
+                </div>
+            </div>
+            <button id="refreshStatusBtn" class="btn btn-secondary">Refresh Status</button>
+        </section>
+
+        <section class="cleanup-section">
+            <h2>Manual Cleanup Actions</h2>
+            <div class="cleanup-grid">
+                <div class="cleanup-card">
+                    <h3>Media Cleanup</h3>
+                    <p>Cleanup movies and TV shows based on age and disk space thresholds.</p>
+                    <div class="cleanup-status">
+                        <span class="status-label">Last Run:</span>
+                        <span id="mediaLastRun" class="status-value">Not yet</span>
+                    </div>
+                    <button id="mediaCleanupBtn" class="btn btn-primary">Run Media Cleanup</button>
+                </div>
+
+                <div class="cleanup-card">
+                    <h3>Tag-Based Cleanup</h3>
+                    <p>Cleanup media based on configured tags and schedules.</p>
+                    <div class="cleanup-status">
+                        <span class="status-label">Last Run:</span>
+                        <span id="tagLastRun" class="status-value">Not yet</span>
+                    </div>
+                    <button id="tagCleanupBtn" class="btn btn-primary">Run Tag-Based Cleanup</button>
+                </div>
+
+                <div class="cleanup-card">
+                    <h3>Episode Cleanup</h3>
+                    <p>Cleanup episodes of shows with the configured tag based on age and count.</p>
+                    <div class="cleanup-status">
+                        <span class="status-label">Last Run:</span>
+                        <span id="episodeLastRun" class="status-value">Not yet</span>
+                    </div>
+                    <button id="episodeCleanupBtn" class="btn btn-primary">Run Episode Cleanup</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="message-section">
+            <div id="messageContainer"></div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

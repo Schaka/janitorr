@@ -170,6 +170,7 @@ tasks.withType<BootBuildImage> {
         "BPE_BPL_JVM_HEAD_ROOM" to "5",
         "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
         "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
+        "BPE_PREPEND_JAVA_TOOL_OPTIONS" to "-XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders",
         "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
         "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:ReservedCodeCacheSize=50M -Xss300K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
     )

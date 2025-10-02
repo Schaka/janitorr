@@ -30,6 +30,24 @@ This way, no deletes will be triggered on Jellyfin and everthing triggered in th
 Then you need Janitorr for Jellyfin and Emby.
 It's THE solution for cleaning up your server and freeing up space before you run into issues.
 
+## 📚 Documentation
+
+Comprehensive documentation is available in multiple languages:
+
+- **🇬🇧 English Documentation**
+  - [Wiki Home](docs/wiki/en/Home.md)
+  - [Docker Compose Setup Guide](docs/wiki/en/Docker-Compose-Setup.md)
+  - [Configuration Guide](docs/wiki/en/Configuration-Guide.md)
+  - [FAQ](docs/wiki/en/FAQ.md)
+  - [Troubleshooting](docs/wiki/en/Troubleshooting.md)
+
+- **🇪🇸 Documentación en Español**
+  - [Inicio de la Wiki](docs/wiki/es/Home.md)
+  - [Guía de Configuración con Docker Compose](docs/wiki/es/Configuracion-Docker-Compose.md)
+  - [Guía de Configuración](docs/wiki/es/Guia-Configuracion.md)
+  - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
+  - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
+
 ## Features
 
 - **Web-based Management UI** - Monitor status and manually trigger cleanup functions through a user-friendly web interface
@@ -78,9 +96,14 @@ To enable debug logging, change `INFO` in the following line in `application.yml
 
 ### Troubleshooting
 Before you create a new issue, please check previous issues to make sure nobody has faced the same problem before.
-[The Wiki](https://github.com/Schaka/janitorr/wiki) also contains a troubleshooting section with commons errors.
 
-If you have any questions, consult the [FAQ section](https://github.com/Schaka/janitorr/wiki/FAQ) before starting a [new discussion](https://github.com/Schaka/janitorr/discussions).
+**📖 Check the documentation:**
+- [English Troubleshooting Guide](docs/wiki/en/Troubleshooting.md)
+- [English FAQ](docs/wiki/en/FAQ.md)
+- [Guía de Solución de Problemas (Español)](docs/wiki/es/Solucion-Problemas.md)
+- [Preguntas Frecuentes (Español)](docs/wiki/es/Preguntas-Frecuentes.md)
+
+If you still need help, start a [new discussion](https://github.com/carcheky/janitorr/discussions).
 
 ## Setup
 
@@ -95,6 +118,8 @@ To exclude media from being considered from deletion, set the `janitorr_keep` ta
 Janitorr looks for can be adjusted in your config file.
 
 ### Setting up Docker
+
+> **📖 For a comprehensive step-by-step guide, see the [Docker Compose Setup Guide](docs/wiki/en/Docker-Compose-Setup.md)** (also available in [Spanish](docs/wiki/es/Configuracion-Docker-Compose.md))
 
 - follow the mapping for `application.yml` examples below
 - within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from this repository

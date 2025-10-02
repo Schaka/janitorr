@@ -32,6 +32,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 ## Features
 
+- **Web-based Management UI** - Monitor status and manually trigger cleanup functions through a user-friendly web interface
 - Remote deletion, disk space aware deletion as well as tag based delete schedules
 - Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in the *arrs - optionally via Jellystat
@@ -51,6 +52,18 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
 - **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
+
+### Management UI
+
+Janitorr includes a web-based management interface accessible at `http://<host>:<port>/` when the application is running.
+
+The management UI allows you to:
+- View the current system status and configuration
+- Manually trigger any cleanup function on-demand
+- Monitor which cleanups have been executed
+- See real-time feedback on cleanup operations
+
+For more details, see [MANAGEMENT_UI.md](MANAGEMENT_UI.md).
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.

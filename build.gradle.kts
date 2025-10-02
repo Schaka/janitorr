@@ -108,7 +108,9 @@ extra {
     project.extra["build.branch"] = branch
     project.extra["build.user"] = build.userName()
 
-    val containerImageName = "ghcr.io/schaka/${project.name}"
+    // Use dynamic repository owner from GITHUB_REPOSITORY or fall back to schaka
+    val repoOwner = System.getenv("GITHUB_REPOSITORY")?.split("/")?.get(0) ?: "schaka"
+    val containerImageName = "ghcr.io/$repoOwner/${project.name}"
 
     val imageType = System.getenv("IMAGE_TYPE") ?: "jvm"
     val platform = System.getenv("TARGET_PLATFORM") ?: "amd64"

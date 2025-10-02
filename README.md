@@ -139,7 +139,7 @@ An example of a `docker-compose.yml` may look like this:
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:jvm-stable
     user: 1000:1000 # Replace with your user who should own your application.yml file
     mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended - higher for very large libraries
     mem_swappiness: 0
@@ -172,7 +172,7 @@ That image is always tagged `:native-stable`. To get a specific version, use `:n
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/schaka/janitorr:native-stable
+    image: ghcr.io/carcheky/janitorr:native-stable
     user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
       - /appdata/janitorr/config/application.yml:/config/config.yml
@@ -190,8 +190,8 @@ services:
       retries: 3
 ```
 
-To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
-The development version of the native image is available as `ghcr.io/schaka/janitorr:native-develop`.
+To get the latest build as found in the development branch, grab the following image: `ghcr.io/carcheky/janitorr:jvm-develop`.
+The development version of the native image is available as `ghcr.io/carcheky/janitorr:native-develop`.
 
 
 ## JetBrains

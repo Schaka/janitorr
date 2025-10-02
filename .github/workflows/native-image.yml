@@ -124,8 +124,8 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/schaka/janitorr:native-${{ steps.branch_name.outputs.value }}
-            ${{ (startsWith(github.ref, 'refs/tags/v') && 'ghcr.io/schaka/janitorr:native-stable') || '' }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:native-${{ steps.branch_name.outputs.value }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-stable', github.repository_owner)) || '' }}
           sources: |
-            ghcr.io/schaka/janitorr:native-amd64-${{ steps.branch_name.outputs.value }}
-            ghcr.io/schaka/janitorr:native-arm64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:native-amd64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:native-arm64-${{ steps.branch_name.outputs.value }}

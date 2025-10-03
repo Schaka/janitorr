@@ -35,7 +35,7 @@ class ConfigurationController(
 ) {
 
     companion object {
-        private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+        private val log = LoggerFactory.getLogger(ConfigurationController::class.java)
     }
 
     @GetMapping

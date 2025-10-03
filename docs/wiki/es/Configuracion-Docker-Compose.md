@@ -53,6 +53,11 @@ Antes de configurar Janitorr, asegúrate de tener:
 
 6. **Acceder a la Interfaz de Gestión:**
    Abre `http://<ip-de-tu-servidor>:<puerto-configurado>/` en tu navegador
+   
+   **✅ ¡La Interfaz de Gestión está completamente funcional!** Ahora puedes:
+   - Ver el estado del sistema en tiempo real
+   - Activar operaciones de limpieza manualmente
+   - Monitorear la ejecución de limpiezas
 
 ## Pasos de Configuración
 
@@ -72,6 +77,8 @@ Configuraciones clave:
 - **Puerto**: El puerto en el que Janitorr escuchará (predeterminado: 8978)
 - **Modo de Prueba**: Comienza con `dry-run: true` para probar sin eliminar nada
 - **Directorio "Leaving Soon"**: Donde se crearán los enlaces simbólicos para medios próximos a eliminar
+
+**✅ Después de la configuración, la Interfaz de Gestión estará accesible en `http://localhost:8978/`**
 
 ### 2. Comprender el Mapeo de Volúmenes
 
@@ -460,29 +467,44 @@ services:
 
 ### La Interfaz de Gestión Devuelve Errores 404
 
-**Problema:** Al acceder a `/api/management/status` u otros endpoints de gestión se devuelven errores 404.
+**✅ ¡Este problema ha sido CORREGIDO en las versiones actuales!**
+
+Si todavía experimentas errores 404, probablemente estés usando una imagen desactualizada.
 
 **Solución:**
-1. Verifica si la variable de entorno `SPRING_PROFILES_ACTIVE` incluye `leyden`
-2. Elimina `leyden` de los perfiles activos - es solo para uso en tiempo de compilación
-3. Si necesitas perfiles personalizados, configúralos sin `leyden`:
+1. Actualiza a la imagen más reciente:
    ```yaml
-   environment:
-     - SPRING_PROFILES_ACTIVE=prod,custom  # NO incluyas leyden
+   image: ghcr.io/carcheky/janitorr:jvm-stable
    ```
-4. Reinicia el contenedor después de eliminar el perfil leyden
-5. Verifica que los endpoints sean accesibles: `curl http://localhost:8978/api/management/status`
-6. Revisa los logs del contenedor para confirmar que ManagementController se cargó: `docker logs janitorr`
+2. Descarga la última imagen:
+   ```bash
+   docker-compose pull janitorr
+   ```
+3. Reinicia el contenedor:
+   ```bash
+   docker-compose up -d janitorr
+   ```
+4. Verifica que los endpoints sean accesibles:
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+
+**Comportamiento esperado con las imágenes actuales:**
+- ✅ `http://localhost:8978/` carga la Interfaz de Gestión
+- ✅ `http://localhost:8978/api/management/status` devuelve estado JSON
+- ✅ Todos los endpoints de limpieza funcionan correctamente
 
 ## Próximos Pasos
 
 Después de una implementación exitosa:
 
 1. **Accede a la Interfaz de Gestión** en `http://<ip-de-tu-servidor>:8978/`
+   - ✅ **¡Funcionando!** La interfaz está completamente funcional en todas las versiones actuales
 2. **Revisa la configuración** y verifica que todos los servicios estén conectados
 3. **Prueba en modo dry-run** antes de habilitar eliminaciones reales
 4. **Monitorea los logs** para entender qué hará Janitorr
 5. **Configura la colección "Leaving Soon"** en Jellyfin
+6. **Usa la interfaz web** para activar limpiezas manuales y monitorear el estado
 
 ## Recursos Adicionales
 

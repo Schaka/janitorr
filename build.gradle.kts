@@ -43,6 +43,9 @@ dependencies {
     implementation("io.github.openfeign:feign-httpclient:13.5")
 
     implementation("org.slf4j:jcl-over-slf4j")
+    
+    // Email notifications
+    implementation("com.sun.mail:jakarta.mail:2.0.1")
 
     testImplementation(kotlin("test"))
     testImplementation("io.mockk:mockk:1.14.5")

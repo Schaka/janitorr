@@ -129,6 +129,28 @@ Use the Management UI:
 2. Click the button for the cleanup you want to run
 3. Monitor the status and logs
 
+### Why does the Management UI return 404 errors?
+
+**Problem:** When accessing `/api/management/status` or the Management UI, you get 404 errors.
+
+**Most Common Cause:** The `leyden` profile is active at runtime.
+
+**Solution:**
+1. Check your docker-compose.yml for `SPRING_PROFILES_ACTIVE`
+2. Remove `leyden` from the environment variables:
+   ```yaml
+   environment:
+     # WRONG - Do NOT do this:
+     # - SPRING_PROFILES_ACTIVE=leyden
+     
+     # CORRECT - Either omit it entirely, or set custom profiles:
+     - SPRING_PROFILES_ACTIVE=prod,custom  # No leyden!
+   ```
+3. Restart the container
+4. The Management UI should now be accessible
+
+**Why?** The `leyden` profile is only for build-time AOT cache generation. When active at runtime, it disables the ManagementController to reduce application startup time during builds.
+
 ### Can I run Janitorr once and exit?
 
 Yes! Set `run-once: true` in your application.yml. Janitorr will:

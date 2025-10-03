@@ -440,10 +440,19 @@ async function saveRule() {
     try {
         showMessage('Saving rule...', 'info');
         
-        // Simulate saving - in real implementation, call /api/rules
-        savedRules.push(rule);
-        localStorage.setItem('janitorr_rules', JSON.stringify(savedRules));
-        
+        // Save rule to server via API
+        const response = await fetch('/api/rules', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(rule)
+        });
+        if (!response.ok) {
+            throw new Error('Failed to save rule: ' + response.statusText);
+        }
+        // Optionally update local state/UI after successful save
+        // You may want to fetch the updated list from the server instead
         renderRulesList();
         showMessage('Rule saved successfully!', 'success');
     } catch (error) {

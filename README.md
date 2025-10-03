@@ -62,6 +62,8 @@ This fork includes additional documentation:
 
 - **[FORK_CHANGES.md](FORK_CHANGES.md)** - Complete list of features added in this fork
 - **[MANAGEMENT_UI.md](MANAGEMENT_UI.md)** - Documentation for the web-based management interface
+- **[Docker Images Guide](docs/DOCKER_IMAGES_GUIDE.md)** - Bilingual guide to available Docker images (EN/ES)
+- **[Docker Image Verification](docs/DOCKER_IMAGE_VERIFICATION.md)** - Verification report for Docker image configuration
 - **[UPSTREAM_SYNC_STATUS.md](UPSTREAM_SYNC_STATUS.md)** - Sync status with upstream repository
 - **[FORK_MAINTENANCE.md](FORK_MAINTENANCE.md)** - Quick reference guide for fork maintenance
 

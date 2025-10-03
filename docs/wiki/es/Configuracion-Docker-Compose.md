@@ -123,6 +123,35 @@ leaving-soon-dir: "/data/media/leaving-soon"           # Ruta como la ve Janitor
 media-server-leaving-soon-dir: "/library/leaving-soon" # Ruta como la ve Jellyfin
 ```
 
+### 3. Configuración de Perfiles de Spring Boot
+
+**Importante:** Janitorr usa perfiles de Spring Boot para propósitos específicos. Comprender esto es crucial para el funcionamiento correcto.
+
+#### El Perfil `leyden`
+
+El perfil `leyden` es **SOLO para generación de caché AOT en tiempo de compilación** y **NUNCA debe activarse en tiempo de ejecución**. Este perfil:
+- Deshabilita la Interfaz de Gestión y los endpoints de API (`/api/management/*`)
+- Se usa automáticamente durante la construcción de imágenes Docker
+- **No debe configurarse** en tu variable de entorno `SPRING_PROFILES_ACTIVE`
+
+#### Configurar Perfiles Personalizados (Opcional)
+
+Si necesitas usar perfiles personalizados de Spring para tu propia configuración, puedes configurarlos vía variable de entorno:
+
+```yaml
+environment:
+  - SPRING_PROFILES_ACTIVE=prod,custom  # Tus perfiles personalizados
+```
+
+**Advertencia:** Nunca incluyas `leyden` en `SPRING_PROFILES_ACTIVE`. Hacerlo deshabilitará la Interfaz de Gestión y causará errores 404 en los endpoints `/api/management/*`.
+
+#### Comportamiento Predeterminado
+
+Por defecto (cuando `SPRING_PROFILES_ACTIVE` no está configurado):
+- ✅ La Interfaz de Gestión es accesible en `http://<host>:<puerto>/`
+- ✅ Todos los endpoints de API funcionan correctamente
+- ✅ Las limpiezas programadas se ejecutan según configuración
+
 ## Ejemplos de Docker Compose
 
 ### Configuración Básica (JVM - Recomendado)
@@ -144,6 +173,9 @@ services:
     environment:
       - THC_PATH=/health
       - THC_PORT=8081
+      # IMPORTANTE: NO configurar SPRING_PROFILES_ACTIVE=leyden
+      # La Interfaz de Gestión requiere que el perfil leyden esté inactivo
+      # - SPRING_PROFILES_ACTIVE=prod  # Opcional: solo tus perfiles personalizados
     ports:
       - "8978:8978" # Opcional: Solo si necesitas acceso externo
     healthcheck:
@@ -488,6 +520,22 @@ services:
 2. Ejecuta `id` en tu host para encontrar tu UID:GID
 3. Actualiza el campo `user:` en docker-compose.yml
 4. Establece la propiedad adecuada: `chown -R 1000:1000 /appdata/janitorr /share_media`
+
+### La Interfaz de Gestión Devuelve Errores 404
+
+**Problema:** Al acceder a `/api/management/status` u otros endpoints de gestión se devuelven errores 404.
+
+**Solución:**
+1. Verifica si la variable de entorno `SPRING_PROFILES_ACTIVE` incluye `leyden`
+2. Elimina `leyden` de los perfiles activos - es solo para uso en tiempo de compilación
+3. Si necesitas perfiles personalizados, configúralos sin `leyden`:
+   ```yaml
+   environment:
+     - SPRING_PROFILES_ACTIVE=prod,custom  # NO incluyas leyden
+   ```
+4. Reinicia el contenedor después de eliminar el perfil leyden
+5. Verifica que los endpoints sean accesibles: `curl http://localhost:8978/api/management/status`
+6. Revisa los logs del contenedor para confirmar que ManagementController se cargó: `docker logs janitorr`
 
 ## Próximos Pasos
 

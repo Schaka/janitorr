@@ -99,9 +99,24 @@ services:
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
     environment:
+      # Management UI Configuration
+      - JANITORR_UI_ENABLED=true # Set to false to disable the web-based Management UI
+      
+      # Spring Boot Configuration (optional)
+      # - SPRING_PROFILES_ACTIVE=management,ui # Activate specific Spring profiles if needed
+      # - SERVER_PORT=8080 # Change the internal port if needed (must also update port mapping)
+      
+      # Management Endpoints Configuration (optional)
+      # - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,management # Control which endpoints are exposed
+      
+      # Health Check Configuration
       # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
       - THC_PATH=/health
       - THC_PORT=8081
+      # IMPORTANT: Do NOT set SPRING_PROFILES_ACTIVE=leyden - the leyden profile is only for build-time AOT cache generation
+      # The Management UI and API endpoints require this profile to be inactive (default behavior)
+      # If you need custom profiles, you can set them here (comma-separated), but avoid 'leyden'
+      # - SPRING_PROFILES_ACTIVE=prod,custom
     healthcheck:
       test: [ "CMD", "/workspace/health-check" ]
       start_period: 30s

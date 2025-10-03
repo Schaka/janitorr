@@ -28,6 +28,11 @@ Estos ajustes son necesarios para que Janitorr funcione:
 server:
   port: 8978  # Puerto en el que Janitorr escucha
 
+# Configuración de la Interfaz de Gestión
+management:
+  ui:
+    enabled: true  # Configura en false para deshabilitar la interfaz web
+
 # Comportamiento de la aplicación
 dry-run: true     # IMPORTANTE: Configura en false para habilitar eliminaciones reales
 run-once: false   # Configura en true para ejecutar una vez y salir
@@ -36,6 +41,37 @@ run-once: false   # Configura en true para ejecutar una vez y salir
 leaving-soon-dir: "/data/media/leaving-soon"
 media-server-leaving-soon-dir: "/data/media/leaving-soon"
 ```
+
+### Configuración de la Interfaz de Gestión
+
+La Interfaz de Gestión proporciona una interfaz web para monitorear y controlar Janitorr:
+
+```yaml
+management:
+  ui:
+    enabled: true  # Habilitar/deshabilitar la interfaz web
+  endpoints:
+    web:
+      exposure:
+        include: health,info,management  # Endpoints de API a exponer
+```
+
+**Variables de Entorno (para Docker):**
+
+```yaml
+environment:
+  - JANITORR_UI_ENABLED=true  # Habilitar/deshabilitar interfaz
+  - SERVER_PORT=8080  # Cambiar puerto de la aplicación
+  - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,management  # Controlar endpoints
+```
+
+**Cuándo deshabilitar la interfaz:**
+- Entornos de servidor sin interfaz gráfica donde solo necesitas limpiezas programadas
+- Preocupaciones de seguridad sobre exponer una interfaz web
+- Ejecución en pipelines CI/CD o scripts automatizados
+- Requisitos mínimos de uso de recursos
+
+Consulta [MANAGEMENT_UI.md](../../../MANAGEMENT_UI.md) para documentación detallada de la interfaz.
 
 ### Conectar a Aplicaciones *arr
 

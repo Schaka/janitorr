@@ -202,7 +202,19 @@ When an error occurs, all endpoints return:
 - All cleanup operations respect the configured dry-run mode
 - Cleanup operations are logged in the Janitorr logs
 - Multiple cleanup operations can be triggered in sequence, but each must complete before starting the next
-- The UI is excluded from the "leyden" profile (used for native image compilation)
+- The UI is excluded from the "leyden" profile (used for AOT cache compilation)
+
+### Important: Spring Boot Profiles
+
+**The Management UI will not be available if the `leyden` profile is active at runtime.**
+
+The `leyden` profile is only used during Docker image builds for AOT cache generation. If you encounter 404 errors when accessing the Management UI or API endpoints:
+
+1. Check that `SPRING_PROFILES_ACTIVE` environment variable does NOT include `leyden`
+2. Remove `leyden` from your docker-compose.yml if present
+3. Restart the container
+
+**Default behavior (recommended):** Do not set `SPRING_PROFILES_ACTIVE` at all, which ensures the Management UI is enabled.
 
 ## Troubleshooting
 

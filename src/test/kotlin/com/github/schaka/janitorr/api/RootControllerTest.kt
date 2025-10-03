@@ -12,7 +12,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(RootController::class)
 @ActiveProfiles("test")
-@Import(RootController::class)
 class RootControllerTest {
 
     @Autowired

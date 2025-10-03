@@ -10,6 +10,8 @@
     <img src="images/logos/janitorr_icon.png" width=384>
 </p>
 
+> **Note**: This is a community-maintained fork of [schaka/janitorr](https://github.com/schaka/janitorr) with additional features including a Management Web UI and comprehensive multi-language documentation. See [FORK_CHANGES.md](FORK_CHANGES.md) for details.
+
 ### Inspiration
 
 This application is heavily inspired by (but not a fork of) [Maintainerr](https://github.com/jorenn92/Maintainerr).
@@ -53,6 +55,15 @@ Comprehensive documentation is available in multiple languages:
   - [Guía de Configuración](docs/wiki/es/Guia-Configuracion.md)
   - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
   - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
+
+### Fork-Specific Documentation
+
+This fork includes additional documentation:
+
+- **[FORK_CHANGES.md](FORK_CHANGES.md)** - Complete list of features added in this fork
+- **[MANAGEMENT_UI.md](MANAGEMENT_UI.md)** - Documentation for the web-based management interface
+- **[UPSTREAM_SYNC_STATUS.md](UPSTREAM_SYNC_STATUS.md)** - Sync status with upstream repository
+- **[FORK_MAINTENANCE.md](FORK_MAINTENANCE.md)** - Quick reference guide for fork maintenance
 
 ## Features
 

@@ -77,7 +77,7 @@ class NotificationServiceImpl(
     }
     
     override fun testNotification(channel: com.github.schaka.janitorr.notifications.NotificationChannel): Boolean {
-        val channelImpl = channels.find { it.getType() == channel.name }
+        val channelImpl = channels.find { it.getType().equals(channel.name, ignoreCase = true) }
         if (channelImpl == null) {
             log.warn("Channel ${channel.name} not configured or not enabled")
             return false

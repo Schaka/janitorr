@@ -69,7 +69,11 @@ class BasicAuthInterceptor(
             log.debug("Authenticated user: ${user.email} with role ${user.role}")
             
             // Update last login time
-            userService.updateLastLogin(user.id)
+            try {
+                userService.updateLastLogin(user.id)
+            } catch (e: Exception) {
+                log.warn("Failed to update last login for user ${user.id}: ${e.message}", e)
+            }
             
             return true
             

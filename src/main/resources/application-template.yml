@@ -4,6 +4,16 @@ logging:
   file: # Delete this line and the one below it, to disable file logging
     name: "/logs/janitorr.log"
 
+# Management UI Configuration
+# The web interface for monitoring and manually triggering cleanup operations
+management:
+  ui:
+    enabled: true # Set to false to disable the Management UI completely
+  endpoints:
+    web:
+      exposure:
+        include: health,info,management # Endpoints available through the API
+
 # File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to create "Leaving Soon" collections in Jellyfin
 # Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well

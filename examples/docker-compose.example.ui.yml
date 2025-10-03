@@ -14,6 +14,17 @@ services:
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
     environment:
+      # Management UI Configuration
+      - JANITORR_UI_ENABLED=true # Set to false to disable the web-based Management UI
+      
+      # Spring Boot Configuration (optional)
+      # - SPRING_PROFILES_ACTIVE=management,ui # Activate specific Spring profiles if needed
+      # - SERVER_PORT=8080 # Change the internal port if needed (must also update port mapping)
+      
+      # Management Endpoints Configuration (optional)
+      # - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,management # Control which endpoints are exposed
+      
+      # Health Check Configuration
       # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
       - THC_PATH=/health
       - THC_PORT=8081
@@ -116,3 +127,29 @@ services:
 
     depends_on:
       - jellystat-db
+
+# Example: Janitorr with Management UI disabled
+# Uncomment the section below if you want to run Janitorr without the web interface
+#  janitorr-no-ui:
+#    container_name: janitorr-no-ui
+#    image: ghcr.io/carcheky/janitorr:jvm-main
+#    user: 1000:1000
+#    mem_limit: 256M
+#    mem_swappiness: 0
+#    volumes:
+#      - /appdata/janitorr/config/application.yml:/config/application.yml
+#      - /appdata/janitorr/logs:/logs
+#      - /share_media:/data
+#    environment:
+#      # Disable Management UI
+#      - JANITORR_UI_ENABLED=false
+#      
+#      # Health Check Configuration
+#      - THC_PATH=/health
+#      - THC_PORT=8081
+#    healthcheck:
+#      test: [ "CMD", "/workspace/health-check" ]
+#      start_period: 30s
+#      interval: 5s
+#      retries: 3
+

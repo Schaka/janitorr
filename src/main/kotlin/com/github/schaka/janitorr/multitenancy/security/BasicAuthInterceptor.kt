@@ -104,7 +104,8 @@ class BasicAuthInterceptor(
     
     private fun sendUnauthorized(response: HttpServletResponse, message: String) {
         response.status = HttpServletResponse.SC_UNAUTHORIZED
-        response.setHeader("WWW-Authenticate", "Basic realm=\"Janitorr Multi-Tenancy API\"")
+        response.setHeader("WWW-Authenticate", "Basic realm=\"Janitorr Multi-Tenancy API\", charset=\"UTF-8\"")
+        response.characterEncoding = "UTF-8"
         response.contentType = "application/json"
         response.writer.write("""{"error": "Unauthorized", "message": "$message"}""")
     }

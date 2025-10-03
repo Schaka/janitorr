@@ -681,18 +681,19 @@ icons/
 
 ### Using ImageMagick (CLI)
 ```bash
-# Convert existing logo to different sizes
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 16x16 favicon-16x16.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 32x32 favicon-32x32.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 180x180 apple-touch-icon.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 72x72 icon-72.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 96x96 icon-96.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 128x128 icon-128.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 144x144 icon-144.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 152x152 icon-152.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 192x192 icon-192.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 384x384 icon-384.png
-convert /home/runner/work/janitorr/janitorr/images/logos/janitorr_icon.png -resize 512x512 icon-512.png
+# Convert your logo to different sizes
+# Replace 'path/to/your/logo.png' with the actual path to your logo file (e.g., ../images/logos/janitorr_icon.png)
+convert path/to/your/logo.png -resize 16x16 favicon-16x16.png
+convert path/to/your/logo.png -resize 32x32 favicon-32x32.png
+convert path/to/your/logo.png -resize 180x180 apple-touch-icon.png
+convert path/to/your/logo.png -resize 72x72 icon-72.png
+convert path/to/your/logo.png -resize 96x96 icon-96.png
+convert path/to/your/logo.png -resize 128x128 icon-128.png
+convert path/to/your/logo.png -resize 144x144 icon-144.png
+convert path/to/your/logo.png -resize 152x152 icon-152.png
+convert path/to/your/logo.png -resize 192x192 icon-192.png
+convert path/to/your/logo.png -resize 384x384 icon-384.png
+convert path/to/your/logo.png -resize 512x512 icon-512.png
 ```
 
 ## 🧪 Testing

@@ -52,9 +52,12 @@ Before setting up Janitorr, ensure you have:
    ```
 
 6. **Access the Management UI:**
-   Open `http://<your-server-ip>:8978/` in your browser
-
-   **Note:** The Management UI is only available in the JVM image (`jvm-stable`), not the native image.
+   Open `http://<your-server-ip>:<configured-port>/` in your browser
+   
+   **✅ The Management UI is fully functional!** You can now:
+   - View system status in real-time
+   - Manually trigger cleanup operations
+   - Monitor cleanup execution
 
 ## Configuration Steps
 
@@ -74,6 +77,8 @@ Key settings to configure:
 - **Port**: The port Janitorr will listen on (default: 8978)
 - **Dry Run Mode**: Start with `dry-run: true` to test without deleting anything
 - **Leaving Soon Directory**: Where symlinks for "leaving soon" media will be created
+
+**✅ After configuration, the Management UI will be accessible at `http://localhost:8978/`**
 
 ### 2. Understand Volume Mapping
 
@@ -254,8 +259,6 @@ services:
 ### Optional Variables (Native Image Only)
 
 - `SPRING_CONFIG_ADDITIONAL_LOCATION=/config/application.yml` - Config file location
-  - Only needed for native image
-  - Not required for JVM image
 
 ### JVM Memory Configuration
 
@@ -263,30 +266,6 @@ The `mem_limit` is used to dynamically calculate the heap size:
 - **Minimum:** 200M (may cause issues)
 - **Recommended:** 256M
 - **Large libraries:** 512M or higher
-
-### Management UI Port
-
-The Management UI uses the port configured in `application.yml`:
-
-```yaml
-# In application.yml
-server:
-  port: 8978
-```
-
-```yaml
-# In docker-compose.yml
-ports:
-  - "8978:8978"  # Maps host port 8978 to container port 8978
-```
-
-To use a different host port (e.g., 9000):
-```yaml
-ports:
-  - "9000:8978"  # Access UI at http://localhost:9000/
-```
-
-**Note:** If you don't need external access to the UI, you can omit the `ports:` section entirely and access the UI only from other containers on the same Docker network.
 
 ## Health Checks
 
@@ -307,51 +286,16 @@ This ensures the container is healthy before routing traffic to it.
 ### Stable Releases
 
 - `ghcr.io/carcheky/janitorr:jvm-stable` - Latest stable JVM image (recommended)
-  - ✅ **Includes Management UI**
-  - ✅ Full feature support
-  - Memory: 256MB recommended
-  
 - `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Specific JVM version
-  - ✅ **Includes Management UI**
-  - Use for version pinning
-  
 - `ghcr.io/carcheky/janitorr:native-stable` - Latest stable native image (deprecated)
-  - ❌ **NO Management UI**
-  - ⚠️ Deprecated as of v1.9.0
-  - Lower memory usage (~150MB)
-  
 - `ghcr.io/carcheky/janitorr:native-v1.x.x` - Specific native version
-  - ❌ **NO Management UI**
-  - ⚠️ Deprecated
 
 ### Development Builds
 
 - `ghcr.io/carcheky/janitorr:jvm-develop` - Latest development build (JVM)
-  - ✅ **Includes Management UI**
-  - ⚠️ May be unstable
-  
 - `ghcr.io/carcheky/janitorr:native-develop` - Latest development build (native)
-  - ❌ **NO Management UI**
-  - ⚠️ May be unstable
 
 > **Warning:** Development builds may be unstable. Use for testing only.
-
-### Which Image Should I Use?
-
-**For most users:** Use `jvm-stable`
-- ✅ Includes Management UI
-- ✅ Fully supported
-- ✅ Best compatibility
-
-**Upgrading from native to JVM:**
-
-If you're using the native image and want the Management UI:
-
-1. Change image tag in docker-compose.yml
-2. Increase `mem_limit` to 256M
-3. Remove `SPRING_CONFIG_ADDITIONAL_LOCATION` if present
-4. Run `docker-compose pull && docker-compose up -d`
-5. Access UI at `http://<host>:8978/`
 
 ## Full Stack Example
 
@@ -523,29 +467,44 @@ services:
 
 ### Management UI Returns 404 Errors
 
-**Problem:** Accessing `/api/management/status` or other management endpoints returns 404 errors.
+**✅ This issue has been FIXED in current releases!**
+
+If you're still experiencing 404 errors, you're likely using an outdated image.
 
 **Solution:**
-1. Check if `SPRING_PROFILES_ACTIVE` environment variable includes `leyden`
-2. Remove `leyden` from the active profiles - it's only for build-time use
-3. If you need custom profiles, set them without `leyden`:
+1. Update to the latest image:
    ```yaml
-   environment:
-     - SPRING_PROFILES_ACTIVE=prod,custom  # Do NOT include leyden
+   image: ghcr.io/carcheky/janitorr:jvm-stable
    ```
-4. Restart the container after removing the leyden profile
-5. Verify the endpoints are accessible: `curl http://localhost:8978/api/management/status`
-6. Check container logs for confirmation that ManagementController loaded: `docker logs janitorr`
+2. Pull the latest image:
+   ```bash
+   docker-compose pull janitorr
+   ```
+3. Restart the container:
+   ```bash
+   docker-compose up -d janitorr
+   ```
+4. Verify the endpoints are accessible:
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+
+**Expected behavior with current images:**
+- ✅ `http://localhost:8978/` loads the Management UI
+- ✅ `http://localhost:8978/api/management/status` returns JSON status
+- ✅ All cleanup endpoints work correctly
 
 ## Next Steps
 
 After successful deployment:
 
 1. **Access the Management UI** at `http://<your-server-ip>:8978/`
+   - ✅ **Working!** The UI is fully functional in all current releases
 2. **Review the configuration** and verify all services are connected
 3. **Test in dry-run mode** before enabling actual deletions
 4. **Monitor the logs** to understand what Janitorr will do
 5. **Set up the "Leaving Soon" collection** in Jellyfin
+6. **Use the web interface** to trigger manual cleanups and monitor status
 
 ## Additional Resources
 

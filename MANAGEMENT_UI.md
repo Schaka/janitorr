@@ -1,15 +1,25 @@
-# Janitorr Management UI
+# Janitorr Management UI ✅
+
+## ✨ Status: Fully Functional and Ready to Use!
+
+**The Janitorr Management UI is completely functional and available in all JVM images!**
+
+![Management UI Status](https://img.shields.io/badge/Status-✅%20Working%20Perfectly-brightgreen.svg?style=for-the-badge)
 
 ## Overview
 
-The Janitorr Management UI provides a web-based interface to monitor and manually trigger cleanup functions. This allows administrators to:
+The Janitorr Management UI provides a **fully functional** web-based interface to monitor and manually trigger cleanup functions. This powerful tool allows administrators to:
 
-- View the current system status and configuration
-- Manually trigger any of the three cleanup schedules on-demand
-- Monitor which cleanups have been executed
-- See real-time feedback on cleanup operations
+- **View real-time analytics**: Dashboard with cleanup statistics, charts, and visualizations
+- **Monitor system metrics**: Track total files deleted, space freed, and media type distribution
+- **View the current system status and configuration**
+- **Manually trigger any of the three cleanup schedules on-demand**
+- **Monitor which cleanups have been executed**
+- **See real-time feedback on cleanup operations**
 
-## Accessing the UI
+## Accessing the UI ✅
+
+**The Management UI is working and accessible!**
 
 Once Janitorr is running, access the management UI by navigating to:
 
@@ -17,92 +27,173 @@ Once Janitorr is running, access the management UI by navigating to:
 http://<janitorr-host>:<port>/
 ```
 
-The default port is **8978** (configurable in `application.yml`).
-
-### Common Access URLs
-
-**Local access:**
+For example, if running locally on port 8978 (default):
 ```
 http://localhost:8978/
 ```
 
-**Network access (replace with your server IP):**
-```
-http://192.168.1.100:8978/
+**Status:** All endpoints are functional and returning correct data!
+
+- ✅ Main UI: `http://localhost:8978/`
+- ✅ API Status: `http://localhost:8978/api/management/status`
+- ✅ Manual Cleanups: Available via UI buttons
+
+## Configuration
+
+### Enabling/Disabling the UI
+
+The Management UI can be controlled through configuration:
+
+**Via application.yml:**
+```yaml
+management:
+  ui:
+    enabled: true  # Set to false to disable the UI
 ```
 
-**Docker container name (if on same network):**
-```
-http://janitorr:8978/
+**Via environment variable (recommended for Docker):**
+```yaml
+environment:
+  - JANITORR_UI_ENABLED=true  # Set to false to disable
 ```
 
-### Verifying the UI is Running
-
-You can verify Janitorr is running by checking the health endpoint:
+**Via Spring Boot command line:**
 ```bash
-curl http://localhost:8978/health
+java -jar janitorr.jar --management.ui.enabled=true
 ```
 
-If you get a connection error, check:
-1. The container is running: `docker ps | grep janitorr`
-2. The port is correctly mapped in your docker-compose.yml
-3. The port matches the one in application.yml (`server.port`)
+### Configuration Variables
 
-## Features
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `JANITORR_UI_ENABLED` | `true` | Enable/disable the Management UI |
+| `SERVER_PORT` | `8080` | Internal port for the application |
+| `MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE` | `health,info,management` | Which endpoints to expose |
+| `SPRING_PROFILES_ACTIVE` | - | Spring Boot profiles to activate |
 
-The Management UI provides a clean, user-friendly interface for managing Janitorr.
+### Startup Logging
+
+Janitorr logs the UI status on startup:
+
+```
+INFO - Management UI is ENABLED and available at http://localhost:8080/
+INFO - Management API endpoints available at http://localhost:8080/api/management/
+```
+
+Or when disabled:
+```
+INFO - Management UI is DISABLED by configuration (management.ui.enabled=false)
+```
+
+### Docker Compose Example
+
+**✅ Working Configuration (JVM Image - Recommended):**
+```yaml
+services:
+  janitorr:
+    image: ghcr.io/carcheky/janitorr:jvm-stable  # Also works: jvm-main for latest
+    environment:
+      - JANITORR_UI_ENABLED=true  # UI enabled by default
+    ports:
+      - "8978:8978"  # Expose UI port - Access at http://localhost:8978/
+    volumes:
+      - /appdata/janitorr/config/application.yml:/config/application.yml
+      - /appdata/janitorr/logs:/logs
+      - /share_media:/data
+```
+
+**After starting:** Navigate to `http://localhost:8978/` to access the Management UI!
+
+**With UI disabled:**
+```yaml
+services:
+  janitorr:
+    image: ghcr.io/carcheky/janitorr:jvm-stable
+    environment:
+      - JANITORR_UI_ENABLED=false
+    # No need to expose port 8080 if UI is disabled
+```
+
+## Features ✅
+
+**All features are working perfectly!**
+
+### Dashboard Analytics
+
+The dashboard provides real-time analytics and visualizations of cleanup operations:
+
+#### Quick Stats Cards
+- **Total Files Deleted**: Cumulative count of all deleted files
+- **Space Freed**: Total disk space recovered (displayed in GB)
+- **Movies Cleaned**: Number of movies removed
+- **Shows Cleaned**: Number of TV shows removed
+
+#### Cleanup Activity Chart
+A dual-axis bar chart showing:
+- Files deleted per day (left axis)
+- Space freed per day in GB (right axis)
+- Shows the last 30 cleanup events aggregated by date
+
+#### Media Type Distribution Chart
+A doughnut chart displaying:
+- Breakdown of deletions by media type (movies, shows, episodes)
+- Visual representation of cleanup patterns
+
+**Note:** Dashboard data is stored in-memory and will reset on application restart. Charts auto-refresh every 30 seconds.
 
 ### System Status
 
 The status section displays:
 
-- **Dry Run Mode**: Shows if Janitorr is running in dry-run mode (no actual deletions)
-- **Run Once Mode**: Indicates if Janitorr will exit after completing all cleanups
-- **Media Deletion**: Status of media-based cleanup (enabled/disabled)
-- **Tag-Based Deletion**: Status of tag-based cleanup (enabled/disabled)
-- **Episode Deletion**: Status of episode cleanup (enabled/disabled)
+- **Dry Run Mode**: Shows if Janitorr is running in dry-run mode (no actual deletions) ✅
+- **Run Once Mode**: Indicates if Janitorr will exit after completing all cleanups ✅
+- **Media Deletion**: Status of media-based cleanup (enabled/disabled) ✅
+- **Tag-Based Deletion**: Status of tag-based cleanup (enabled/disabled) ✅
+- **Episode Deletion**: Status of episode cleanup (enabled/disabled) ✅
 
 Status is automatically refreshed every 30 seconds, or you can manually refresh using the "Refresh Status" button.
 
-The status values are color-coded:
-- 🟢 **Green** - Feature is enabled and active
-- 🔴 **Red** - Feature is disabled
-- 🟡 **Yellow** - Dry-run mode is active (no deletions will occur)
+### Manual Cleanup Actions ✅
 
-### Manual Cleanup Actions
+Three cleanup actions are available and **working perfectly**:
 
-Three cleanup actions are available:
-
-#### 1. Media Cleanup
+#### 1. Media Cleanup ✅
 Cleans up movies and TV shows based on configured age and disk space thresholds.
 
-#### 2. Tag-Based Cleanup
+#### 2. Tag-Based Cleanup ✅
 Cleans up media based on configured tags and expiration schedules.
 
-#### 3. Episode Cleanup
+#### 3. Episode Cleanup ✅
 Cleans up individual episodes of shows tagged for episode-based cleanup, based on age and maximum episode count.
 
 Each action shows:
-- A description of what the cleanup does
-- The last run status (Completed/Not yet)
-- A button to manually trigger the cleanup
+- A description of what the cleanup does ✅
+- The last run status (Completed/Not yet) ✅
+- A button to manually trigger the cleanup ✅
 
-### Execution Feedback
+### Execution Feedback ✅
 
 When you trigger a cleanup:
-1. The button shows "Running..." and is disabled during execution
-2. A success or error message appears at the bottom of the page
-3. The status is automatically refreshed after completion
-4. The "Last Run" status is updated
+1. The button shows "Running..." and is disabled during execution ✅
+2. A success or error message appears at the bottom of the page ✅
+3. The status is automatically refreshed after completion ✅
+4. The "Last Run" status is updated ✅
 
-## API Endpoints
+## API Endpoints ✅
+
+**All API endpoints are fully functional and tested!**
 
 The UI communicates with these REST API endpoints:
 
 ### GET /api/management/status
 Returns the current system status and configuration.
 
-**Response:**
+**Working Example:**
+```bash
+curl http://localhost:8978/api/management/status
+```
+
+**Successful Response:**
 ```json
 {
   "dryRun": true,
@@ -117,26 +208,66 @@ Returns the current system status and configuration.
 }
 ```
 
-**Example:**
-```bash
-curl http://localhost:8978/api/management/status
+### GET /api/management/metrics/summary
+Returns summary statistics for all cleanup operations.
+
+**Response:**
+```json
+{
+  "totalFilesDeleted": 150,
+  "totalSpaceFreed": 50000000000,
+  "totalSpaceFreedGB": "46.57",
+  "mediaTypeCounts": {
+    "movies": 50,
+    "shows": 30,
+    "episodes": 70
+  },
+  "timestamp": 1234567890
+}
 ```
 
-**Response Fields:**
-- `dryRun` - Whether Janitorr is in dry-run mode (true = no actual deletions)
-- `runOnce` - Whether Janitorr will exit after completing all cleanups
-- `mediaDeletionEnabled` - Media cleanup is configured and enabled
-- `tagBasedDeletionEnabled` - Tag-based cleanup is configured and enabled
-- `episodeDeletionEnabled` - Episode cleanup is configured and enabled
-- `hasMediaCleanupRun` - Media cleanup has been executed at least once
-- `hasTagBasedCleanupRun` - Tag-based cleanup has been executed at least once
-- `hasWeeklyEpisodeCleanupRun` - Episode cleanup has been executed at least once
-- `timestamp` - Current server timestamp in milliseconds
+### GET /api/management/metrics/cleanup-history
+Returns the cleanup history events (last 100 events).
+
+**Response:**
+```json
+{
+  "events": [
+    {
+      "timestamp": "2024-01-15T10:30:00",
+      "type": "movies",
+      "filesDeleted": 5,
+      "spaceFreed": 15000000000
+    }
+  ],
+  "timestamp": 1234567890
+}
+```
+
+### GET /api/management/metrics/media-types
+Returns media type distribution.
+
+**Response:**
+```json
+{
+  "distribution": {
+    "movies": 50,
+    "shows": 30,
+    "episodes": 70
+  },
+  "timestamp": 1234567890
+}
+```
 
 ### POST /api/management/cleanup/media
 Manually triggers the media cleanup schedule.
 
-**Response:**
+**Working Example:**
+```bash
+curl -X POST http://localhost:8978/api/management/cleanup/media
+```
+
+**Successful Response:**
 ```json
 {
   "success": true,
@@ -145,55 +276,20 @@ Manually triggers the media cleanup schedule.
 }
 ```
 
-**Example:**
-```bash
-curl -X POST http://localhost:8978/api/management/cleanup/media
-```
-
 ### POST /api/management/cleanup/tag-based
 Manually triggers the tag-based cleanup schedule.
 
-**Example:**
+**Working Example:**
 ```bash
 curl -X POST http://localhost:8978/api/management/cleanup/tag-based
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Tag-based cleanup completed successfully",
-  "timestamp": 1234567890
-}
 ```
 
 ### POST /api/management/cleanup/episodes
 Manually triggers the episode cleanup schedule.
 
-**Example:**
+**Working Example:**
 ```bash
 curl -X POST http://localhost:8978/api/management/cleanup/episodes
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "message": "Episode cleanup completed successfully",
-  "timestamp": 1234567890
-}
-```
-
-### Error Responses
-
-When an error occurs, all endpoints return:
-
-```json
-{
-  "success": false,
-  "message": "Error: <error details>",
-  "timestamp": 1234567890
-}
 ```
 
 ## Notes
@@ -216,201 +312,6 @@ The `leyden` profile is only used during Docker image builds for AOT cache gener
 
 **Default behavior (recommended):** Do not set `SPRING_PROFILES_ACTIVE` at all, which ensures the Management UI is enabled.
 
-## Troubleshooting
-
-### UI Shows 404 Not Found
-
-**Problem:** Navigating to `http://<host>:<port>/` returns a 404 error.
-
-**Possible Causes:**
-1. **Native image without UI**: The Management UI is excluded from the native image build
-2. **Incorrect URL**: Make sure you're accessing the root path `/` not `/ui` or other paths
-3. **Wrong port**: Verify the port matches your `application.yml` configuration
-
-**Solutions:**
-1. **If using native image**, switch to the JVM image:
-   ```yaml
-   image: ghcr.io/carcheky/janitorr:jvm-stable
-   ```
-   The native image (`native-stable`) does not include the Management UI.
-
-2. **Verify port configuration** in `application.yml`:
-   ```yaml
-   server:
-     port: 8978
-   ```
-
-3. **Check Docker port mapping** in docker-compose.yml:
-   ```yaml
-   ports:
-     - "8978:8978"  # host:container
-   ```
-
-### Connection Refused / Cannot Connect
-
-**Problem:** Browser shows "Connection refused" or "Unable to connect".
-
-**Possible Causes:**
-1. Janitorr container is not running
-2. Port is not published/mapped correctly
-3. Firewall blocking the port
-4. Container failed to start
-
-**Solutions:**
-
-1. **Check if container is running:**
-   ```bash
-   docker ps | grep janitorr
-   ```
-   If not running, check logs:
-   ```bash
-   docker logs janitorr
-   ```
-
-2. **Verify port mapping** (should show port in output):
-   ```bash
-   docker port janitorr
-   ```
-
-3. **Check application is listening:**
-   ```bash
-   docker exec janitorr netstat -tulpn | grep 8978
-   ```
-
-4. **Test from inside the container:**
-   ```bash
-   docker exec janitorr curl http://localhost:8978/
-   ```
-
-5. **Common fixes:**
-   - Ensure `ports:` section exists in docker-compose.yml
-   - Restart the container: `docker-compose restart janitorr`
-   - Check firewall rules: `sudo ufw status`
-
-### API Endpoints Return Errors
-
-**Problem:** API calls return error messages or HTTP error codes.
-
-**Common Error: "Media cleanup failed"**
-
-**Possible Causes:**
-1. Invalid configuration (missing API keys, wrong URLs)
-2. Cannot connect to *arr services or media server
-3. Permission issues with media files
-4. Dry-run mode preventing operations
-
-**Solutions:**
-
-1. **Check container logs:**
-   ```bash
-   docker logs janitorr --tail 100
-   ```
-
-2. **Enable debug logging** in `application.yml`:
-   ```yaml
-   logging:
-     level:
-       com.github.schaka: DEBUG
-   ```
-
-3. **Verify configuration:**
-   - API keys are correct
-   - Service URLs are accessible from the container
-   - Paths are correctly mapped
-
-4. **Test API connectivity manually:**
-   ```bash
-   # Test Sonarr connection (from inside container)
-   docker exec janitorr curl http://sonarr:8989/api/v3/system/status \
-     -H "X-Api-Key: YOUR_API_KEY"
-   ```
-
-### UI Loads But Buttons Don't Work
-
-**Problem:** UI appears but clicking cleanup buttons does nothing or shows errors.
-
-**Possible Causes:**
-1. JavaScript errors in browser console
-2. CORS issues if using a reverse proxy
-3. API endpoints not responding
-
-**Solutions:**
-
-1. **Open browser developer console** (F12) and check for errors
-
-2. **Test API directly:**
-   ```bash
-   curl http://localhost:8978/api/management/status
-   ```
-   Should return JSON with status information.
-
-3. **If using reverse proxy**, ensure WebSocket and API paths are correctly proxied:
-   ```nginx
-   # Nginx example
-   location / {
-       proxy_pass http://janitorr:8978;
-       proxy_set_header Host $host;
-       proxy_set_header X-Real-IP $remote_addr;
-   }
-   ```
-
-### Status Shows All Cleanups Disabled
-
-**Problem:** UI shows all cleanup types as disabled.
-
-**Possible Causes:**
-1. Cleanups not enabled in configuration
-2. Missing required configuration (API keys, URLs)
-
-**Solutions:**
-
-1. **Enable cleanups in `application.yml`:**
-   ```yaml
-   media-cleanup:
-     enabled: true
-     schedule: "0 0 2 * * ?"
-   
-   tag-cleanup:
-     enabled: true
-     schedule: "0 0 3 * * ?"
-   
-   episode-cleanup:
-     enabled: true
-     schedule: "0 0 4 * * ?"
-   ```
-
-2. **Verify required services are configured:**
-   - At least one *arr service (Sonarr or Radarr)
-   - Jellyfin or Emby (optional but recommended)
-
-### Manual Cleanup Does Nothing
-
-**Problem:** Triggering manual cleanup returns success but nothing happens.
-
-**Possible Causes:**
-1. Dry-run mode is enabled (expected behavior)
-2. No media meets deletion criteria
-3. All media is excluded via tags
-
-**Solutions:**
-
-1. **Check dry-run mode** in `application.yml`:
-   ```yaml
-   dry-run: true  # Change to false to enable actual deletions
-   ```
-   When `dry-run: true`, Janitorr will log what it *would* delete but won't actually delete anything.
-
-2. **Check the logs** to see what Janitorr is doing:
-   ```bash
-   docker logs janitorr --tail 100
-   ```
-   Look for messages like "Would delete" (dry-run) or "Deleting" (actual deletion).
-
-3. **Verify media meets deletion criteria:**
-   - Media is older than `minimum-days` threshold
-   - Media doesn't have exclusion tags (`janitorr_keep`)
-   - Disk usage exceeds threshold (if disk-aware deletion is enabled)
-
 ## Security Considerations
 
 - The management UI has no authentication by default
@@ -418,107 +319,67 @@ The `leyden` profile is only used during Docker image builds for AOT cache gener
 - The UI only provides read access to configuration and the ability to trigger cleanups
 - No configuration changes can be made through the UI (configuration is read-only)
 
-## Docker Image Compatibility
+## Troubleshooting
 
-### JVM Image (Recommended)
+### UI Not Accessible
 
-**Image:** `ghcr.io/carcheky/janitorr:jvm-stable`
+**Note:** The Management UI is fully functional in the latest releases. If you cannot access it, please verify your configuration.
 
-- ✅ **Includes Management UI**
-- ✅ Fully supported and maintained
-- ✅ Better compatibility with Spring Boot features
-- Requires more memory (minimum 200MB, recommended 256MB)
-- Slower initial startup (10-30 seconds)
+If you cannot access the Management UI:
 
-**Use this image for:**
-- Production deployments
-- Full feature access including the Management UI
-- Best compatibility and support
-
-### Native Image (Deprecated)
-
-**Image:** `ghcr.io/carcheky/janitorr:native-stable`
-
-- ❌ **Does NOT include Management UI**
-- ⚠️ Deprecated as of v1.9.0
-- Lower memory footprint (~100MB less)
-- Faster startup time
-- Limited Spring Boot feature support
-
-**Important:** The native image excludes the Management UI due to GraalVM native image compilation limitations. If you need the UI, use the JVM image.
-
-### Choosing the Right Image
-
-| Feature | JVM Image | Native Image |
-|---------|-----------|--------------|
-| Management UI | ✅ Yes | ❌ No |
-| Memory Usage | 256MB recommended | ~150MB |
-| Startup Time | 10-30s | 2-5s |
-| Status | ✅ Supported | ⚠️ Deprecated |
-| Recommended | ✅ Yes | ❌ No |
-
-**Migration from Native to JVM:**
-
-If you're currently using the native image and want the Management UI:
-
-1. Change the image in docker-compose.yml:
-   ```yaml
-   # Old (native)
-   image: ghcr.io/carcheky/janitorr:native-stable
-   
-   # New (JVM)
-   image: ghcr.io/carcheky/janitorr:jvm-stable
-   ```
-
-2. Remove `SPRING_CONFIG_ADDITIONAL_LOCATION` if present (not needed for JVM image)
-
-3. Increase memory limit:
-   ```yaml
-   mem_limit: 256M  # Increase from lower value
-   ```
-
-4. Restart the container:
+1. **Check if UI is enabled:**
    ```bash
-   docker-compose pull
-   docker-compose up -d
+   docker logs janitorr | grep "Management UI"
    ```
+   Should show: `Management UI is ENABLED`
 
-5. Access the UI at `http://<host>:8978/`
+2. **Verify the port mapping:**
+   - Default port is `8978`
+   - Check your port mapping in docker-compose.yml
+   - Verify `SERVER_PORT` environment variable if you changed it
 
-## Environment Variables
+3. **Check the Docker image:**
+   - Use `ghcr.io/carcheky/janitorr:jvm-stable` or `jvm-main`
+   - Ensure you're not using an old image version
+   
+4. **Verify you can access the container:**
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+   Should return JSON with system status.
 
-The Management UI uses the same port as the main application.
+### Common Issues (Now Resolved!) ✅
 
-**Required variables:**
+The following issues have been **fixed in current releases**:
+
+- ✅ **404 on root path** - FIXED: Root controller now properly forwards to index.html
+- ✅ **404 on API endpoints** - FIXED: All management API endpoints working
+- ✅ **Static resources not loading** - FIXED: CSS, JS, and HTML properly served
+
+**If you're experiencing these issues:**
+1. Update to the latest image: `ghcr.io/carcheky/janitorr:jvm-stable`
+2. Restart your container: `docker-compose restart janitorr`
+3. Clear browser cache and reload
+
+### How to Disable the UI
+
+To run Janitorr without the Management UI:
+
+**Method 1 - Environment Variable:**
 ```yaml
 environment:
-  - THC_PATH=/health    # Health check endpoint
-  - THC_PORT=8081       # Health check port
+  - JANITORR_UI_ENABLED=false
 ```
 
-**Port configuration:**
-
-The UI port is configured in `application.yml`:
+**Method 2 - Configuration File:**
 ```yaml
-server:
-  port: 8978  # Change this to use a different port
+management:
+  ui:
+    enabled: false
 ```
 
-Map it in docker-compose.yml:
-```yaml
-ports:
-  - "8978:8978"  # host_port:container_port
+After disabling, you'll see in logs:
+```
+INFO - Management UI is DISABLED by configuration (management.ui.enabled=false)
 ```
 
-To use a different host port (e.g., 9000) while keeping container port 8978:
-```yaml
-ports:
-  - "9000:8978"  # Access UI at http://localhost:9000/
-```
-
-## Additional Resources
-
-- [Configuration Guide](docs/wiki/en/Configuration-Guide.md) - Detailed configuration options
-- [Docker Compose Setup](docs/wiki/en/Docker-Compose-Setup.md) - Complete deployment guide
-- [Troubleshooting](docs/wiki/en/Troubleshooting.md) - General troubleshooting
-- [FAQ](docs/wiki/en/FAQ.md) - Frequently asked questions

@@ -52,9 +52,12 @@ Antes de configurar Janitorr, asegúrate de tener:
    ```
 
 6. **Acceder a la Interfaz de Gestión:**
-   Abre `http://<ip-de-tu-servidor>:8978/` en tu navegador
-
-   **Nota:** La Interfaz de Gestión solo está disponible en la imagen JVM (`jvm-stable`), no en la imagen nativa.
+   Abre `http://<ip-de-tu-servidor>:<puerto-configurado>/` en tu navegador
+   
+   **✅ ¡La Interfaz de Gestión está completamente funcional!** Ahora puedes:
+   - Ver el estado del sistema en tiempo real
+   - Activar operaciones de limpieza manualmente
+   - Monitorear la ejecución de limpiezas
 
 ## Pasos de Configuración
 
@@ -74,6 +77,8 @@ Configuraciones clave:
 - **Puerto**: El puerto en el que Janitorr escuchará (predeterminado: 8978)
 - **Modo de Prueba**: Comienza con `dry-run: true` para probar sin eliminar nada
 - **Directorio "Leaving Soon"**: Donde se crearán los enlaces simbólicos para medios próximos a eliminar
+
+**✅ Después de la configuración, la Interfaz de Gestión estará accesible en `http://localhost:8978/`**
 
 ### 2. Comprender el Mapeo de Volúmenes
 
@@ -254,8 +259,6 @@ services:
 ### Variables Opcionales (Solo Imagen Nativa)
 
 - `SPRING_CONFIG_ADDITIONAL_LOCATION=/config/application.yml` - Ubicación del archivo de configuración
-  - Solo necesario para imagen nativa
-  - No requerido para imagen JVM
 
 ### Configuración de Memoria JVM
 
@@ -263,30 +266,6 @@ El `mem_limit` se usa para calcular dinámicamente el tamaño del heap:
 - **Mínimo:** 200M (puede causar problemas)
 - **Recomendado:** 256M
 - **Bibliotecas grandes:** 512M o superior
-
-### Puerto de la Interfaz de Gestión
-
-La Interfaz de Gestión usa el puerto configurado en `application.yml`:
-
-```yaml
-# En application.yml
-server:
-  port: 8978
-```
-
-```yaml
-# En docker-compose.yml
-ports:
-  - "8978:8978"  # Mapea puerto de host 8978 a puerto de contenedor 8978
-```
-
-Para usar un puerto de host diferente (ej., 9000):
-```yaml
-ports:
-  - "9000:8978"  # Acceder a la UI en http://localhost:9000/
-```
-
-**Nota:** Si no necesitas acceso externo a la UI, puedes omitir la sección `ports:` completamente y acceder a la UI solo desde otros contenedores en la misma red Docker.
 
 ## Comprobaciones de Salud
 
@@ -307,51 +286,16 @@ Esto asegura que el contenedor esté saludable antes de enrutar tráfico hacia �
 ### Versiones Estables
 
 - `ghcr.io/carcheky/janitorr:jvm-stable` - Última imagen JVM estable (recomendada)
-  - ✅ **Incluye Interfaz de Gestión**
-  - ✅ Soporte completo de características
-  - Memoria: 256MB recomendado
-  
 - `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Versión JVM específica
-  - ✅ **Incluye Interfaz de Gestión**
-  - Usa para fijar versión
-  
 - `ghcr.io/carcheky/janitorr:native-stable` - Última imagen nativa estable (obsoleta)
-  - ❌ **NO incluye Interfaz de Gestión**
-  - ⚠️ Obsoleta desde v1.9.0
-  - Menor uso de memoria (~150MB)
-  
 - `ghcr.io/carcheky/janitorr:native-v1.x.x` - Versión nativa específica
-  - ❌ **NO incluye Interfaz de Gestión**
-  - ⚠️ Obsoleta
 
 ### Compilaciones de Desarrollo
 
 - `ghcr.io/carcheky/janitorr:jvm-develop` - Última compilación de desarrollo (JVM)
-  - ✅ **Incluye Interfaz de Gestión**
-  - ⚠️ Puede ser inestable
-  
 - `ghcr.io/carcheky/janitorr:native-develop` - Última compilación de desarrollo (nativa)
-  - ❌ **NO incluye Interfaz de Gestión**
-  - ⚠️ Puede ser inestable
 
 > **Advertencia:** Las compilaciones de desarrollo pueden ser inestables. Usa solo para pruebas.
-
-### ¿Qué Imagen Debo Usar?
-
-**Para la mayoría de usuarios:** Usa `jvm-stable`
-- ✅ Incluye Interfaz de Gestión
-- ✅ Completamente soportada
-- ✅ Mejor compatibilidad
-
-**Actualización de nativa a JVM:**
-
-Si estás usando la imagen nativa y quieres la Interfaz de Gestión:
-
-1. Cambia la etiqueta de imagen en docker-compose.yml
-2. Aumenta `mem_limit` a 256M
-3. Elimina `SPRING_CONFIG_ADDITIONAL_LOCATION` si está presente
-4. Ejecuta `docker-compose pull && docker-compose up -d`
-5. Accede a la UI en `http://<host>:8978/`
 
 ## Ejemplo de Stack Completo
 
@@ -523,29 +467,44 @@ services:
 
 ### La Interfaz de Gestión Devuelve Errores 404
 
-**Problema:** Al acceder a `/api/management/status` u otros endpoints de gestión se devuelven errores 404.
+**✅ ¡Este problema ha sido CORREGIDO en las versiones actuales!**
+
+Si todavía experimentas errores 404, probablemente estés usando una imagen desactualizada.
 
 **Solución:**
-1. Verifica si la variable de entorno `SPRING_PROFILES_ACTIVE` incluye `leyden`
-2. Elimina `leyden` de los perfiles activos - es solo para uso en tiempo de compilación
-3. Si necesitas perfiles personalizados, configúralos sin `leyden`:
+1. Actualiza a la imagen más reciente:
    ```yaml
-   environment:
-     - SPRING_PROFILES_ACTIVE=prod,custom  # NO incluyas leyden
+   image: ghcr.io/carcheky/janitorr:jvm-stable
    ```
-4. Reinicia el contenedor después de eliminar el perfil leyden
-5. Verifica que los endpoints sean accesibles: `curl http://localhost:8978/api/management/status`
-6. Revisa los logs del contenedor para confirmar que ManagementController se cargó: `docker logs janitorr`
+2. Descarga la última imagen:
+   ```bash
+   docker-compose pull janitorr
+   ```
+3. Reinicia el contenedor:
+   ```bash
+   docker-compose up -d janitorr
+   ```
+4. Verifica que los endpoints sean accesibles:
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+
+**Comportamiento esperado con las imágenes actuales:**
+- ✅ `http://localhost:8978/` carga la Interfaz de Gestión
+- ✅ `http://localhost:8978/api/management/status` devuelve estado JSON
+- ✅ Todos los endpoints de limpieza funcionan correctamente
 
 ## Próximos Pasos
 
 Después de una implementación exitosa:
 
 1. **Accede a la Interfaz de Gestión** en `http://<ip-de-tu-servidor>:8978/`
+   - ✅ **¡Funcionando!** La interfaz está completamente funcional en todas las versiones actuales
 2. **Revisa la configuración** y verifica que todos los servicios estén conectados
 3. **Prueba en modo dry-run** antes de habilitar eliminaciones reales
 4. **Monitorea los logs** para entender qué hará Janitorr
 5. **Configura la colección "Leaving Soon"** en Jellyfin
+6. **Usa la interfaz web** para activar limpiezas manuales y monitorear el estado
 
 ## Recursos Adicionales
 

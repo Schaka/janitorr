@@ -17,9 +17,9 @@ Once Janitorr is running, access the management UI by navigating to:
 http://<janitorr-host>:<port>/
 ```
 
-For example, if running locally on port 8080:
+For example, if running with the default port 8978:
 ```
-http://localhost:8080/
+http://localhost:8978/
 ```
 
 ## Features

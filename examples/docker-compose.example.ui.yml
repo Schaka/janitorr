@@ -21,7 +21,7 @@
 #    nano /appdata/janitorr/config/application.yml
 #
 # 4. Start the service:
-#    docker-compose -f docker-compose.example.ui.yml up -d
+#    docker-compose -f examples/docker-compose.example.ui.yml up -d
 #
 # 5. Access the Management UI:
 #    Open http://<your-server-ip>:8978/ in your browser

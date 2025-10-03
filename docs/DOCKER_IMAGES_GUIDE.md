@@ -220,5 +220,5 @@ Yes, this fork is fully compatible with upstream configurations. You can migrate
 
 ---
 
-**Última actualización / Last updated**: Octubre 3, 2025  
+**Última actualización / Last updated**: Octubre 10, 2025  
 **Versión del documento / Document version**: 1.0

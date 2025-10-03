@@ -490,93 +490,115 @@ Problemas comunes y sus soluciones al ejecutar Janitorr.
 
 ## Problemas de la Interfaz de Gestión
 
+**✅ Nota:** La Interfaz de Gestión está completamente funcional en las versiones actuales. La mayoría de los problemas comunes han sido resueltos.
+
 ### No Se Puede Acceder a la Interfaz
 
-**Síntomas:** No se puede acceder a la interfaz web en `http://localhost:8080/`
+**Síntomas:** No se puede acceder a la interfaz web en `http://localhost:8978/`
 
 **Soluciones:**
 
-1. **Verifica si la interfaz está habilitada:**
+1. **Verifica que estés usando la imagen más reciente:**
+   ```bash
+   docker-compose pull janitorr
+   docker-compose up -d janitorr
+   ```
+
+2. **Verifica si la interfaz está habilitada:**
    ```bash
    docker logs janitorr | grep "Management UI"
    ```
    
    Debería mostrar:
    ```
-   INFO - Management UI is ENABLED and available at http://localhost:8080/
+   INFO - Management UI is ENABLED and available at http://localhost:8978/
    ```
 
-2. **Verifica la variable de entorno:**
+3. **Verifica la variable de entorno:**
    ```bash
    docker exec janitorr printenv | grep JANITORR_UI_ENABLED
    ```
    
-   Debería devolver `JANITORR_UI_ENABLED=true`
+   Debería devolver `JANITORR_UI_ENABLED=true` (o nada, ya que true es el valor predeterminado)
 
-3. **Verifica el mapeo de puertos:**
+4. **Verifica el mapeo de puertos:**
    ```yaml
    ports:
-     - "8080:8080"  # Asegúrate de que esto esté en tu docker-compose.yml
+     - "8978:8978"  # Asegúrate de que esto esté en tu docker-compose.yml
    ```
 
-4. **Verifica el archivo de configuración:**
+5. **Prueba el endpoint:**
    ```bash
-   docker exec janitorr cat /config/application.yml | grep -A 3 "management:"
+   curl http://localhost:8978/api/management/status
    ```
    
-   Debería mostrar:
-   ```yaml
-   management:
-     ui:
-       enabled: true
-   ```
+   Debería devolver JSON con el estado del sistema.
 
 ### La Interfaz Muestra Error 404
 
+**✅ ¡Este problema ha sido CORREGIDO en las versiones actuales!**
+
+Si todavía ves errores 404 en la Interfaz de Gestión:
+
 **Síntomas:** Acceder a la URL raíz devuelve 404 No Encontrado
 
-**Causas Comunes:**
-- La interfaz está deshabilitada
-- Usando el perfil `leyden` (compilación de imagen nativa)
-- Recursos estáticos no disponibles
+**Solución:**
 
-**Soluciones:**
-
-1. **Habilita la interfaz mediante variable de entorno:**
-   ```yaml
-   environment:
-     - JANITORR_UI_ENABLED=true
-   ```
-
-2. **Verifica los perfiles activos:**
+1. **Actualiza a la imagen más reciente:**
    ```bash
-   docker logs janitorr | grep "spring.profiles.active"
+   docker-compose pull janitorr
+   docker-compose up -d janitorr
    ```
    
-   Si ves el perfil `leyden`, la interfaz está deshabilitada por diseño.
-
-3. **Reinicia el contenedor después de cambiar la configuración:**
-   ```bash
-   docker-compose restart janitorr
+2. **Verifica la etiqueta de imagen:**
+   ```yaml
+   image: ghcr.io/carcheky/janitorr:jvm-stable  # Usa esta o jvm-main
    ```
+
+3. **Limpia la caché del navegador y vuelve a intentar**
+
+**Comportamiento esperado con las imágenes actuales:**
+- ✅ `http://localhost:8978/` muestra la Interfaz de Gestión
+- ✅ Todos los botones y funciones trabajan correctamente
+- ✅ Los endpoints de API devuelven respuestas adecuadas
 
 ### Los Endpoints de la API Devuelven 404
 
-**Síntomas:** `/api/management/status` devuelve 404
+**✅ ¡Este problema ha sido CORREGIDO en las versiones actuales!**
+
+Si `/api/management/status` devuelve 404:
+
+**Solución:**
+1. **Actualiza a la imagen más reciente** como se describe arriba
+2. **Verifica el endpoint:**
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+3. **Revisa los logs del contenedor:**
+   ```bash
+   docker logs janitorr | grep "Management"
+   ```
+
+### Las Funciones de la Interfaz No Funcionan
+
+**Síntomas:** Los botones no responden o las limpiezas no se activan
 
 **Soluciones:**
 
-1. **Verifica que la interfaz esté habilitada** (igual que arriba)
+1. **Verifica errores en la consola del navegador:**
+   - Abre las herramientas de desarrollo del navegador (F12)
+   - Busca errores de JavaScript en la pestaña Console
 
-2. **Verifica que el controlador esté cargado:**
+2. **Verifica la conectividad de la API:**
    ```bash
-   docker logs janitorr | grep ManagementController
+   curl -X POST http://localhost:8978/api/management/cleanup/media
    ```
 
-3. **Prueba con curl:**
+3. **Revisa los logs de Janitorr:**
    ```bash
-   curl http://localhost:8080/api/management/status
+   docker logs -f janitorr
    ```
+   Observa los mensajes de ejecución de limpieza.
 
 ### Deshabilitar la Interfaz
 

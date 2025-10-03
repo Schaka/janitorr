@@ -129,4 +129,23 @@ clients:
     enabled: false
     whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
     url: "http://streamystats:3000"
+
+# Multi-Tenancy and User Management (DISABLED by default)
+# WARNING: This feature is in DEVELOPMENT stage and requires additional security configuration
+# See docs/wiki/en/Multi-Tenancy-Guide.md for complete documentation
+multitenancy:
+  enabled: false # Set to true to enable multi-user and multi-tenancy features
+  
+  # Default admin user configuration (only created if create-on-startup is true)
+  default-admin:
+    create-on-startup: false # Set to true to create default admin user on first startup
+    email: "admin@janitorr.local" # Change this to your admin email
+    password: "change-me-please" # IMPORTANT: Change this immediately after first login!
+  
+  # Authentication configuration (future features - not yet implemented)
+  auth:
+    jwt-enabled: false # JWT token-based authentication (not yet implemented)
+    jwt-secret: "change-this-secret-key-in-production" # Override in production
+    jwt-expiration-seconds: 86400 # 24 hours
+    oauth-enabled: false # OAuth integration (not yet implemented)
     api-key: "jellystat-key" # Jellyfin API key

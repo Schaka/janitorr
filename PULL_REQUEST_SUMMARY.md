@@ -17,12 +17,6 @@ Fix the critical issue where accessing the Management UI at `http://localhost:89
 - **Fix Summary**: `FIX_SUMMARY_MANAGEMENT_UI.md` (181 lines)
 - **Architecture Diagrams**: `ARCHITECTURE_DIAGRAM.md` (158 lines)
 
-### Statistics
-- **5 files changed**
-- **384 insertions**
-- **0 deletions**
-- **Minimal, surgical fix** ✅
-
 ## 🔍 Root Cause Analysis
 
 Spring Boot serves static resources from `/static` directory by default, making them accessible at the root context path. However, **there was no controller mapping for the root path "/"** to explicitly serve the `index.html` file.

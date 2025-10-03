@@ -430,6 +430,104 @@ schedule: "0 0 0 1 * ?"
 schedule: "0 0 2 ? * MON-FRI"
 ```
 
+## Motor de Inteligencia IA/ML (Característica Futura)
+
+> **Estado:** 🚧 Fase de Planificación - No Implementada Aún  
+> **Prioridad:** Baja (Característica Futura Avanzada)
+
+El Motor de Inteligencia IA/ML es una característica futura que utilizará aprendizaje automático para optimizar las decisiones de limpieza basándose en patrones de visualización y preferencias del usuario.
+
+### Descripción General
+
+Cuando se implemente, esta característica:
+- Analizará el historial de visualización para predecir qué medios deben conservarse
+- Aprenderá de las decisiones y preferencias del usuario
+- Proporcionará recomendaciones inteligentes con explicaciones
+- Optimizará el momento de limpieza basándose en patrones de uso
+
+### Configuración
+
+La característica de IA puede configurarse en `application.yml`, pero está **deshabilitada por defecto**:
+
+```yaml
+ai:
+  enabled: false  # Características de IA no implementadas aún
+  model-path: /config/models
+  training:
+    enabled: false
+    schedule: "0 0 3 * * ?"
+    min-data-points: 1000
+    historical-data-days: 90
+  inference:
+    cache-ttl: 3600
+    batch-size: 100
+    confidence-threshold: 0.7
+    timeout-ms: 100
+  features:
+    external-apis: false  # Preservación de privacidad, solo local
+    user-feedback: true   # Aprender de correcciones
+    natural-language: false  # Característica futura
+    computer-vision: false   # Característica futura
+```
+
+### Documentación de Arquitectura
+
+Para información detallada sobre la arquitectura de IA/ML planificada:
+- **Inglés:** [AI/ML Engine Architecture](../../AI_ML_ENGINE_ARCHITECTURE.md)
+- **Español:** [Arquitectura del Motor IA/ML](../../ARQUITECTURA_MOTOR_IA_ML.md)
+
+### Características Clave (Planificadas)
+
+#### Modelo de Puntuación de Contenido
+- Predice probabilidad de conservar/eliminar para cada elemento multimedia
+- Considera: frecuencia de visualización, antigüedad, preferencias de género, impacto de almacenamiento
+- Proporciona puntuaciones de confianza y explicaciones
+
+#### Reconocimiento de Patrones
+- Detecta horarios y hábitos de visualización
+- Identifica patrones de maratón para series activas
+- Reconoce preferencias estacionales
+
+#### Análisis Predictivo
+- Pronostica necesidades de almacenamiento
+- Sugiere momento óptimo de limpieza
+- Recomienda contenido a conservar basándose en tendencias
+
+### Privacidad y Ética
+
+El motor de IA está diseñado con la privacidad en mente:
+- **Procesamiento Local:** Todo ML se ejecuta localmente, sin compartir datos externos
+- **Anonimización:** Los IDs de usuario se hashean antes de procesarse
+- **Transparencia:** Todas las decisiones vienen con explicaciones
+- **Control del Usuario:** Fácil opt-out y capacidad de anulación
+- **Retención de Datos:** Datos de entrenamiento purgados después de 90 días
+
+### Estado Actual
+
+Esta característica está en la fase de arquitectura y planificación. El código base incluye:
+- Estructura de configuración (`AIProperties`)
+- Modelos de datos para características ML (`MediaFeatures`, `ViewingSession`)
+- Interfaces de servicio (`InferenceEngine`, `ContentScoringModel`)
+- Implementaciones placeholder
+
+**Para contribuir o seguir el progreso:**
+- Revisa la documentación de arquitectura
+- Proporciona retroalimentación sobre requisitos de características
+- Sugiere algoritmos ML y enfoques
+
+### ¿Cuándo Estará Disponible?
+
+Esta es una característica compleja a largo plazo. Cronograma de implementación:
+- **Fase 1:** Infraestructura de recopilación de datos (2-3 meses)
+- **Fase 2:** Modelos ML centrales (3-4 meses)
+- **Fase 3:** Características de inteligencia (2-3 meses)
+- **Fase 4:** Integración de UI (2 meses)
+- **Fase 5:** Características avanzadas (3-4 meses)
+
+**Tiempo estimado total:** 12-16 meses
+
+Consulta [GitHub Issues](https://github.com/carcheky/janitorr/issues) para estado actual y discusiones.
+
 ## Consideraciones de Seguridad
 
 ### Claves API

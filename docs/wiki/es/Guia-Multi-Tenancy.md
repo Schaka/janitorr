@@ -325,35 +325,37 @@ Tenant
 
 ## Mejoras Futuras
 
-### Fase 1: Seguridad (Prioridad)
-- [ ] Integración con Spring Security
-- [ ] Generación y validación de tokens JWT
-- [ ] Hash de contraseñas BCrypt
-- [ ] Gestión de sesiones
-- [ ] Protección CSRF
+Las siguientes mejoras están bajo consideración y pueden implementarse en versiones futuras:
 
-### Fase 2: Persistencia
-- [ ] Entidades JPA
-- [ ] Base de datos H2 para desarrollo
-- [ ] Soporte PostgreSQL para producción
-- [ ] Scripts de migración de base de datos
-- [ ] Backup y restauración
+### Fase 1: Seguridad (Prioridad - Bajo Consideración)
+- [ ] Integración con Spring Security (puede agregarse)
+- [ ] Generación y validación de tokens JWT (bajo consideración)
+- [ ] Hash de contraseñas BCrypt (puede implementarse)
+- [ ] Gestión de sesiones (bajo consideración)
+- [ ] Protección CSRF (puede agregarse)
 
-### Fase 3: Características Avanzadas
-- [ ] Integración OAuth (Google, GitHub, Discord)
-- [ ] Autenticación de dos factores
-- [ ] Gestión de claves API
-- [ ] Limitación de tasa
-- [ ] Log de auditoría
-- [ ] Notificaciones por email
-- [ ] Recuperación de contraseña
-- [ ] Sistema de invitación de usuarios
+### Fase 2: Persistencia (Bajo Consideración)
+- [ ] Entidades JPA (puede implementarse)
+- [ ] Base de datos H2 para desarrollo (bajo consideración)
+- [ ] Soporte PostgreSQL para producción (puede agregarse)
+- [ ] Scripts de migración de base de datos (bajo consideración)
+- [ ] Backup y restauración (puede implementarse)
 
-### Fase 4: Integración UI
-- [ ] Páginas de login/logout
-- [ ] Dashboard de gestión de usuarios
-- [ ] Página de configuración de perfil
-- [ ] Selector de tenant
+### Fase 3: Características Avanzadas (Bajo Consideración)
+- [ ] Integración OAuth (Google, GitHub, Discord) (puede agregarse)
+- [ ] Autenticación de dos factores (bajo consideración)
+- [ ] Gestión de claves API (puede implementarse)
+- [ ] Limitación de tasa (bajo consideración)
+- [ ] Log de auditoría (puede agregarse)
+- [ ] Notificaciones por email (bajo consideración)
+- [ ] Recuperación de contraseña (puede implementarse)
+- [ ] Sistema de invitación de usuarios (bajo consideración)
+
+### Fase 4: Integración UI (Bajo Consideración)
+- [ ] Páginas de login/logout (puede agregarse)
+- [ ] Dashboard de gestión de usuarios (bajo consideración)
+- [ ] Página de configuración de perfil (puede implementarse)
+- [ ] Selector de tenant (bajo consideración)
 - [ ] Componentes UI basados en roles
 
 ### Fase 5: Multi-Tenancy

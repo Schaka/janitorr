@@ -743,14 +743,16 @@ All plugins scanned for:
 
 ## Future Enhancements
 
-- **Plugin Sponsorship**: Support plugin developers financially
-- **Beta Testing Program**: Early access to plugin updates
-- **Plugin Collections**: Curated sets of related plugins
-- **A/B Testing**: Try different plugin versions
-- **Advanced Analytics**: Detailed usage analytics for publishers
-- **Plugin Recommendations**: AI-based plugin suggestions
-- **Integration Testing**: Automated compatibility testing
-- **Multi-language Support**: Plugins in multiple languages
+The following enhancements are under consideration and may be implemented in future releases:
+
+- **Plugin Sponsorship**: Support plugin developers financially (may be added)
+- **Beta Testing Program**: Early access to plugin updates (under consideration)
+- **Plugin Collections**: Curated sets of related plugins (may be implemented)
+- **A/B Testing**: Try different plugin versions (under consideration)
+- **Advanced Analytics**: Detailed usage analytics for publishers (may be added)
+- **Plugin Recommendations**: AI-based plugin suggestions (under consideration)
+- **Integration Testing**: Automated compatibility testing (may be implemented)
+- **Multi-language Support**: Plugins in multiple languages (under consideration)
 
 ## Implementation Timeline
 

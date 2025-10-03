@@ -203,15 +203,17 @@ Future enhancement: Test with actual API calls using test keys.
 
 ## Future Enhancements
 
-### Planned Features
-1. **JustWatch Integration**: Streaming availability data
-2. **Availability Scoring**: Use streaming data in intelligence
-3. **Personal Stats**: User watchlist/collection from Trakt
-4. **Batch Enrichment**: Bulk API calls for efficiency
-5. **Metrics**: Track API usage and decisions
+The following enhancements are under consideration and may be implemented in future releases:
 
-### API Expansion
-Additional APIs to consider:
+### Features Under Consideration
+1. **JustWatch Integration**: Streaming availability data (may be added)
+2. **Availability Scoring**: Use streaming data in intelligence (under consideration)
+3. **Personal Stats**: User watchlist/collection from Trakt (may be implemented)
+4. **Batch Enrichment**: Bulk API calls for efficiency (under consideration)
+5. **Metrics**: Track API usage and decisions (may be added)
+
+### API Expansion Under Consideration
+Additional APIs that may be integrated in the future:
 - Letterboxd for film ratings
 - TVDb for TV show metadata
 - AniDB for anime metadata

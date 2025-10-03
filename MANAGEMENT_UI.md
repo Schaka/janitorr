@@ -50,6 +50,8 @@ If you get a connection error, check:
 
 ## Features
 
+The Management UI provides a clean, user-friendly interface for managing Janitorr.
+
 ### System Status
 
 The status section displays:
@@ -61,6 +63,11 @@ The status section displays:
 - **Episode Deletion**: Status of episode cleanup (enabled/disabled)
 
 Status is automatically refreshed every 30 seconds, or you can manually refresh using the "Refresh Status" button.
+
+The status values are color-coded:
+- 🟢 **Green** - Feature is enabled and active
+- 🔴 **Red** - Feature is disabled
+- 🟡 **Yellow** - Dry-run mode is active (no deletions will occur)
 
 ### Manual Cleanup Actions
 

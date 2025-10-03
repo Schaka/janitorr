@@ -92,15 +92,29 @@ This fork includes additional documentation:
 
 Janitorr includes a **web-based management interface** that makes it easy to monitor and control cleanup operations.
 
-<img src="images/management_ui_screenshot.png" width="80%" alt="Janitorr Management UI">
-
 **Quick Access:** After starting Janitorr with Docker, open your browser to:
 ```
 http://localhost:8978/
 ```
 (Replace `localhost` with your server IP if accessing remotely)
 
-#### Features
+#### UI Overview
+
+The Management UI provides a clean, simple interface with:
+
+**System Status Panel:**
+- Real-time view of dry-run mode status
+- Run-once mode indicator
+- Enabled/disabled status for each cleanup type (Media, Tag-based, Episode)
+- Auto-refresh every 30 seconds
+
+**Manual Cleanup Actions:**
+- Three cleanup cards (Media, Tag-Based, Episode)
+- Each shows last run status and description
+- One-click buttons to trigger cleanups manually
+- Real-time feedback with success/error messages
+
+**Features:**
 
 ✨ **System Status Dashboard**
 - View current configuration (dry-run mode, enabled cleanups)

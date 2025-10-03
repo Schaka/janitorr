@@ -51,6 +51,9 @@ Comprehensive documentation is available in multiple languages:
   - [FAQ](docs/wiki/en/FAQ.md)
   - [Troubleshooting](docs/wiki/en/Troubleshooting.md)
 
+- **🏗️ Architecture Documentation**
+  - [Plugin System Architecture](docs/architecture/README.md) - Future extensibility framework (design phase)
+
 - **🇪🇸 Documentación en Español**
   - [Inicio de la Wiki](docs/wiki/es/Home.md)
   - [Guía de Configuración con Docker Compose](docs/wiki/es/Configuracion-Docker-Compose.md)

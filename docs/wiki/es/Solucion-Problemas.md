@@ -10,6 +10,7 @@ Problemas comunes y sus soluciones al ejecutar Janitorr.
 - [Problemas de Operaciones de Archivos](#problemas-de-operaciones-de-archivos)
 - [Problemas de Eliminación](#problemas-de-eliminación)
 - [Problemas de Rendimiento](#problemas-de-rendimiento)
+- [Problemas de la Interfaz de Gestión](#problemas-de-la-interfaz-de-gestión)
 - [Registro y Depuración](#registro-y-depuración)
 
 ## Problemas del Contenedor
@@ -486,6 +487,118 @@ Problemas comunes y sus soluciones al ejecutar Janitorr.
    media-cleanup:
      schedule: "0 0 3 * * ?"  # 3 AM cuando el servidor está menos ocupado
    ```
+
+## Problemas de la Interfaz de Gestión
+
+### No Se Puede Acceder a la Interfaz
+
+**Síntomas:** No se puede acceder a la interfaz web en `http://localhost:8080/`
+
+**Soluciones:**
+
+1. **Verifica si la interfaz está habilitada:**
+   ```bash
+   docker logs janitorr | grep "Management UI"
+   ```
+   
+   Debería mostrar:
+   ```
+   INFO - Management UI is ENABLED and available at http://localhost:8080/
+   ```
+
+2. **Verifica la variable de entorno:**
+   ```bash
+   docker exec janitorr printenv | grep JANITORR_UI_ENABLED
+   ```
+   
+   Debería devolver `JANITORR_UI_ENABLED=true`
+
+3. **Verifica el mapeo de puertos:**
+   ```yaml
+   ports:
+     - "8080:8080"  # Asegúrate de que esto esté en tu docker-compose.yml
+   ```
+
+4. **Verifica el archivo de configuración:**
+   ```bash
+   docker exec janitorr cat /config/application.yml | grep -A 3 "management:"
+   ```
+   
+   Debería mostrar:
+   ```yaml
+   management:
+     ui:
+       enabled: true
+   ```
+
+### La Interfaz Muestra Error 404
+
+**Síntomas:** Acceder a la URL raíz devuelve 404 No Encontrado
+
+**Causas Comunes:**
+- La interfaz está deshabilitada
+- Usando el perfil `leyden` (compilación de imagen nativa)
+- Recursos estáticos no disponibles
+
+**Soluciones:**
+
+1. **Habilita la interfaz mediante variable de entorno:**
+   ```yaml
+   environment:
+     - JANITORR_UI_ENABLED=true
+   ```
+
+2. **Verifica los perfiles activos:**
+   ```bash
+   docker logs janitorr | grep "spring.profiles.active"
+   ```
+   
+   Si ves el perfil `leyden`, la interfaz está deshabilitada por diseño.
+
+3. **Reinicia el contenedor después de cambiar la configuración:**
+   ```bash
+   docker-compose restart janitorr
+   ```
+
+### Los Endpoints de la API Devuelven 404
+
+**Síntomas:** `/api/management/status` devuelve 404
+
+**Soluciones:**
+
+1. **Verifica que la interfaz esté habilitada** (igual que arriba)
+
+2. **Verifica que el controlador esté cargado:**
+   ```bash
+   docker logs janitorr | grep ManagementController
+   ```
+
+3. **Prueba con curl:**
+   ```bash
+   curl http://localhost:8080/api/management/status
+   ```
+
+### Deshabilitar la Interfaz
+
+Si deseas ejecutar Janitorr sin la interfaz web:
+
+**Método 1 - Variable de Entorno (recomendado):**
+```yaml
+environment:
+  - JANITORR_UI_ENABLED=false
+```
+
+**Método 2 - Archivo de Configuración:**
+```yaml
+management:
+  ui:
+    enabled: false
+```
+
+Después de deshabilitar, los logs mostrarán:
+```
+INFO - Management UI is DISABLED by configuration (management.ui.enabled=false)
+```
 
 ## Registro y Depuración
 

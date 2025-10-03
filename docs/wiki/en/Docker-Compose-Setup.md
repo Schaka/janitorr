@@ -121,6 +121,35 @@ leaving-soon-dir: "/data/media/leaving-soon"           # Path as Janitorr sees i
 media-server-leaving-soon-dir: "/library/leaving-soon" # Path as Jellyfin sees it
 ```
 
+### 3. Spring Boot Profiles Configuration
+
+**Important:** Janitorr uses Spring Boot profiles for specific purposes. Understanding these is crucial for proper operation.
+
+#### The `leyden` Profile
+
+The `leyden` profile is **ONLY for build-time AOT cache generation** and should **NEVER be activated at runtime**. This profile:
+- Disables the Management UI and API endpoints (`/api/management/*`)
+- Is automatically used during Docker image builds
+- **Must not be set** in your `SPRING_PROFILES_ACTIVE` environment variable
+
+#### Setting Custom Profiles (Optional)
+
+If you need to use custom Spring profiles for your own configuration, you can set them via environment variable:
+
+```yaml
+environment:
+  - SPRING_PROFILES_ACTIVE=prod,custom  # Your custom profiles
+```
+
+**Warning:** Never include `leyden` in `SPRING_PROFILES_ACTIVE`. Doing so will disable the Management UI and cause 404 errors on `/api/management/*` endpoints.
+
+#### Default Behavior
+
+By default (when `SPRING_PROFILES_ACTIVE` is not set):
+- ✅ Management UI is accessible at `http://<host>:<port>/`
+- ✅ All API endpoints work correctly
+- ✅ Scheduled cleanups run as configured
+
 ## Docker Compose Examples
 
 ### Basic Setup (JVM - Recommended)
@@ -142,6 +171,9 @@ services:
     environment:
       - THC_PATH=/health
       - THC_PORT=8081
+      # IMPORTANT: Do NOT set SPRING_PROFILES_ACTIVE=leyden
+      # The Management UI requires the leyden profile to be inactive
+      # - SPRING_PROFILES_ACTIVE=prod  # Optional: your custom profiles only
     ports:
       - "8978:8978" # Optional: Only if you need external access
     healthcheck:
@@ -425,6 +457,22 @@ services:
 2. Run `id` on your host to find your UID:GID
 3. Update the `user:` field in docker-compose.yml
 4. Set proper ownership: `chown -R 1000:1000 /appdata/janitorr /share_media`
+
+### Management UI Returns 404 Errors
+
+**Problem:** Accessing `/api/management/status` or other management endpoints returns 404 errors.
+
+**Solution:**
+1. Check if `SPRING_PROFILES_ACTIVE` environment variable includes `leyden`
+2. Remove `leyden` from the active profiles - it's only for build-time use
+3. If you need custom profiles, set them without `leyden`:
+   ```yaml
+   environment:
+     - SPRING_PROFILES_ACTIVE=prod,custom  # Do NOT include leyden
+   ```
+4. Restart the container after removing the leyden profile
+5. Verify the endpoints are accessible: `curl http://localhost:8978/api/management/status`
+6. Check container logs for confirmation that ManagementController loaded: `docker logs janitorr`
 
 ## Next Steps
 

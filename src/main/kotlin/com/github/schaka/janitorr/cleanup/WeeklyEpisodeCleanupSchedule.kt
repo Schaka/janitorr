@@ -21,6 +21,9 @@ import java.time.LocalDateTime
 /**
  * This class works differently than the other schedules because it covers one special use case.
  * TV shows only (mostly daily episodes), regarding only the latest season or x amount of latest episodes.
+ * 
+ * IMPORTANT: This service is excluded from the "leyden" profile (@Profile("!leyden")).
+ * The "leyden" profile is only for build-time AOT cache generation and should never be active at runtime.
  */
 @Profile("!leyden")
 @Service

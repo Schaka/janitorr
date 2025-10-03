@@ -492,7 +492,24 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Initialize
+function applyDarkMode() {
+    // Check localStorage for dark mode preference
+    const darkModeEnabled = localStorage.getItem('darkMode') === 'true';
+    if (darkModeEnabled) {
+        document.body.classList.add('dark-mode');
+        if (elements.darkModeToggle) {
+            elements.darkModeToggle.checked = true;
+        }
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (elements.darkModeToggle) {
+            elements.darkModeToggle.checked = false;
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+    applyDarkMode();
     refreshDashboard();
     
     // Auto-refresh dashboard every 30 seconds

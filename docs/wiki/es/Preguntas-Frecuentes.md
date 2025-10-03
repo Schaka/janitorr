@@ -255,6 +255,60 @@ Configura los detalles de conexión en application.yml. Cuando esté conectado, 
 
 **Nota:** Solo se puede habilitar un servicio de estadísticas (Jellystat O Streamystats) a la vez.
 
+## Características de IA/ML
+
+### ¿Qué es el Motor de Inteligencia IA/ML?
+
+El Motor de Inteligencia IA/ML es una **característica futura** que utilizará aprendizaje automático para tomar decisiones de limpieza más inteligentes basadas en patrones de visualización y comportamiento del usuario. Actualmente está en fase de planificación y arquitectura.
+
+### ¿La IA está habilitada por defecto?
+
+No. Todas las características de IA están **deshabilitadas por defecto** y no están implementadas aún. La configuración existe en el código base como placeholder para desarrollo futuro.
+
+### ¿Cuándo estarán disponibles las características de IA?
+
+Esta es una característica compleja a largo plazo con un cronograma estimado de 12-16 meses para implementación completa:
+- **Fase 1:** Recopilación de datos (2-3 meses)
+- **Fase 2:** Modelos ML centrales (3-4 meses)
+- **Fase 3:** Características de inteligencia (2-3 meses)
+- **Fase 4:** Integración de UI (2 meses)
+- **Fase 5:** Características avanzadas (3-4 meses)
+
+Sigue el progreso en [GitHub Issues](https://github.com/carcheky/janitorr/issues).
+
+### ¿Qué harán las características de IA?
+
+Cuando se implementen, el motor de IA:
+- Analizará el historial de visualización para predecir qué medios conservar
+- Aprenderá de tus decisiones de limpieza y preferencias
+- Proporcionará recomendaciones inteligentes con explicaciones
+- Optimizará el momento de limpieza basándose en patrones de uso
+- Detectará maratones y patrones de visualización estacionales
+- Pronosticará necesidades de almacenamiento
+
+### ¿Las características de IA compartirán mis datos externamente?
+
+No. El motor de IA está diseñado con la privacidad en mente:
+- **Todo el procesamiento es local** - no se envían datos a servicios externos
+- **Los IDs de usuario se anonimizan** antes del procesamiento ML
+- **La retención de datos es limitada** - datos de entrenamiento purgados después de 90 días
+- **Fácil opt-out** - la IA puede deshabilitarse completamente
+- **Decisiones transparentes** - todas las recomendaciones incluyen explicaciones
+
+### ¿Cómo puedo contribuir al desarrollo de IA?
+
+Puedes contribuir:
+- Revisando la documentación de arquitectura: [Arquitectura del Motor IA/ML](../../ARQUITECTURA_MOTOR_IA_ML.md)
+- Proporcionando retroalimentación sobre requisitos de características
+- Sugiriendo algoritmos ML y enfoques
+- Probando cuando estén disponibles versiones alpha/beta
+
+### ¿Dónde puedo aprender más sobre la arquitectura de IA?
+
+Consulta la documentación detallada de arquitectura:
+- **Inglés:** [AI/ML Engine Architecture](../../AI_ML_ENGINE_ARCHITECTURE.md)
+- **Español:** [Arquitectura del Motor IA/ML](../../ARQUITECTURA_MOTOR_IA_ML.md)
+
 ## ¿Aún tienes preguntas?
 
 - Revisa la guía de [Solución de Problemas](Solucion-Problemas.md)

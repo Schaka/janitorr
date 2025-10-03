@@ -1,5 +1,11 @@
 # Janitorr - Cleans up your media library
 
+[![CI/CD Pipeline](https://github.com/carcheky/janitorr/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/ci-cd.yml)
+[![JVM Image](https://github.com/carcheky/janitorr/workflows/JVM%20Image/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/jvm-image.yml)
+[![Native Image](https://github.com/carcheky/janitorr/workflows/Native%20images/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/native-image.yml)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+
 <p align="center">
     <img src="images/logos/janitorr_icon.png" width=384>
 </p>
@@ -218,6 +224,22 @@ services:
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/carcheky/janitorr:jvm-develop`.
 The development version of the native image is available as `ghcr.io/carcheky/janitorr:native-develop`.
 
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- How to submit changes
+- Commit message conventions
+- Development workflow
+- Code style guidelines
+
+### Quick Start for Contributors
+
+1. Fork and clone the repository
+2. Make your changes following [Conventional Commits](https://www.conventionalcommits.org/)
+3. Submit a pull request
+
+All commits must follow the Conventional Commits specification. See the [CI/CD Documentation](docs/CI-CD.md) for more details on our automated release process.
 
 ## JetBrains
 Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.

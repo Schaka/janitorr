@@ -29,3 +29,8 @@ application-local.yml
 application-seedbox.yml
 docker-compose.yml
 logs
+
+# Node.js (for semantic-release and commitlint)
+node_modules/
+package-lock.json
+.npmrc

@@ -45,7 +45,7 @@ class ConditionEvaluator(
     }
 
     private fun evaluateAge(condition: AgeCondition, mediaItem: LibraryItem): Boolean {
-        val ageInDays = ChronoUnit.DAYS.between(mediaItem.historyAge, LocalDateTime.now())
+        val ageInDays = ChronoUnit.DAYS.between(mediaItem.importedDate, LocalDateTime.now())
         return compare(ageInDays.toInt(), condition.days, condition.operator)
     }
 

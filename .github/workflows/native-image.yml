@@ -36,12 +36,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Log in to Docker Hub to pull images without rate limit
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USER }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
       - name: Log into GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -66,8 +60,6 @@ jobs:
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           LC_ALL: "en_US.UTF-8"
           IMAGE_TYPE: "native"
           TARGET_PLATFORM: "amd64"
@@ -96,8 +88,6 @@ jobs:
         env:
           USERNAME: ${{ github.actor }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           LC_ALL: "en_US.UTF-8"
           IMAGE_TYPE: "native"
           TARGET_PLATFORM: "arm64"

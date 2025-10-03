@@ -160,8 +160,6 @@ All workflows can be triggered:
 The following secrets should be configured in GitHub repository settings:
 
 - `GITHUB_TOKEN` - Automatically provided by GitHub Actions
-- `DOCKERHUB_USER` - Docker Hub username (for rate limit avoidance)
-- `DOCKERHUB_PASSWORD` - Docker Hub password/token
 
 ## Troubleshooting
 

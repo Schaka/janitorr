@@ -1,61 +1,108 @@
-# Docker Compose Example - Management UI Access
-# This example demonstrates how to set up Janitorr with the Management UI accessible via browser.
-#
-# The Management UI provides a web-based interface to:
-# - View the current system status and configuration
-# - Manually trigger any of the three cleanup schedules on-demand
-# - Monitor which cleanups have been executed
-# - See real-time feedback on cleanup operations
-#
-# Access the Management UI at: http://<your-server-ip>:8978/
-#
-# Environment Variables:
-# You can customize the paths by setting environment variables, or use the defaults:
-# - JANITORR_CONFIG_PATH: Path to janitorr config directory (default: ./volumes/janitorr-config)
-# - JANITORR_LOGS_PATH: Path to janitorr logs directory (default: ./volumes/janitorr-logs)
-# - JANITORR_DATA_PATH: Path to media data directory (default: ./volumes/data)
-# - PUID: User ID for file ownership (default: 1000)
-# - PGID: Group ID for file ownership (default: 1000)
-#
-# Prerequisites:
-# 1. Create the configuration directory:
-#    mkdir -p ./volumes/janitorr-config ./volumes/janitorr-logs
-#    (or your custom paths from environment variables)
-#
-# 2. Download the application template:
-#    wget -O ./volumes/janitorr-config/application.yml \
-#      https://raw.githubusercontent.com/carcheky/janitorr/main/src/main/resources/application-template.yml
-#
-# 3. Edit the configuration file with your *arr, Jellyfin/Emby, and Jellyseerr API keys:
-#    nano ./volumes/janitorr-config/application.yml
-#
-# 4. Start the service:
-#    docker-compose -f docker-compose.example.ui.yml up -d
-#
-# 5. Access the Management UI:
-#    Open http://<your-server-ip>:8978/ in your browser
-
-version: "3"
-
 services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+      - DOTNET_GCHighMemPercent=48
+    devices:
+      - /dev/dri:/dev/dri
+    volumes:
+      - /appdata/jellyfin:/config
+      - /share_media:/data
+      - /appdata/jellyfin/cache:/cache
+    ports:
+      - 8096:8096
+    restart: unless-stopped
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - /appdata/radarr:/config
+      - /share_media:/data
+    ports:
+      - 7878:7878
+
+  jellyseerr:
+    image: fallenbagel/jellyseerr:latest
+    container_name: jellyseerr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    ports:
+      - 5050:5055
+    volumes:
+      - /appdata/jellyseerr:/app/config
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Berlin
+    volumes:
+      - /appdata/sonarr:/config
+      - /share_media:/data
+    ports:
+      - 8989:8989
+
+  jellystat-db:
+    container_name: jellystat-db
+    image: postgres:15.2
+    user: 1000:1000
+    environment:
+      POSTGRES_DB: 'jfstat'
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+    volumes:
+      - /appdata/jellystat/postgres-data:/var/lib/postgresql/data # Mounting the volume
+    restart: unless-stopped
+
+
+  jellystat:
+    container_name: jellystat
+    image: cyfershepard/jellystat:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_IP: jellystat-db
+      POSTGRES_PORT: 5432
+      JWT_SECRET: 'fsdf89hjdfs3123'
+    ports:
+      - "3000:3000"
+    volumes:
+      - /appdata/jellystat/config:/app/backend/backup-data # Mounting the volume
+
+    depends_on:
+      - jellystat-db
+
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
-    user: ${PUID:-1000}:${PGID:-1000}
-    mem_limit: 256M # Minimum 200M, recommended 256M
+    image: ghcr.io/schaka/janitorr:jvm-stable
+    user: 1000:1000 # Replace with your user who should own your application.yml file
+    mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended
     mem_swappiness: 0
+    ports:
+      - "8978:8080"
     volumes:
-      - ${JANITORR_CONFIG_PATH:-./volumes/janitorr-config}/application.yml:/config/application.yml
-      - ${JANITORR_LOGS_PATH:-./volumes/janitorr-logs}:/logs
-      - ${JANITORR_DATA_PATH:-./volumes/data}:/data
+      - /appdata/janitorr/config/application.yml:/config/application.yml
+      - /appdata/janitorr/logs:/logs
+      - /share_media:/data
     environment:
+      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
       - THC_PATH=/health
       - THC_PORT=8081
-    ports:
-      - "8978:8978" # Management UI will be accessible at http://<host-ip>:8978/
     healthcheck:
-      test: ["CMD", "/workspace/health-check"]
+      test: [ "CMD", "/workspace/health-check" ]
       start_period: 30s
       interval: 5s
       retries: 3
-    restart: unless-stopped

@@ -14,6 +14,14 @@ management:
       exposure:
         include: health,info,management # Endpoints available through the API
 
+# Rule Engine Configuration (Advanced)
+# Custom cleanup rules with drag-and-drop visual builder
+rule-engine:
+  enabled: false # Set to true to enable the visual rule builder and custom rules
+  rules-directory: "/config/rules" # Directory where custom rules are stored
+  max-rules-per-execution: 100 # Maximum number of rules to process in one execution
+  enable-scheduled-rules: false # Set to true to enable automatic execution of scheduled rules
+
 # File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to create "Leaving Soon" collections in Jellyfin
 # Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well

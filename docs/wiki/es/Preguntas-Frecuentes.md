@@ -129,6 +129,28 @@ Usa la Interfaz de Gestión:
 2. Haz clic en el botón de la limpieza que quieres ejecutar
 3. Monitorea el estado y los logs
 
+### ¿Por qué la Interfaz de Gestión devuelve errores 404?
+
+**Problema:** Al acceder a `/api/management/status` o la Interfaz de Gestión, obtienes errores 404.
+
+**Causa Más Común:** El perfil `leyden` está activo en tiempo de ejecución.
+
+**Solución:**
+1. Verifica tu docker-compose.yml para `SPRING_PROFILES_ACTIVE`
+2. Elimina `leyden` de las variables de entorno:
+   ```yaml
+   environment:
+     # INCORRECTO - NO hagas esto:
+     # - SPRING_PROFILES_ACTIVE=leyden
+     
+     # CORRECTO - Omítelo completamente, o configura perfiles personalizados:
+     - SPRING_PROFILES_ACTIVE=prod,custom  # ¡Sin leyden!
+   ```
+3. Reinicia el contenedor
+4. La Interfaz de Gestión ahora debería ser accesible
+
+**¿Por qué?** El perfil `leyden` es solo para generación de caché AOT en tiempo de compilación. Cuando está activo en tiempo de ejecución, deshabilita el ManagementController para reducir el tiempo de inicio de la aplicación durante las compilaciones.
+
 ### ¿Puedo ejecutar Janitorr una vez y salir?
 
 ¡Sí! Configura `run-once: true` en tu application.yml. Janitorr:

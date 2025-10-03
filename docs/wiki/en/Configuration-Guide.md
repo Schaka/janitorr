@@ -28,6 +28,11 @@ These settings are required for Janitorr to function:
 server:
   port: 8978  # Port Janitorr listens on
 
+# Management UI configuration
+management:
+  ui:
+    enabled: true  # Set to false to disable the web-based Management UI
+
 # Application behavior
 dry-run: true     # IMPORTANT: Set to false to enable actual deletions
 run-once: false   # Set to true to run once and exit
@@ -36,6 +41,37 @@ run-once: false   # Set to true to run once and exit
 leaving-soon-dir: "/data/media/leaving-soon"
 media-server-leaving-soon-dir: "/data/media/leaving-soon"
 ```
+
+### Management UI Configuration
+
+The Management UI provides a web interface for monitoring and controlling Janitorr:
+
+```yaml
+management:
+  ui:
+    enabled: true  # Enable/disable the web UI
+  endpoints:
+    web:
+      exposure:
+        include: health,info,management  # API endpoints to expose
+```
+
+**Environment Variables (for Docker):**
+
+```yaml
+environment:
+  - JANITORR_UI_ENABLED=true  # Enable/disable UI
+  - SERVER_PORT=8080  # Change application port
+  - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,management  # Control endpoints
+```
+
+**When to disable the UI:**
+- Headless server environments where you only need scheduled cleanups
+- Security concerns about exposing a web interface
+- Running in CI/CD pipelines or automated scripts
+- Minimal resource usage requirements
+
+See [MANAGEMENT_UI.md](../../../MANAGEMENT_UI.md) for detailed UI documentation.
 
 ### Connecting to *arr Applications
 

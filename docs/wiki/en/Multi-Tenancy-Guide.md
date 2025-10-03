@@ -59,11 +59,24 @@ multitenancy:
 
 ### Security Considerations
 
-**CRITICAL**: The current implementation does NOT include authentication. The API endpoints are exposed without protection. You **MUST** add one of the following:
+**CRITICAL**: The multi-tenancy API endpoints require authentication to prevent unauthorized access.
 
-1. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication
-2. **Spring Security**: Add Spring Security configuration (future enhancement)
+**Recommended Security Setup:**
+
+1. **Enable Built-in Authentication** (Easiest):
+   ```yaml
+   security:
+     enabled: true
+     username: admin
+     password: your-secure-password
+   ```
+   See the [Security Guide](Security-Guide.md) for detailed configuration.
+
+2. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication
+
 3. **Network Isolation**: Restrict access via firewall rules
+
+For detailed security setup instructions, see the [Security Guide](Security-Guide.md).
 
 ## API Endpoints
 

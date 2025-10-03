@@ -21,6 +21,12 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Duration
 
+/**
+ * Scheduled service for media cleanup operations.
+ * 
+ * IMPORTANT: This service is excluded from the "leyden" profile (@Profile("!leyden")).
+ * The "leyden" profile is only for build-time AOT cache generation and should never be active at runtime.
+ */
 @Profile("!leyden")
 @Service
 class MediaCleanupSchedule(

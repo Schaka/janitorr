@@ -22,6 +22,12 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
+/**
+ * Scheduled service for tag-based cleanup operations.
+ * 
+ * IMPORTANT: This service is excluded from the "leyden" profile (@Profile("!leyden")).
+ * The "leyden" profile is only for build-time AOT cache generation and should never be active at runtime.
+ */
 @Profile("!leyden")
 @Service
 class TagBasedCleanupSchedule(

@@ -33,6 +33,7 @@ class WeeklyEpisodeCleanupSchedule(
         val sonarrProperties: SonarrProperties,
         val sonarrClient: SonarrClient,
         val runOnce: RunOnce,
+        val metricsService: com.github.schaka.janitorr.metrics.MetricsService,
 
         var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 ) {
@@ -60,6 +61,9 @@ class WeeklyEpisodeCleanupSchedule(
 
         val today = LocalDateTime.now()
         val series = sonarrClient.getAllSeries().filter { it.tags.contains(episodeTag.id) }
+        
+        var totalEpisodesDeleted = 0
+        var totalSpaceFreed = 0L
 
         for (show in series) {
             val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
@@ -85,6 +89,9 @@ class WeeklyEpisodeCleanupSchedule(
                         if (!applicationProperties.dryRun) {
                             sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                             episodes.remove(episode)
+                            totalEpisodesDeleted++
+                            // Track file size if available
+                            episode.episodeFile?.size?.let { totalSpaceFreed += it }
                         }
                     }
                 }
@@ -101,10 +108,18 @@ class WeeklyEpisodeCleanupSchedule(
                     if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                         if (!applicationProperties.dryRun) {
                             sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                            totalEpisodesDeleted++
+                            // Track file size if available
+                            episode.episodeFile?.size?.let { totalSpaceFreed += it }
                         }
                     }
                 }
             }
+        }
+        
+        // Record metrics for deleted episodes
+        if (totalEpisodesDeleted > 0) {
+            metricsService.recordCleanup("episodes", totalEpisodesDeleted, totalSpaceFreed)
         }
 
         runOnce.hasWeeklyEpisodeCleanupRun = true

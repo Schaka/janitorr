@@ -39,7 +39,8 @@ class TagBasedCleanupSchedule(
     runOnce: RunOnce,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService) {
+    metricsService: com.github.schaka.janitorr.metrics.MetricsService,
+) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService, metricsService) {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

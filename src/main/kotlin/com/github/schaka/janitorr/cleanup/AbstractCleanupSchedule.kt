@@ -26,6 +26,7 @@ abstract class AbstractCleanupSchedule(
     protected val runOnce: RunOnce,
     protected val sonarrService: ServarrService,
     protected val radarrService: ServarrService,
+    protected val metricsService: com.github.schaka.janitorr.metrics.MetricsService,
 ) {
 
     companion object {
@@ -98,6 +99,12 @@ abstract class AbstractCleanupSchedule(
         jellyseerrService.cleanupRequests(deletedMovies)
         mediaServerService.cleanupMovies(deletedMovies)
         mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
+        
+        // Record metrics for space freed
+        if (deletedMovies.isNotEmpty()) {
+            val totalSpaceFreed = deletedMovies.sumOf { it.fileSize }
+            metricsService.recordCleanup("movies", deletedMovies.size, totalSpaceFreed)
+        }
     }
 
     protected fun deleteTvShows(toDeleteShows: List<LibraryItem>) {
@@ -109,6 +116,12 @@ abstract class AbstractCleanupSchedule(
         jellyseerrService.cleanupRequests(deletedShows)
         mediaServerService.cleanupTvShows(deletedShows)
         mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
+        
+        // Record metrics for space freed
+        if (deletedShows.isNotEmpty()) {
+            val totalSpaceFreed = deletedShows.sumOf { it.fileSize }
+            metricsService.recordCleanup("shows", deletedShows.size, totalSpaceFreed)
+        }
     }
 
     private fun logKeep(item: LibraryItem) {

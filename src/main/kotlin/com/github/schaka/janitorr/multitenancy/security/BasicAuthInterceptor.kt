@@ -57,20 +57,9 @@ class BasicAuthInterceptor(
             
             val user = userService.findByEmail(email)
             
-            if (user == null) {
-                log.warn("Authentication failed: User not found - $email")
-                sendUnauthorized(response, "Invalid credentials")
-                return false
-            }
-            
-            if (!user.enabled) {
-                log.warn("Authentication failed: User disabled - $email")
-                sendUnauthorized(response, "Account disabled")
-                return false
-            }
-            
-            if (!userService.verifyPassword(user, password)) {
-                log.warn("Authentication failed: Invalid password for $email")
+            if (user == null || !user.enabled || !userService.verifyPassword(user, password)) {
+                log.warn("Authentication failed: Invalid credentials")
+                log.debug("Auth failure details: email=$email, userExists=${user != null}, enabled=${user?.enabled}, passwordValid=${user?.let { userService.verifyPassword(it, password) }}")
                 sendUnauthorized(response, "Invalid credentials")
                 return false
             }

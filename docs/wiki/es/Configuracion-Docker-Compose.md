@@ -52,7 +52,9 @@ Antes de configurar Janitorr, asegúrate de tener:
    ```
 
 6. **Acceder a la Interfaz de Gestión:**
-   Abre `http://<ip-de-tu-servidor>:<puerto-configurado>/` en tu navegador
+   Abre `http://<ip-de-tu-servidor>:8978/` en tu navegador
+
+   **Nota:** La Interfaz de Gestión solo está disponible en la imagen JVM (`jvm-stable`), no en la imagen nativa.
 
 ## Pasos de Configuración
 
@@ -220,6 +222,8 @@ services:
 ### Variables Opcionales (Solo Imagen Nativa)
 
 - `SPRING_CONFIG_ADDITIONAL_LOCATION=/config/application.yml` - Ubicación del archivo de configuración
+  - Solo necesario para imagen nativa
+  - No requerido para imagen JVM
 
 ### Configuración de Memoria JVM
 
@@ -227,6 +231,30 @@ El `mem_limit` se usa para calcular dinámicamente el tamaño del heap:
 - **Mínimo:** 200M (puede causar problemas)
 - **Recomendado:** 256M
 - **Bibliotecas grandes:** 512M o superior
+
+### Puerto de la Interfaz de Gestión
+
+La Interfaz de Gestión usa el puerto configurado en `application.yml`:
+
+```yaml
+# En application.yml
+server:
+  port: 8978
+```
+
+```yaml
+# En docker-compose.yml
+ports:
+  - "8978:8978"  # Mapea puerto de host 8978 a puerto de contenedor 8978
+```
+
+Para usar un puerto de host diferente (ej., 9000):
+```yaml
+ports:
+  - "9000:8978"  # Acceder a la UI en http://localhost:9000/
+```
+
+**Nota:** Si no necesitas acceso externo a la UI, puedes omitir la sección `ports:` completamente y acceder a la UI solo desde otros contenedores en la misma red Docker.
 
 ## Comprobaciones de Salud
 
@@ -247,16 +275,51 @@ Esto asegura que el contenedor esté saludable antes de enrutar tráfico hacia �
 ### Versiones Estables
 
 - `ghcr.io/carcheky/janitorr:jvm-stable` - Última imagen JVM estable (recomendada)
+  - ✅ **Incluye Interfaz de Gestión**
+  - ✅ Soporte completo de características
+  - Memoria: 256MB recomendado
+  
 - `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Versión JVM específica
+  - ✅ **Incluye Interfaz de Gestión**
+  - Usa para fijar versión
+  
 - `ghcr.io/carcheky/janitorr:native-stable` - Última imagen nativa estable (obsoleta)
+  - ❌ **NO incluye Interfaz de Gestión**
+  - ⚠️ Obsoleta desde v1.9.0
+  - Menor uso de memoria (~150MB)
+  
 - `ghcr.io/carcheky/janitorr:native-v1.x.x` - Versión nativa específica
+  - ❌ **NO incluye Interfaz de Gestión**
+  - ⚠️ Obsoleta
 
 ### Compilaciones de Desarrollo
 
 - `ghcr.io/carcheky/janitorr:jvm-develop` - Última compilación de desarrollo (JVM)
+  - ✅ **Incluye Interfaz de Gestión**
+  - ⚠️ Puede ser inestable
+  
 - `ghcr.io/carcheky/janitorr:native-develop` - Última compilación de desarrollo (nativa)
+  - ❌ **NO incluye Interfaz de Gestión**
+  - ⚠️ Puede ser inestable
 
 > **Advertencia:** Las compilaciones de desarrollo pueden ser inestables. Usa solo para pruebas.
+
+### ¿Qué Imagen Debo Usar?
+
+**Para la mayoría de usuarios:** Usa `jvm-stable`
+- ✅ Incluye Interfaz de Gestión
+- ✅ Completamente soportada
+- ✅ Mejor compatibilidad
+
+**Actualización de nativa a JVM:**
+
+Si estás usando la imagen nativa y quieres la Interfaz de Gestión:
+
+1. Cambia la etiqueta de imagen en docker-compose.yml
+2. Aumenta `mem_limit` a 256M
+3. Elimina `SPRING_CONFIG_ADDITIONAL_LOCATION` si está presente
+4. Ejecuta `docker-compose pull && docker-compose up -d`
+5. Accede a la UI en `http://<host>:8978/`
 
 ## Ejemplo de Stack Completo
 

@@ -218,6 +218,54 @@ logging:
 - `DEBUG` - Detailed debugging info
 - `TRACE` - Very detailed trace information
 
+## Management UI Configuration
+
+The Management UI is enabled by default when using the JVM image.
+
+### Port Configuration
+
+The UI uses the same port as the main application:
+
+```yaml
+server:
+  port: 8978  # Change to use a different port
+```
+
+### Accessing the UI
+
+Once Janitorr is running:
+```
+http://<your-server-ip>:8978/
+```
+
+### Docker Port Mapping
+
+Map the port in docker-compose.yml:
+```yaml
+ports:
+  - "8978:8978"  # host:container
+```
+
+To use a different host port:
+```yaml
+ports:
+  - "9000:8978"  # Access at http://localhost:9000/
+```
+
+### Image Requirements
+
+⚠️ **Important:** The Management UI is only available in the JVM image.
+
+```yaml
+# ✅ Includes Management UI
+image: ghcr.io/carcheky/janitorr:jvm-stable
+
+# ❌ Does NOT include Management UI (deprecated)
+image: ghcr.io/carcheky/janitorr:native-stable
+```
+
+For complete UI documentation, see [MANAGEMENT_UI.md](../../MANAGEMENT_UI.md).
+
 ## Path Configuration
 
 ### Understanding Path Mapping
@@ -343,6 +391,43 @@ If exposing the Management UI:
 - Consider using HTTPS
 - Restrict access by IP if possible
 
+### Management UI Access
+
+The Management UI has no built-in authentication. To secure it:
+
+**Option 1: No external access (recommended for most users)**
+```yaml
+# docker-compose.yml
+ports:
+  # Remove or comment out the ports section
+  # - "8978:8978"  # Don't expose to host
+```
+Access the UI only from other containers on the same Docker network.
+
+**Option 2: Reverse proxy with authentication**
+
+Use Nginx, Traefik, or similar with basic auth:
+
+```nginx
+# Nginx example
+location / {
+    auth_basic "Janitorr Admin";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://janitorr:8978;
+}
+```
+
+**Option 3: IP restriction**
+
+Restrict access to specific IPs:
+```nginx
+location / {
+    allow 192.168.1.0/24;  # Your local network
+    deny all;
+    proxy_pass http://janitorr:8978;
+}
+```
+
 ## Example Complete Configuration
 
 See [Docker Compose Setup](Docker-Compose-Setup.md#full-stack-example) for a complete example with all services configured.
@@ -423,6 +508,7 @@ dry-run: true
 - [Docker Compose Setup](Docker-Compose-Setup.md) - Complete deployment guide
 - [FAQ](FAQ.md) - Common questions
 - [Troubleshooting](Troubleshooting.md) - Detailed problem solving
+- [Management UI Guide](../../MANAGEMENT_UI.md) - Web interface documentation
 
 ---
 

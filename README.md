@@ -90,15 +90,53 @@ This fork includes additional documentation:
 
 ### Management UI
 
-Janitorr includes a web-based management interface accessible at `http://<host>:<port>/` when the application is running.
+Janitorr includes a **web-based management interface** that makes it easy to monitor and control cleanup operations.
 
-The management UI allows you to:
-- View the current system status and configuration
-- Manually trigger any cleanup function on-demand
+<img src="images/management_ui_screenshot.png" width="80%" alt="Janitorr Management UI">
+
+**Quick Access:** After starting Janitorr with Docker, open your browser to:
+```
+http://localhost:8978/
+```
+(Replace `localhost` with your server IP if accessing remotely)
+
+#### Features
+
+✨ **System Status Dashboard**
+- View current configuration (dry-run mode, enabled cleanups)
 - Monitor which cleanups have been executed
-- See real-time feedback on cleanup operations
+- See real-time system state
 
-For more details, see [MANAGEMENT_UI.md](MANAGEMENT_UI.md).
+🎯 **Manual Cleanup Triggers**
+- Manually trigger any cleanup function on-demand
+- Get immediate feedback on cleanup operations
+- Perfect for testing or emergency cleanup
+
+📊 **Real-time Feedback**
+- Success/error messages for all operations
+- Automatic status refresh every 30 seconds
+- Execution history tracking
+
+#### Requirements
+
+⚠️ **Important:** The Management UI is only available in the **JVM image**, not the native image.
+
+**JVM Image (with UI):**
+```yaml
+image: ghcr.io/carcheky/janitorr:jvm-stable  # ✅ Includes UI
+```
+
+**Native Image (no UI):**
+```yaml
+image: ghcr.io/carcheky/janitorr:native-stable  # ❌ No UI (deprecated)
+```
+
+#### Documentation
+
+For complete documentation including troubleshooting, API endpoints, and examples:
+- 📖 **[MANAGEMENT_UI.md](MANAGEMENT_UI.md)** - Complete Management UI guide
+- 🌐 **[Configuration Guide](docs/wiki/en/Configuration-Guide.md)** - UI configuration options
+- 🐳 **[Docker Setup](docs/wiki/en/Docker-Compose-Setup.md)** - Port mapping and access
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.

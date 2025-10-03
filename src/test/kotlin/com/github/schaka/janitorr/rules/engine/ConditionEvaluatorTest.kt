@@ -130,4 +130,41 @@ internal class ConditionEvaluatorTest {
         // This will depend on actual disk usage, so we just verify it doesn't throw
         assertTrue(result is Boolean, "Disk usage evaluation should return a boolean")
     }
+
+    @Test
+    fun testSizeConditionWithExistingFile() {
+        // Create a temporary file with a known size
+        val tempFile = File.createTempFile("test", ".mkv")
+        try {
+            // Write 5GB worth of data (5 * 1024 * 1024 * 1024 bytes)
+            // For testing purposes, we'll just use a small file and test the logic
+            tempFile.writeText("test content")
+            
+            val testMediaItem = mediaItem.copy(filePath = tempFile.absolutePath)
+            
+            // Test with a condition that should match (file is smaller than 1GB)
+            val condition = SizeCondition(
+                operator = ComparisonOperator.LESS_THAN,
+                sizeInGB = 1.0
+            )
+            
+            val result = conditionEvaluator.evaluate(condition, testMediaItem)
+            assertTrue(result, "Small file should be less than 1GB")
+        } finally {
+            tempFile.delete()
+        }
+    }
+
+    @Test
+    fun testSizeConditionWithNonExistentFile() {
+        val testMediaItem = mediaItem.copy(filePath = "/nonexistent/file.mkv")
+        
+        val condition = SizeCondition(
+            operator = ComparisonOperator.GREATER_THAN,
+            sizeInGB = 1.0
+        )
+        
+        val result = conditionEvaluator.evaluate(condition, testMediaItem)
+        assertFalse(result, "Non-existent file should return false")
+    }
 }

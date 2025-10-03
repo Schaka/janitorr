@@ -1,0 +1,52 @@
+{
+  "name": "janitorr",
+  "version": "1.0.0",
+  "description": "Janitorr - Cleans up your media library",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/carcheky/janitorr.git"
+  },
+  "license": "SEE LICENSE IN LICENSE.txt",
+  "private": true,
+  "scripts": {
+    "prepare": "husky || true"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^18.4.3",
+    "@commitlint/config-conventional": "^18.4.3",
+    "husky": "^8.0.3",
+    "semantic-release": "^22.0.12",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1"
+  },
+  "release": {
+    "branches": [
+      "main",
+      {
+        "name": "develop",
+        "prerelease": true
+      }
+    ],
+    "plugins": [
+      "@semantic-release/commit-analyzer",
+      "@semantic-release/release-notes-generator",
+      [
+        "@semantic-release/changelog",
+        {
+          "changelogFile": "CHANGELOG.md"
+        }
+      ],
+      [
+        "@semantic-release/git",
+        {
+          "assets": [
+            "CHANGELOG.md",
+            "package.json"
+          ],
+          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
+        }
+      ],
+      "@semantic-release/github"
+    ]
+  }
+}

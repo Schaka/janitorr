@@ -190,7 +190,7 @@ class ConfigurationController(
     }
 
     @GetMapping("/backups")
-    fun listBackups(): ResponseEntity<Map<String, Any>> {
+    fun listBackups(): ResponseEntity<Map<String, Any?>> {
         log.info("Listing available backups")
         return try {
             val backups = configurationService.listBackups()

@@ -56,7 +56,7 @@ class JanitorrApplication {
                 MemberCategory.PUBLIC_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_PUBLIC_METHODS)
 
             // Register static resources for Management UI
-            hints.resources().registerPattern("static/*")
+            hints.resources().registerPattern("static/**")
         }
     }
 }

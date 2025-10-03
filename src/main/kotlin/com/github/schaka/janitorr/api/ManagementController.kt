@@ -6,13 +6,33 @@ import com.github.schaka.janitorr.cleanup.TagBasedCleanupSchedule
 import com.github.schaka.janitorr.cleanup.WeeklyEpisodeCleanupSchedule
 import com.github.schaka.janitorr.config.ApplicationProperties
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Profile
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
+/**
+ * REST controller for manual management operations and system status.
+ * 
+ * This controller provides endpoints for:
+ * - Checking system status and configuration
+ * - Manually triggering cleanup operations
+ * 
+ * IMPORTANT: This controller is excluded from the "leyden" profile (@Profile("!leyden")).
+ * 
+ * The "leyden" profile is ONLY used during Docker image builds for AOT (Ahead-Of-Time) cache generation.
+ * It should NEVER be active at runtime. If users set SPRING_PROFILES_ACTIVE=leyden at runtime,
+ * this controller will not load, causing 404 errors on all management API endpoints.
+ * 
+ * See documentation:
+ * - docs/wiki/en/Docker-Compose-Setup.md - "Spring Boot Profiles Configuration"
+ * - docs/wiki/es/Configuracion-Docker-Compose.md - "Configuración de Perfiles de Spring Boot"
+ * - docs/wiki/en/FAQ.md - "Why does the Management UI return 404 errors?"
+ */
 @Profile("!leyden")
+@ConditionalOnProperty(prefix = "management.ui", name = ["enabled"], havingValue = "true", matchIfMissing = true)
 @RestController
 @RequestMapping("/api/management")
 class ManagementController(

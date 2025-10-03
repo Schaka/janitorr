@@ -7,6 +7,12 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import kotlin.system.exitProcess
 
+/**
+ * Component that manages the run-once behavior of Janitorr.
+ * 
+ * IMPORTANT: This component is excluded from the "leyden" profile (@Profile("!leyden")).
+ * The "leyden" profile is only for build-time AOT cache generation and should never be active at runtime.
+ */
 @Profile("!leyden")
 @Component
 class RunOnce(

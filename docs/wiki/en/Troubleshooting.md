@@ -10,6 +10,7 @@ Common issues and their solutions when running Janitorr.
 - [File Operation Issues](#file-operation-issues)
 - [Deletion Issues](#deletion-issues)
 - [Performance Issues](#performance-issues)
+- [Management UI Issues](#management-ui-issues)
 - [Logging and Debugging](#logging-and-debugging)
 
 ## Container Issues
@@ -486,6 +487,118 @@ Common issues and their solutions when running Janitorr.
    media-cleanup:
      schedule: "0 0 3 * * ?"  # 3 AM when server is less busy
    ```
+
+## Management UI Issues
+
+### UI Not Accessible
+
+**Symptoms:** Cannot access the web UI at `http://localhost:8080/`
+
+**Solutions:**
+
+1. **Check if UI is enabled:**
+   ```bash
+   docker logs janitorr | grep "Management UI"
+   ```
+   
+   Should show:
+   ```
+   INFO - Management UI is ENABLED and available at http://localhost:8080/
+   ```
+
+2. **Verify environment variable:**
+   ```bash
+   docker exec janitorr printenv | grep JANITORR_UI_ENABLED
+   ```
+   
+   Should return `JANITORR_UI_ENABLED=true`
+
+3. **Check port mapping:**
+   ```yaml
+   ports:
+     - "8080:8080"  # Make sure this is in your docker-compose.yml
+   ```
+
+4. **Verify configuration file:**
+   ```bash
+   docker exec janitorr cat /config/application.yml | grep -A 3 "management:"
+   ```
+   
+   Should show:
+   ```yaml
+   management:
+     ui:
+       enabled: true
+   ```
+
+### UI Shows 404 Error
+
+**Symptoms:** Accessing root URL returns 404 Not Found
+
+**Common Causes:**
+- UI is disabled
+- Using `leyden` profile (native image compilation)
+- Static resources not available
+
+**Solutions:**
+
+1. **Enable UI via environment variable:**
+   ```yaml
+   environment:
+     - JANITORR_UI_ENABLED=true
+   ```
+
+2. **Check active profiles:**
+   ```bash
+   docker logs janitorr | grep "spring.profiles.active"
+   ```
+   
+   If you see `leyden` profile, the UI is disabled by design.
+
+3. **Restart container after configuration change:**
+   ```bash
+   docker-compose restart janitorr
+   ```
+
+### API Endpoints Return 404
+
+**Symptoms:** `/api/management/status` returns 404
+
+**Solutions:**
+
+1. **Verify UI is enabled** (same as above)
+
+2. **Check controller is loaded:**
+   ```bash
+   docker logs janitorr | grep ManagementController
+   ```
+
+3. **Test with curl:**
+   ```bash
+   curl http://localhost:8080/api/management/status
+   ```
+
+### Disabling the UI
+
+If you want to run Janitorr without the web UI:
+
+**Method 1 - Environment Variable (recommended):**
+```yaml
+environment:
+  - JANITORR_UI_ENABLED=false
+```
+
+**Method 2 - Configuration File:**
+```yaml
+management:
+  ui:
+    enabled: false
+```
+
+After disabling, logs will show:
+```
+INFO - Management UI is DISABLED by configuration (management.ui.enabled=false)
+```
 
 ## Logging and Debugging
 

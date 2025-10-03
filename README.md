@@ -1,5 +1,11 @@
 # Janitorr - Cleans up your media library
 
+[![CI/CD Pipeline](https://github.com/carcheky/janitorr/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/ci-cd.yml)
+[![JVM Image](https://github.com/carcheky/janitorr/workflows/JVM%20Image/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/jvm-image.yml)
+[![Native Image](https://github.com/carcheky/janitorr/workflows/Native%20images/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/native-image.yml)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+
 <p align="center">
     <img src="images/logos/janitorr_icon.png" width=384>
 </p>

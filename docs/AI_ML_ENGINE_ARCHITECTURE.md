@@ -374,22 +374,24 @@ ai:
 
 ## Future Enhancements
 
-### Natural Language Interface
-- Query understanding: "Show movies unwatched for 6 months"
-- Conversational cleanup: "What should I delete for 50GB?"
-- Voice command integration
+The following enhancements are under consideration and may be implemented in future releases:
 
-### Computer Vision
-- Poster/artwork quality scoring
-- Scene detection for content type
-- Duplicate detection via visual similarity
-- Quality assessment (upscaled content)
+### Natural Language Interface (Under Consideration)
+- Query understanding: "Show movies unwatched for 6 months" (may be added)
+- Conversational cleanup: "What should I delete for 50GB?" (under consideration)
+- Voice command integration (may be implemented)
 
-### Advanced Analytics
-- Disk health monitoring
-- Performance optimization suggestions
-- Resource planning predictions
-- Service health forecasting
+### Computer Vision (Under Consideration)
+- Poster/artwork quality scoring (may be added)
+- Scene detection for content type (under consideration)
+- Duplicate detection via visual similarity (may be implemented)
+- Quality assessment (upscaled content) (under consideration)
+
+### Advanced Analytics (Under Consideration)
+- Disk health monitoring (may be added)
+- Performance optimization suggestions (under consideration)
+- Resource planning predictions (may be implemented)
+- Service health forecasting (under consideration)
 
 ## References
 

@@ -282,17 +282,20 @@ class CleanupService(
 
 ## Future Enhancements
 
-### Planned (Not in This PR)
-1. JustWatch integration for streaming availability
-2. Availability scoring in intelligence
-3. Personal stats from Trakt watchlist
-4. Batch API calls for efficiency
-5. Metrics and reporting dashboard
-6. Integration into actual cleanup flow
+The following enhancements are under consideration and may be implemented in future releases:
+
+### Under Consideration (Not in This PR)
+1. JustWatch integration for streaming availability (may be added)
+2. Availability scoring in intelligence (under consideration)
+3. Personal stats from Trakt watchlist (under consideration)
+4. Batch API calls for efficiency (may be implemented)
+5. Metrics and reporting dashboard (under consideration)
+6. Integration into actual cleanup flow (may be added)
 
 ### API Expansion Opportunities
+Additional APIs that may be considered for future integration:
 - Letterboxd for film ratings
-- TVDb for TV metadata
+- TVDb for TV show metadata
 - AniDB for anime
 - Custom API support
 

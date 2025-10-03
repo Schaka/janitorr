@@ -128,35 +128,37 @@ For detailed information about the planned architecture:
 
 ## Future Implementation Phases
 
-### Phase 1: Data Collection (2-3 months)
-- [ ] Implement data collection pipeline
-- [ ] Create training data storage (SQLite/H2)
-- [ ] Build feature engineering pipeline
-- [ ] Integrate with existing stats services
+The following implementation phases are under consideration and may be added in future releases:
 
-### Phase 2: Core ML Models (3-4 months)
-- [ ] Implement ContentScoringModel with Kotlin ML or DJL
-- [ ] Build training pipeline
-- [ ] Add model validation and testing
-- [ ] Create model persistence layer
+### Phase 1: Data Collection (2-3 months) - Under Consideration
+- [ ] Implement data collection pipeline (may be added)
+- [ ] Create training data storage (SQLite/H2) (under consideration)
+- [ ] Build feature engineering pipeline (may be implemented)
+- [ ] Integrate with existing stats services (under consideration)
 
-### Phase 3: Intelligence Features (2-3 months)
-- [ ] Pattern recognition models
-- [ ] Predictive analytics
-- [ ] Explanation engine
-- [ ] A/B testing framework
+### Phase 2: Core ML Models (3-4 months) - Under Consideration
+- [ ] Implement ContentScoringModel with Kotlin ML or DJL (may be added)
+- [ ] Build training pipeline (under consideration)
+- [ ] Add model validation and testing (may be implemented)
+- [ ] Create model persistence layer (under consideration)
 
-### Phase 4: UI Integration (2 months)
-- [ ] AI recommendations dashboard
-- [ ] Interactive feedback system
-- [ ] Visualization of decisions
-- [ ] User preference tuning
+### Phase 3: Intelligence Features (2-3 months) - Under Consideration
+- [ ] Pattern recognition models (may be added)
+- [ ] Predictive analytics (under consideration)
+- [ ] Explanation engine (may be implemented)
+- [ ] A/B testing framework (under consideration)
 
-### Phase 5: Advanced Features (3-4 months)
-- [ ] Natural language interface
-- [ ] Computer vision integration
-- [ ] External API integrations (optional)
-- [ ] Continuous learning system
+### Phase 4: UI Integration (2 months) - Under Consideration
+- [ ] AI recommendations dashboard (may be added)
+- [ ] Interactive feedback system (under consideration)
+- [ ] Visualization of decisions (may be implemented)
+- [ ] User preference tuning (under consideration)
+
+### Phase 5: Advanced Features (3-4 months) - Under Consideration
+- [ ] Natural language interface (may be added)
+- [ ] Computer vision integration (under consideration)
+- [ ] External API integrations (optional) (may be implemented)
+- [ ] Continuous learning system (under consideration)
 
 ## Contributing
 

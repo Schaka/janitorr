@@ -292,57 +292,59 @@ The current implementation has **NO AUTHENTICATION**. API endpoints are publicly
 
 ## Future Enhancements
 
-### Phase 2: Security (PRIORITY)
-- [ ] Spring Security dependency
-- [ ] JWT token implementation
-- [ ] BCrypt password encoder
-- [ ] Authentication filters
-- [ ] Authorization annotations
-- [ ] CSRF protection
+The following enhancements are under consideration and may be implemented in future releases:
 
-### Phase 3: Persistence
-- [ ] JPA entity annotations
-- [ ] H2 embedded database
-- [ ] PostgreSQL support
-- [ ] MySQL support
-- [ ] Database migrations (Flyway/Liquibase)
-- [ ] Connection pooling
+### Phase 2: Security (Under Consideration - PRIORITY)
+- [ ] Spring Security dependency (may be added)
+- [ ] JWT token implementation (under consideration)
+- [ ] BCrypt password encoder (may be implemented)
+- [ ] Authentication filters (under consideration)
+- [ ] Authorization annotations (may be added)
+- [ ] CSRF protection (under consideration)
 
-### Phase 4: Advanced Features
-- [ ] OAuth 2.0 integration
-- [ ] Google authentication
-- [ ] GitHub authentication
-- [ ] Discord authentication
-- [ ] Two-factor authentication (TOTP)
-- [ ] Email verification
-- [ ] Password recovery
-- [ ] Account lockout policies
+### Phase 3: Persistence (Under Consideration)
+- [ ] JPA entity annotations (may be implemented)
+- [ ] H2 embedded database (under consideration)
+- [ ] PostgreSQL support (may be added)
+- [ ] MySQL support (may be added)
+- [ ] Database migrations (Flyway/Liquibase) (under consideration)
+- [ ] Connection pooling (may be implemented)
 
-### Phase 5: UI Integration
-- [ ] Login page
-- [ ] Registration page
-- [ ] User management dashboard
-- [ ] Profile settings page
-- [ ] Tenant selector
-- [ ] Role-based UI hiding
+### Phase 4: Advanced Features (Under Consideration)
+- [ ] OAuth 2.0 integration (may be added)
+- [ ] Google authentication (under consideration)
+- [ ] GitHub authentication (under consideration)
+- [ ] Discord authentication (under consideration)
+- [ ] Two-factor authentication (TOTP) (may be implemented)
+- [ ] Email verification (under consideration)
+- [ ] Password recovery (may be added)
+- [ ] Account lockout policies (under consideration)
 
-### Phase 6: Enterprise Features
-- [ ] API key management
-- [ ] Rate limiting per user
-- [ ] Resource quota enforcement
-- [ ] Audit logging
-- [ ] Email notifications
-- [ ] Webhook notifications
-- [ ] Usage analytics
-- [ ] Billing integration
+### Phase 5: UI Integration (Under Consideration)
+- [ ] Login page (may be implemented)
+- [ ] Registration page (may be added)
+- [ ] User management dashboard (under consideration)
+- [ ] Profile settings page (under consideration)
+- [ ] Tenant selector (may be implemented)
+- [ ] Role-based UI hiding (under consideration)
 
-### Phase 7: Multi-Tenancy
-- [ ] Tenant-specific configurations
-- [ ] Path isolation
-- [ ] Service filtering
-- [ ] Database schema per tenant
-- [ ] Tenant onboarding wizard
-- [ ] Tenant migration tools
+### Phase 6: Enterprise Features (Under Consideration)
+- [ ] API key management (may be added)
+- [ ] Rate limiting per user (under consideration)
+- [ ] Resource quota enforcement (under consideration)
+- [ ] Audit logging (may be implemented)
+- [ ] Email notifications (under consideration)
+- [ ] Webhook notifications (may be added)
+- [ ] Usage analytics (under consideration)
+- [ ] Billing integration (under consideration)
+
+### Phase 7: Multi-Tenancy (Under Consideration)
+- [ ] Tenant-specific configurations (may be implemented)
+- [ ] Path isolation (under consideration)
+- [ ] Service filtering (may be added)
+- [ ] Database schema per tenant (under consideration)
+- [ ] Tenant onboarding wizard (may be implemented)
+- [ ] Tenant migration tools (under consideration)
 
 ## Impact Analysis
 

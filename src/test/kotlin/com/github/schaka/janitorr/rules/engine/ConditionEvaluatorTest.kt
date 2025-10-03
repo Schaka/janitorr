@@ -25,7 +25,8 @@ internal class ConditionEvaluatorTest {
     fun setup() {
         fileSystemProperties = FileSystemProperties(
             access = true,
-            freeSpaceCheckDir = "/"
+            freeSpaceCheckDir = "/",
+            mediaServerLeavingSoonDir = null
         )
         conditionEvaluator = ConditionEvaluator(fileSystemProperties)
         

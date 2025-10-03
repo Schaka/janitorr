@@ -74,9 +74,10 @@ class SecurityConfig(
 
     @Bean
     fun userDetailsService(): UserDetailsService {
+        val encodedPassword = passwordEncoder().encode(securityProperties.password)
         val user = User.builder()
             .username(securityProperties.username)
-            .password(passwordEncoder().encode(securityProperties.password))
+            .password(encodedPassword)
             .roles("ADMIN")
             .build()
 

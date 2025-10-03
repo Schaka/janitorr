@@ -25,6 +25,8 @@ on:
     branches:
       - '**'
 
+  workflow_dispatch:
+
 jobs:
   build-jvm-x86:
     runs-on: ubuntu-latest

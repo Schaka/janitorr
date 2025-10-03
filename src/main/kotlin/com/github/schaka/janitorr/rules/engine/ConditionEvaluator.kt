@@ -19,6 +19,7 @@ class ConditionEvaluator(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+        private const val BYTES_PER_GB = 1024.0 * 1024.0 * 1024.0
     }
 
     fun evaluate(condition: Condition, mediaItem: LibraryItem): Boolean {
@@ -56,7 +57,7 @@ class ConditionEvaluator(
             return false
         }
         
-        val sizeInGB = file.length() / (1024.0 * 1024.0 * 1024.0)
+        val sizeInGB = file.length() / BYTES_PER_GB
         return compare(sizeInGB, condition.sizeInGB, condition.operator)
     }
 

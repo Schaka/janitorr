@@ -1,0 +1,398 @@
+/* Configuration Page Specific Styles */
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+/* Tabs Navigation */
+.tabs {
+    display: flex;
+    gap: 5px;
+    margin: 20px 0;
+    border-bottom: 2px solid #e0e0e0;
+    flex-wrap: wrap;
+}
+
+.tab-btn {
+    padding: 12px 24px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.tab-btn.active {
+    color: #4CAF50;
+    border-bottom-color: #4CAF50;
+    background-color: #f0f8f0;
+}
+
+/* Tab Content */
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Configuration Sections */
+.config-section {
+    background: white;
+    padding: 25px;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.config-section h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+    font-size: 1.3em;
+}
+
+.config-section h4 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: #555;
+    font-size: 1.1em;
+}
+
+.help-text {
+    color: #666;
+    font-size: 14px;
+    margin: 5px 0 15px 0;
+    font-style: italic;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+.form-grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    font-weight: 500;
+    color: #444;
+}
+
+.form-grid input[type="text"],
+.form-grid input[type="password"],
+.form-grid input[type="number"],
+.form-grid select {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-grid input[type="text"]:focus,
+.form-grid input[type="password"]:focus,
+.form-grid input[type="number"]:focus,
+.form-grid select:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+.form-grid input[type="checkbox"] {
+    width: auto;
+    margin-right: 8px;
+}
+
+.form-grid label:has(input[type="checkbox"]) {
+    flex-direction: row;
+    align-items: center;
+}
+
+.form-grid label.important {
+    color: #d32f2f;
+    font-weight: 600;
+}
+
+/* Test Connection Container */
+.test-container {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.btn-test {
+    min-width: 150px;
+}
+
+.test-result {
+    font-size: 14px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+.test-result.success {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.test-result.error {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.test-result.testing {
+    background-color: #fff3e0;
+    color: #ef6c00;
+}
+
+/* Dynamic Lists */
+.expiration-list,
+.schedule-list,
+.tag-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.expiration-item,
+.schedule-item,
+.tag-item {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+}
+
+.expiration-item input,
+.schedule-item input {
+    flex: 1;
+    min-width: 100px;
+}
+
+.tag-item input {
+    flex: 1;
+}
+
+.remove-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.remove-btn:hover {
+    background-color: #d32f2f;
+}
+
+/* Backup Actions */
+.backup-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+}
+
+.backups-container {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.backup-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.backup-item-info {
+    flex: 1;
+}
+
+.backup-item-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.backup-item-date {
+    font-size: 12px;
+    color: #666;
+}
+
+.backup-item-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-danger {
+    background-color: #f44336;
+}
+
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .tabs {
+        flex-direction: column;
+    }
+    
+    .tab-btn {
+        width: 100%;
+        text-align: left;
+        border-left: 3px solid transparent;
+        border-bottom: none;
+    }
+    
+    .tab-btn.active {
+        border-left-color: #4CAF50;
+        border-bottom-color: transparent;
+    }
+    
+    .header-actions {
+        flex-direction: column;
+        width: 100%;
+    }
+    
+    .header-actions .btn {
+        width: 100%;
+    }
+    
+    .backup-actions {
+        flex-direction: column;
+    }
+    
+    .backup-actions .btn {
+        width: 100%;
+    }
+}
+
+/* Loading Spinner for Test Buttons */
+.btn-test.loading::before {
+    content: "";
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    margin-right: 8px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Validation States */
+input.invalid {
+    border-color: #f44336;
+    background-color: #ffebee;
+}
+
+input.valid {
+    border-color: #4CAF50;
+    background-color: #e8f5e9;
+}
+
+/* Tooltips */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: help;
+    margin-left: 5px;
+    color: #666;
+}
+
+.tooltip:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 125%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #333;
+    color: white;
+    padding: 8px 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 12px;
+    z-index: 1000;
+}
+
+.tooltip:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 115%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: #333;
+    z-index: 1000;
+}
+
+/* Loading State */
+.loading {
+    text-align: center;
+    color: #666;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    color: #999;
+    padding: 40px;
+    font-style: italic;
+}
+
+.empty-state::before {
+    content: "📭";
+    display: block;
+    font-size: 48px;
+    margin-bottom: 10px;
+}

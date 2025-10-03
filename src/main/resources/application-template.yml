@@ -138,37 +138,22 @@ clients:
     whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
     url: "http://streamystats:3000"
 
-# External APIs for intelligent cleanup decisions
-# These APIs provide additional metadata for smarter deletion decisions
-external-apis:
-  enabled: false # Set to true to enable external API integration
-  cache-refresh-interval: 24h # How often to refresh cached API data
+# Multi-Tenancy and User Management (DISABLED by default)
+# WARNING: This feature is in DEVELOPMENT stage and requires additional security configuration
+# See docs/wiki/en/Multi-Tenancy-Guide.md for complete documentation
+multitenancy:
+  enabled: false # Set to true to enable multi-user and multi-tenancy features
   
-  # The Movie Database (TMDB) - https://www.themoviedb.org/settings/api
-  tmdb:
-    enabled: false
-    api-key: "your-tmdb-api-key" # Get free API key from TMDB
-    base-url: "https://api.themoviedb.org/3"
+  # Default admin user configuration (only created if create-on-startup is true)
+  default-admin:
+    create-on-startup: false # Set to true to create default admin user on first startup
+    email: "admin@janitorr.local" # Change this to your admin email
+    password: "change-me-please" # IMPORTANT: Change this immediately after first login!
   
-  # OMDb API (IMDb data) - http://www.omdbapi.com/apikey.aspx
-  omdb:
-    enabled: false
-    api-key: "your-omdb-api-key" # Get API key from OMDb
-    base-url: "http://www.omdbapi.com"
-  
-  # Trakt.tv - https://trakt.tv/oauth/applications
-  trakt:
-    enabled: false
-    client-id: "your-trakt-client-id"
-    client-secret: "your-trakt-client-secret"
-    base-url: "https://api.trakt.tv"
-  
-  # Configure how different scores are weighted in the overall intelligence score
-  scoring:
-    tmdb-rating-weight: 0.25 # Weight for TMDB ratings (0-1)
-    imdb-rating-weight: 0.25 # Weight for IMDb ratings (0-1)
-    popularity-weight: 0.20 # Weight for popularity scores (0-1)
-    trending-weight: 0.15 # Weight for trending status (0-1)
-    availability-weight: 0.10 # Weight for streaming availability (0-1)
-    collectibility-weight: 0.05 # Weight for collectibility/rarity (0-1)
+  # Authentication configuration (future features - not yet implemented)
+  auth:
+    jwt-enabled: false # JWT token-based authentication (not yet implemented)
+    jwt-secret: "change-this-secret-key-in-production" # Override in production
+    jwt-expiration-seconds: 86400 # 24 hours
+    oauth-enabled: false # OAuth integration (not yet implemented)
     api-key: "jellystat-key" # Jellyfin API key

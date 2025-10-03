@@ -214,7 +214,7 @@ services:
 
 ### 1. Usa HTTPS
 
-La autenticación HTTP Basic transmite credenciales en codificación base64 (no cifradas). Siempre usa HTTPS en producción:
+La autenticación HTTP Basic transmite credenciales en formato base64, que es fácilmente reversible y no proporciona protección de seguridad. Siempre usa HTTPS en producción:
 
 - Usa un proxy inverso con certificados SSL/TLS
 - Obtén certificados gratuitos de [Let's Encrypt](https://letsencrypt.org/)

@@ -20,16 +20,22 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
     havingValue = "true",
     matchIfMissing = false
 )
+import org.springframework.beans.factory.annotation.Value
+
 class MultiTenancyConfig(
-    private val basicAuthInterceptor: BasicAuthInterceptor
+    private val basicAuthInterceptor: BasicAuthInterceptor,
+    @Value("\${auth.requireAuthentication:false}")
+    private val requireAuthentication: Boolean
 ) : WebMvcConfigurer {
     
     /**
      * Register authentication interceptor for multi-tenancy endpoints
      */
     override fun addInterceptors(registry: InterceptorRegistry) {
-        registry.addInterceptor(basicAuthInterceptor)
-            .addPathPatterns("/api/users/**", "/api/tenants/**")
+        if (requireAuthentication) {
+            registry.addInterceptor(basicAuthInterceptor)
+                .addPathPatterns("/api/users/**", "/api/tenants/**")
+        }
     }
     
     /**

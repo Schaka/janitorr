@@ -3,9 +3,12 @@ const API_BASE = '/api/management';
 
 // State
 let statusData = null;
-let cleanupHistoryChart = null;
-let mediaTypeChart = null;
 
+// Chart instances
+const charts = {
+    cleanupHistory: null,
+    mediaType: null
+};
 // DOM elements
 const elements = {
     // Status elements

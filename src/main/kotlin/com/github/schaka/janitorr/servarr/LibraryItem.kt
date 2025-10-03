@@ -28,6 +28,8 @@ data class LibraryItem(
         // extra files that may be provided and or copied over for leaving soon - like subtitles
         val extraFiles: MutableList<String> = mutableListOf(),
 
+        // File size in bytes for tracking space freed during cleanup
+        val sizeInBytes: Long = 0L,
 
 )
 {

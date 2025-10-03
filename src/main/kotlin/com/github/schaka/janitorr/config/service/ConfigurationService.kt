@@ -48,13 +48,12 @@ class ConfigurationService(
     private val jellyseerrProperties: JellyseerrProperties,
     private val jellystatProperties: JellystatProperties,
     private val streamystatsProperties: StreamystatsProperties,
-    private val managementUiProperties: ManagementUiProperties
+    private val managementUiProperties: ManagementUiProperties,
+    private val configurationPathProperties: ConfigurationPathProperties
 ) {
 
     companion object {
         private val log = LoggerFactory.getLogger(ConfigurationService::class.java)
-        private const val CONFIG_FILE_PATH = "/config/application.yml"
-        private const val BACKUP_DIR = "/config/backups"
     }
 
     /**
@@ -185,9 +184,9 @@ class ConfigurationService(
      * Export configuration as YAML string
      */
     fun exportConfiguration(): String {
-        val configFile = File(CONFIG_FILE_PATH)
+        val configFile = File(configurationPathProperties.configFile)
         if (!configFile.exists()) {
-            throw IllegalStateException("Configuration file not found: $CONFIG_FILE_PATH")
+            throw IllegalStateException("Configuration file not found: ${configurationPathProperties.configFile}")
         }
         return configFile.readText()
     }
@@ -208,7 +207,7 @@ class ConfigurationService(
         createBackup()
         
         // Write new configuration
-        val configFile = File(CONFIG_FILE_PATH)
+        val configFile = File(configurationPathProperties.configFile)
         configFile.writeText(yamlContent)
         
         log.info("Configuration imported successfully")
@@ -218,7 +217,7 @@ class ConfigurationService(
      * Create backup of current configuration
      */
     fun createBackup(): String {
-        val backupDir = File(BACKUP_DIR)
+        val backupDir = File(configurationPathProperties.backupDirectory)
         if (!backupDir.exists()) {
             backupDir.mkdirs()
         }
@@ -226,13 +225,13 @@ class ConfigurationService(
         val timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"))
         val backupFile = File(backupDir, "application_$timestamp.yml")
         
-        val configFile = File(CONFIG_FILE_PATH)
+        val configFile = File(configurationPathProperties.configFile)
         if (configFile.exists()) {
             Files.copy(configFile.toPath(), backupFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
             log.info("Configuration backup created: ${backupFile.name}")
             return backupFile.name
         } else {
-            throw IllegalStateException("Configuration file not found: $CONFIG_FILE_PATH")
+            throw IllegalStateException("Configuration file not found: ${configurationPathProperties.configFile}")
         }
     }
 
@@ -240,7 +239,7 @@ class ConfigurationService(
      * Restore configuration from backup
      */
     fun restoreFromBackup(backupFileName: String) {
-        val backupFile = File(BACKUP_DIR, backupFileName)
+        val backupFile = File(configurationPathProperties.backupDirectory, backupFileName)
         if (!backupFile.exists()) {
             throw IllegalArgumentException("Backup file not found: $backupFileName")
         }
@@ -248,7 +247,7 @@ class ConfigurationService(
         // Create a backup of current state before restoring
         createBackup()
         
-        val configFile = File(CONFIG_FILE_PATH)
+        val configFile = File(configurationPathProperties.configFile)
         Files.copy(backupFile.toPath(), configFile.toPath(), StandardCopyOption.REPLACE_EXISTING)
         
         log.info("Configuration restored from backup: $backupFileName")
@@ -258,7 +257,7 @@ class ConfigurationService(
      * List available backups
      */
     fun listBackups(): List<String> {
-        val backupDir = File(BACKUP_DIR)
+        val backupDir = File(configurationPathProperties.backupDirectory)
         if (!backupDir.exists()) {
             return emptyList()
         }
@@ -279,7 +278,7 @@ class ConfigurationService(
         val templateResource = this::class.java.classLoader.getResourceAsStream("application-template.yml")
             ?: throw IllegalStateException("Template file not found")
         
-        val configFile = File(CONFIG_FILE_PATH)
+        val configFile = File(configurationPathProperties.configFile)
         configFile.outputStream().use { output ->
             templateResource.copyTo(output)
         }
@@ -415,7 +414,7 @@ class ConfigurationService(
         }
         val yaml = Yaml(dumperOptions)
         
-        val configFile = File(CONFIG_FILE_PATH)
+        val configFile = File(configurationPathProperties.configFile)
         configFile.writeText(yaml.dump(configMap))
     }
 }

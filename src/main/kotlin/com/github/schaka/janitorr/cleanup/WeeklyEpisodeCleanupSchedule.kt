@@ -33,6 +33,7 @@ class WeeklyEpisodeCleanupSchedule(
         val sonarrProperties: SonarrProperties,
         val sonarrClient: SonarrClient,
         val runOnce: RunOnce,
+        val notificationService: com.github.schaka.janitorr.notifications.NotificationService,
 
         var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
 ) {
@@ -60,54 +61,90 @@ class WeeklyEpisodeCleanupSchedule(
 
         val today = LocalDateTime.now()
         val series = sonarrClient.getAllSeries().filter { it.tags.contains(episodeTag.id) }
+        var totalEpisodesDeleted = 0
+        val errors = mutableListOf<String>()
 
-        for (show in series) {
-            val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
-            val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
-                .filter { it.airDate != null }
-                .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
-                .toMutableList()
+        try {
+            for (show in series) {
+                try {
+                    val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
+                    val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
+                        .filter { it.airDate != null }
+                        .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
+                        .toMutableList()
 
-            val episodesHistory = sonarrClient.getHistory(show.id, latestSeason.seasonNumber)
-                    .sortedBy { parseDate(it.date)}
-                    .distinctBy { it.episodeId }
+                    val episodesHistory = sonarrClient.getHistory(show.id, latestSeason.seasonNumber)
+                            .sortedBy { parseDate(it.date)}
+                            .distinctBy { it.episodeId }
 
-            log.info("Deleting single episodes of ${show.title}")
+                    log.info("Deleting single episodes of ${show.title}")
+                    var episodesDeletedForShow = 0
 
-            // Delete by age
-            for (episodeHistory in episodesHistory) {
-                val episode = episodes.first{ it.seriesId == episodeHistory.seriesId && it.id == episodeHistory.episodeId }
-                val grabDate = parseDate(episodeHistory.date)
-                if (grabDate + applicationProperties.episodeDeletion.maxAge <= today) {
-                    log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because of its age")
+                    // Delete by age
+                    for (episodeHistory in episodesHistory) {
+                        val episode = episodes.first{ it.seriesId == episodeHistory.seriesId && it.id == episodeHistory.episodeId }
+                        val grabDate = parseDate(episodeHistory.date)
+                        if (grabDate + applicationProperties.episodeDeletion.maxAge <= today) {
+                            log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because of its age")
 
-                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
-                        if (!applicationProperties.dryRun) {
-                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
-                            episodes.remove(episode)
+                            if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                                if (!applicationProperties.dryRun) {
+                                    sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                                    episodes.remove(episode)
+                                }
+                                episodesDeletedForShow++
+                            }
                         }
                     }
-                }
-            }
 
-            // Delete by count
-            if (episodes.size > applicationProperties.episodeDeletion.maxEpisodes) {
-                val leftoverEpisodes = episodes.sortedByDescending { it.episodeNumber }.take(applicationProperties.episodeDeletion.maxEpisodes)
-                episodes.removeAll(leftoverEpisodes) // remove the most recent episodes from the list, as we want to keep those
+                    // Delete by count
+                    if (episodes.size > applicationProperties.episodeDeletion.maxEpisodes) {
+                        val leftoverEpisodes = episodes.sortedByDescending { it.episodeNumber }.take(applicationProperties.episodeDeletion.maxEpisodes)
+                        episodes.removeAll(leftoverEpisodes) // remove the most recent episodes from the list, as we want to keep those
 
-                for (episode in episodes) {
-                    log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because there are too many episodes")
+                        for (episode in episodes) {
+                            log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because there are too many episodes")
 
-                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
-                        if (!applicationProperties.dryRun) {
-                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                            if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                                if (!applicationProperties.dryRun) {
+                                    sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                                }
+                                episodesDeletedForShow++
+                            }
                         }
                     }
+                    
+                    totalEpisodesDeleted += episodesDeletedForShow
+                } catch (e: Exception) {
+                    log.error("Error cleaning up episodes for show: ${show.title}", e)
+                    errors.add("Error cleaning up ${show.title}: ${e.message}")
                 }
             }
+            
+            // Send notification about cleanup completion
+            sendCleanupNotification(totalEpisodesDeleted, errors)
+        } catch (e: Exception) {
+            log.error("Error during episode cleanup", e)
+            errors.add("Episode cleanup error: ${e.message}")
+            sendCleanupNotification(totalEpisodesDeleted, errors)
         }
 
         runOnce.hasWeeklyEpisodeCleanupRun = true
+    }
+    
+    private fun sendCleanupNotification(filesDeleted: Int, errors: List<String>) {
+        try {
+            val stats = com.github.schaka.janitorr.notifications.CleanupStats(
+                cleanupType = "EPISODE",
+                filesDeleted = filesDeleted,
+                spaceFreeGB = 0.0, // Episodes don't track space saved
+                dryRun = applicationProperties.dryRun,
+                errors = errors
+            )
+            notificationService.sendCleanupComplete(stats)
+        } catch (e: Exception) {
+            log.error("Error sending cleanup notification", e)
+        }
     }
 
     private fun parseDate(date: String): LocalDateTime {

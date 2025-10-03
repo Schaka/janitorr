@@ -24,19 +24,6 @@ class MetricsService {
     private val cleanupHistory = mutableListOf<CleanupEvent>()
     private val serviceLock = Any()
 
-    init {
-        // Add some sample data for demonstration
-        initializeSampleData()
-    }
-
-    private fun initializeSampleData() {
-        // This adds sample data so the dashboard shows something on first load
-        recordCleanup("movies", 5, 15_000_000_000L) // 15 GB
-        recordCleanup("shows", 3, 8_000_000_000L)   // 8 GB
-        recordCleanup("episodes", 12, 6_000_000_000L) // 6 GB
-        log.info("Initialized MetricsService with sample data")
-    }
-
     /**
      * Record a cleanup event
      */

@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
+import com.github.schaka.janitorr.metrics.MetricsService
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import org.slf4j.LoggerFactory
@@ -26,6 +27,7 @@ abstract class AbstractCleanupSchedule(
     protected val runOnce: RunOnce,
     protected val sonarrService: ServarrService,
     protected val radarrService: ServarrService,
+    protected val metricsService: MetricsService,
 ) {
 
     companion object {
@@ -95,6 +97,12 @@ abstract class AbstractCleanupSchedule(
         val cannotDeleteMovies = toDeleteMovies.filter { it.seeding }
         val deletedMovies = toDeleteMovies.filter { !it.seeding }
 
+        // Calculate space freed from successfully deleted movies
+        val spaceFreed = deletedMovies.sumOf { it.sizeInBytes }
+        if (deletedMovies.isNotEmpty()) {
+            metricsService.recordCleanup("movies", deletedMovies.size, spaceFreed)
+        }
+
         jellyseerrService.cleanupRequests(deletedMovies)
         mediaServerService.cleanupMovies(deletedMovies)
         mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
@@ -105,6 +113,13 @@ abstract class AbstractCleanupSchedule(
 
         val cannotDeleteShow = toDeleteShows.filter { it.seeding }
         val deletedShows = toDeleteShows.filter { !it.seeding }
+
+        // Calculate space freed from successfully deleted shows/seasons
+        val spaceFreed = deletedShows.sumOf { it.sizeInBytes }
+        if (deletedShows.isNotEmpty()) {
+            val type = if (applicationProperties.wholeTvShow) "shows" else "episodes"
+            metricsService.recordCleanup(type, deletedShows.size, spaceFreed)
+        }
 
         jellyseerrService.cleanupRequests(deletedShows)
         mediaServerService.cleanupTvShows(deletedShows)

@@ -129,4 +129,38 @@ clients:
     enabled: false
     whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
     url: "http://streamystats:3000"
+
+# External APIs for intelligent cleanup decisions
+# These APIs provide additional metadata for smarter deletion decisions
+external-apis:
+  enabled: false # Set to true to enable external API integration
+  cache-refresh-interval: 24h # How often to refresh cached API data
+  
+  # The Movie Database (TMDB) - https://www.themoviedb.org/settings/api
+  tmdb:
+    enabled: false
+    api-key: "your-tmdb-api-key" # Get free API key from TMDB
+    base-url: "https://api.themoviedb.org/3"
+  
+  # OMDb API (IMDb data) - http://www.omdbapi.com/apikey.aspx
+  omdb:
+    enabled: false
+    api-key: "your-omdb-api-key" # Get API key from OMDb
+    base-url: "http://www.omdbapi.com"
+  
+  # Trakt.tv - https://trakt.tv/oauth/applications
+  trakt:
+    enabled: false
+    client-id: "your-trakt-client-id"
+    client-secret: "your-trakt-client-secret"
+    base-url: "https://api.trakt.tv"
+  
+  # Configure how different scores are weighted in the overall intelligence score
+  scoring:
+    tmdb-rating-weight: 0.25 # Weight for TMDB ratings (0-1)
+    imdb-rating-weight: 0.25 # Weight for IMDb ratings (0-1)
+    popularity-weight: 0.20 # Weight for popularity scores (0-1)
+    trending-weight: 0.15 # Weight for trending status (0-1)
+    availability-weight: 0.10 # Weight for streaming availability (0-1)
+    collectibility-weight: 0.05 # Weight for collectibility/rarity (0-1)
     api-key: "jellystat-key" # Jellyfin API key

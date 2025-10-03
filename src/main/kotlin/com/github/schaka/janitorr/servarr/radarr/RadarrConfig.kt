@@ -6,9 +6,6 @@ import com.github.schaka.janitorr.servarr.ServarrService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
-/**
- * Only required for native image
- */
 @Configuration(proxyBeanMethods = false)
 class RadarrConfig(
     //val radarrRestService: RadarrRestService,

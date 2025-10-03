@@ -65,7 +65,6 @@ jobs:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           LC_ALL: "en_US.UTF-8"
-          IMAGE_TYPE: "jvm"
           TARGET_PLATFORM: "amd64"
 
   build-jvm-aarch64:
@@ -95,7 +94,6 @@ jobs:
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           LC_ALL: "en_US.UTF-8"
-          IMAGE_TYPE: "jvm"
           TARGET_PLATFORM: "arm64"
 
   combine-images:

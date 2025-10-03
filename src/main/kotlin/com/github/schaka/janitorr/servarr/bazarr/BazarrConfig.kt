@@ -11,9 +11,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 
-/**
- * Only required for native image
- */
 @Configuration(proxyBeanMethods = false)
 class BazarrConfig(
     val bazarrNoOpService: BazarrNoOpService

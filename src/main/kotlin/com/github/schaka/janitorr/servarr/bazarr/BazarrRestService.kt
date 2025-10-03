@@ -3,12 +3,10 @@ package com.github.schaka.janitorr.servarr.bazarr
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 
 @Service
-@RegisterReflectionForBinding(classes = [BazarrPage::class, BazarrPayload::class, Subtitles::class])
 class BazarrRestService(
 
     val bazarrClient: BazarrClient,

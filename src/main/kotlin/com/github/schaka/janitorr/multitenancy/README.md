@@ -83,34 +83,34 @@ curl -X POST http://localhost:8978/api/users \
 
 ## Security Warning
 
-⚠️ **IMPORTANT**: This implementation does NOT include authentication. The API endpoints are publicly accessible. You MUST add authentication before production use.
+⚠️ **IMPORTANT**: The API endpoints require authentication to prevent unauthorized access.
 
-Options:
-1. Use a reverse proxy with authentication (Nginx, Traefik)
-2. Add Spring Security configuration
+**Recommended Options:**
+1. **Enable Built-in Authentication** (Easiest): Configure `security.enabled: true` in application.yml - See [Security Guide](../../../docs/wiki/en/Security-Guide.md)
+2. Use a reverse proxy with authentication (Nginx, Traefik)
 3. Restrict network access via firewall
 
 ## Future Enhancements
 
-See the [Multi-Tenancy Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md) for detailed roadmap.
+The following enhancements are under consideration and may be implemented in future releases. See the [Multi-Tenancy Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md) for detailed roadmap.
 
-### Priority 1: Security
-- Spring Security integration
-- JWT tokens
-- BCrypt password hashing
-- CSRF protection
+### Priority 1: Security (Under Consideration)
+- Spring Security integration (may be added)
+- JWT tokens (under consideration)
+- BCrypt password hashing (may be implemented)
+- CSRF protection (under consideration)
 
-### Priority 2: Persistence
-- JPA entities
-- H2/PostgreSQL support
-- Migration scripts
+### Priority 2: Persistence (Under Consideration)
+- JPA entities (may be added)
+- H2/PostgreSQL support (under consideration)
+- Migration scripts (may be implemented)
 
-### Priority 3: Advanced Features
-- OAuth (Google, GitHub, Discord)
-- 2FA
-- API keys
-- Rate limiting
-- Audit logging
+### Priority 3: Advanced Features (Under Consideration)
+- OAuth (Google, GitHub, Discord) (may be added)
+- 2FA (under consideration)
+- API keys (may be implemented)
+- Rate limiting (under consideration)
+- Audit logging (may be added)
 
 ## Contributing
 

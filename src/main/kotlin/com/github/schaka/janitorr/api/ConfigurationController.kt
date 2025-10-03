@@ -202,7 +202,7 @@ class ConfigurationController(
             log.error("Error listing backups", e)
             ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(mapOf(
                 "backups" to emptyList<String>(),
-                "error" to e.message,
+                "error" to (e.message ?: "Unknown error"),
                 "timestamp" to System.currentTimeMillis()
             ))
         }

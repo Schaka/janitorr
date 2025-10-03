@@ -59,11 +59,24 @@ multitenancy:
 
 ### Consideraciones de Seguridad
 
-**CRÍTICO**: La implementación actual NO incluye autenticación. Los endpoints de la API están expuestos sin protección. **DEBES** agregar una de las siguientes opciones:
+**CRÍTICO**: Los endpoints de la API de multi-tenancy requieren autenticación para prevenir el acceso no autorizado.
 
-1. **Autenticación con Proxy Inverso**: Usa Nginx, Traefik, o Caddy con autenticación
-2. **Spring Security**: Agregar configuración de Spring Security (mejora futura)
+**Configuración de Seguridad Recomendada:**
+
+1. **Habilitar Autenticación Integrada** (Más fácil):
+   ```yaml
+   security:
+     enabled: true
+     username: admin
+     password: tu-contraseña-segura
+   ```
+   Ver la [Guía de Seguridad](Guia-Seguridad.md) para configuración detallada.
+
+2. **Autenticación con Proxy Inverso**: Usa Nginx, Traefik, o Caddy con autenticación
+
 3. **Aislamiento de Red**: Restringir acceso mediante reglas de firewall
+
+Para instrucciones detalladas de configuración de seguridad, ver la [Guía de Seguridad](Guia-Seguridad.md).
 
 ## Endpoints de la API
 

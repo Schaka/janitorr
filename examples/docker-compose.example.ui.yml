@@ -17,6 +17,10 @@ services:
       # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
       - THC_PATH=/health
       - THC_PORT=8081
+      # IMPORTANT: Do NOT set SPRING_PROFILES_ACTIVE=leyden - the leyden profile is only for build-time AOT cache generation
+      # The Management UI and API endpoints require this profile to be inactive (default behavior)
+      # If you need custom profiles, you can set them here (comma-separated), but avoid 'leyden'
+      # - SPRING_PROFILES_ACTIVE=prod,custom
     healthcheck:
       test: [ "CMD", "/workspace/health-check" ]
       start_period: 30s

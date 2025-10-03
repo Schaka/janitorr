@@ -357,6 +357,104 @@ schedule: "0 0 0 1 * ?"
 schedule: "0 0 2 ? * MON-FRI"
 ```
 
+## AI/ML Intelligence Engine (Future Feature)
+
+> **Status:** 🚧 Planning Phase - Not Yet Implemented  
+> **Priority:** Low (Advanced Future Feature)
+
+The AI/ML Intelligence Engine is a future feature that will use machine learning to optimize cleanup decisions based on viewing patterns and user preferences.
+
+### Overview
+
+When implemented, this feature will:
+- Analyze viewing history to predict which media should be kept
+- Learn from user decisions and preferences
+- Provide intelligent recommendations with explanations
+- Optimize cleanup timing based on usage patterns
+
+### Configuration
+
+The AI feature can be configured in `application.yml`, but is **disabled by default**:
+
+```yaml
+ai:
+  enabled: false  # AI features are not yet implemented
+  model-path: /config/models
+  training:
+    enabled: false
+    schedule: "0 0 3 * * ?"
+    min-data-points: 1000
+    historical-data-days: 90
+  inference:
+    cache-ttl: 3600
+    batch-size: 100
+    confidence-threshold: 0.7
+    timeout-ms: 100
+  features:
+    external-apis: false  # Privacy-preserving, local-only
+    user-feedback: true   # Learn from corrections
+    natural-language: false  # Future feature
+    computer-vision: false   # Future feature
+```
+
+### Architecture Documentation
+
+For detailed information about the planned AI/ML architecture:
+- **English:** [AI/ML Engine Architecture](../../AI_ML_ENGINE_ARCHITECTURE.md)
+- **Spanish:** [Arquitectura del Motor IA/ML](../../ARQUITECTURA_MOTOR_IA_ML.md)
+
+### Key Features (Planned)
+
+#### Content Scoring Model
+- Predicts keep/delete probability for each media item
+- Considers: watch frequency, recency, genre preferences, storage impact
+- Provides confidence scores and explanations
+
+#### Pattern Recognition
+- Detects viewing schedules and habits
+- Identifies binge-watching patterns for active series
+- Recognizes seasonal preferences
+
+#### Predictive Analytics
+- Forecasts storage needs
+- Suggests optimal cleanup timing
+- Recommends content to keep based on trends
+
+### Privacy & Ethics
+
+The AI engine is designed with privacy in mind:
+- **Local Processing:** All ML runs locally, no external data sharing
+- **Anonymization:** User IDs are hashed before processing
+- **Transparency:** All decisions come with explanations
+- **User Control:** Easy opt-out and override capability
+- **Data Retention:** Training data purged after 90 days
+
+### Current Status
+
+This feature is in the architecture and planning phase. The codebase includes:
+- Configuration structure (`AIProperties`)
+- Data models for ML features (`MediaFeatures`, `ViewingSession`)
+- Service interfaces (`InferenceEngine`, `ContentScoringModel`)
+- Placeholder implementations
+
+**To contribute or track progress:**
+- Review architecture documentation
+- Provide feedback on feature requirements
+- Suggest ML algorithms and approaches
+
+### When Will This Be Available?
+
+This is a complex, long-term feature. Implementation timeline:
+- **Phase 1:** Data collection infrastructure (2-3 months)
+- **Phase 2:** Core ML models (3-4 months)
+- **Phase 3:** Intelligence features (2-3 months)
+- **Phase 4:** UI integration (2 months)
+- **Phase 5:** Advanced features (3-4 months)
+
+**Total estimated time:** 12-16 months
+
+See [GitHub Issues](https://github.com/carcheky/janitorr/issues) for current status and discussions.
+
 ## Security Considerations
 
 ### API Keys

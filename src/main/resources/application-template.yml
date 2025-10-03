@@ -130,3 +130,25 @@ clients:
     whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
     url: "http://streamystats:3000"
     api-key: "jellystat-key" # Jellyfin API key
+
+# AI/ML Intelligence Engine (Future Feature - Currently in Planning Phase)
+# This feature uses machine learning to optimize cleanup decisions based on viewing patterns
+# Status: Disabled by default - Architecture documentation available in docs/AI_ML_ENGINE_ARCHITECTURE.md
+ai:
+  enabled: false # AI features are disabled by default and not yet implemented
+  model-path: /config/models # Where to store trained ML models
+  training:
+    enabled: false # Manual training only (automatic training not yet implemented)
+    schedule: "0 0 3 * * ?" # 3 AM daily (if/when automatic training is implemented)
+    min-data-points: 1000 # Minimum viewing history entries before training
+    historical-data-days: 90 # Days of history to use for training
+  inference:
+    cache-ttl: 3600 # Cache predictions for 1 hour (seconds)
+    batch-size: 100 # Items per batch for library scoring
+    confidence-threshold: 0.7 # Minimum confidence (0.0-1.0) to act on predictions
+    timeout-ms: 100 # Maximum time to wait for a prediction (milliseconds)
+  features:
+    external-apis: false # Disable external data sources (privacy-preserving)
+    user-feedback: true # Learn from user corrections (when implemented)
+    natural-language: false # Natural language query interface (future)
+    computer-vision: false # Computer vision features (future)

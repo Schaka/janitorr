@@ -83,11 +83,11 @@ curl -X POST http://localhost:8978/api/users \
 
 ## Security Warning
 
-⚠️ **IMPORTANT**: This implementation does NOT include authentication. The API endpoints are publicly accessible. You MUST add authentication before production use.
+⚠️ **IMPORTANT**: The API endpoints require authentication to prevent unauthorized access.
 
-Options:
-1. Use a reverse proxy with authentication (Nginx, Traefik)
-2. Add Spring Security configuration
+**Recommended Options:**
+1. **Enable Built-in Authentication** (Easiest): Configure `security.enabled: true` in application.yml - See [Security Guide](../../../docs/wiki/en/Security-Guide.md)
+2. Use a reverse proxy with authentication (Nginx, Traefik)
 3. Restrict network access via firewall
 
 ## Future Enhancements

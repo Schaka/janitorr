@@ -47,18 +47,14 @@ class MultiTenancyInitializer(
                 password = adminConfig.password,
                 role = UserRole.ADMIN
             )
-            log.warn("=" * 80)
+            log.warn("=".repeat(80))
             log.warn("DEFAULT ADMIN USER CREATED")
             log.warn("Email: ${admin.email}")
             log.warn("Password: ${adminConfig.password}")
             log.warn("PLEASE CHANGE THIS PASSWORD IMMEDIATELY!")
-            log.warn("=" * 80)
+            log.warn("=".repeat(80))
         } catch (e: Exception) {
             log.error("Failed to create default admin user", e)
         }
-    }
-    
-    private operator fun String.times(n: Int): String {
-        return this.repeat(n)
     }
 }

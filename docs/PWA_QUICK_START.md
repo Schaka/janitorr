@@ -624,6 +624,11 @@ async function subscribeUserToPush() {
         const registration = await navigator.serviceWorker.ready;
         const subscription = await registration.pushManager.subscribe({
             userVisibleOnly: true,
+            // Replace 'YOUR_PUBLIC_VAPID_KEY_HERE' with your actual public VAPID key.
+            // To generate VAPID keys, use the 'web-push' npm package:
+            //   npx web-push generate-vapid-keys
+            // The public key goes here, and the private key is used on your server.
+            // See: https://web-push-book.gauntface.com/chapter-04/01-generating-vapid-keys/
             applicationServerKey: urlBase64ToUint8Array('YOUR_PUBLIC_VAPID_KEY_HERE')
         });
         

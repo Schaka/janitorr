@@ -25,6 +25,13 @@ data class MultiTenancyProperties(
 
 data class AuthConfig(
     /**
+     * Require authentication for multi-tenancy API endpoints.
+     * When true, all API calls must provide valid HTTP Basic Auth credentials.
+     * When false, endpoints are unprotected (NOT RECOMMENDED for production).
+     */
+    val requireAuthentication: Boolean = false,
+    
+    /**
      * Enable JWT authentication
      */
     val jwtEnabled: Boolean = false,

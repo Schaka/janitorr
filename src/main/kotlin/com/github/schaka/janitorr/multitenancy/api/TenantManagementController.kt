@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.multitenancy.api
 import com.github.schaka.janitorr.multitenancy.model.Tenant
 import com.github.schaka.janitorr.multitenancy.model.TenantUser
 import com.github.schaka.janitorr.multitenancy.model.UserRole
+import com.github.schaka.janitorr.multitenancy.security.AuthorizationUtils
 import com.github.schaka.janitorr.multitenancy.service.TenantService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.*
  * - Tenant switching
  * 
  * Only available when multi-tenancy is enabled.
+ * 
+ * Authorization:
+ * - All tenant operations require ADMIN role
  */
 @ConditionalOnProperty(prefix = "multitenancy", name = ["enabled"], havingValue = "true")
 @RestController
@@ -33,9 +37,12 @@ class TenantManagementController(
     
     /**
      * Create a new tenant
+     * Requires: ADMIN role
      */
     @PostMapping
     fun createTenant(@RequestBody request: CreateTenantRequest): ResponseEntity<Tenant> {
+        AuthorizationUtils.requireAdmin()
+        
         return try {
             val tenant = tenantService.createTenant(
                 name = request.name,
@@ -50,18 +57,24 @@ class TenantManagementController(
     
     /**
      * Get all tenants
+     * Requires: ADMIN role
      */
     @GetMapping
     fun getAllTenants(): ResponseEntity<List<Tenant>> {
+        AuthorizationUtils.requireAdmin()
+        
         val tenants = tenantService.getAllTenants()
         return ResponseEntity.ok(tenants)
     }
     
     /**
      * Get tenant by ID
+     * Requires: ADMIN role
      */
     @GetMapping("/{tenantId}")
     fun getTenantById(@PathVariable tenantId: String): ResponseEntity<Tenant> {
+        AuthorizationUtils.requireAdmin()
+        
         val tenant = tenantService.findById(tenantId)
         return tenant?.let { ResponseEntity.ok(it) }
             ?: ResponseEntity.notFound().build()
@@ -69,21 +82,27 @@ class TenantManagementController(
     
     /**
      * Get all users in a tenant
+     * Requires: ADMIN role
      */
     @GetMapping("/{tenantId}/users")
     fun getTenantUsers(@PathVariable tenantId: String): ResponseEntity<List<TenantUser>> {
+        AuthorizationUtils.requireAdmin()
+        
         val users = tenantService.getTenantUsers(tenantId)
         return ResponseEntity.ok(users)
     }
     
     /**
      * Add user to tenant
+     * Requires: ADMIN role
      */
     @PostMapping("/{tenantId}/users")
     fun addUserToTenant(
         @PathVariable tenantId: String,
         @RequestBody request: AddUserToTenantRequest
     ): ResponseEntity<TenantUser> {
+        AuthorizationUtils.requireAdmin()
+        
         return try {
             val tenantUser = tenantService.addUserToTenant(
                 tenantId = tenantId,
@@ -102,12 +121,15 @@ class TenantManagementController(
     
     /**
      * Remove user from tenant
+     * Requires: ADMIN role
      */
     @DeleteMapping("/{tenantId}/users/{userId}")
     fun removeUserFromTenant(
         @PathVariable tenantId: String,
         @PathVariable userId: String
     ): ResponseEntity<Void> {
+        AuthorizationUtils.requireAdmin()
+        
         val success = tenantService.removeUserFromTenant(tenantId, userId)
         return if (success) {
             ResponseEntity.noContent().build()
@@ -118,9 +140,12 @@ class TenantManagementController(
     
     /**
      * Delete tenant
+     * Requires: ADMIN role
      */
     @DeleteMapping("/{tenantId}")
     fun deleteTenant(@PathVariable tenantId: String): ResponseEntity<Void> {
+        AuthorizationUtils.requireAdmin()
+        
         val success = tenantService.deleteTenant(tenantId)
         return if (success) {
             ResponseEntity.noContent().build()

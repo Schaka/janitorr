@@ -4,6 +4,8 @@
     <img src="images/logos/janitorr_icon.png" width=384>
 </p>
 
+> **Note**: This is a community-maintained fork of [schaka/janitorr](https://github.com/schaka/janitorr) with additional features including a Management Web UI and comprehensive multi-language documentation. See [FORK_CHANGES.md](FORK_CHANGES.md) for details.
+
 ### Inspiration
 
 This application is heavily inspired by (but not a fork of) [Maintainerr](https://github.com/jorenn92/Maintainerr).

@@ -36,6 +36,12 @@ const elements = {
     moviesDeleted: document.getElementById('moviesDeleted'),
     showsDeleted: document.getElementById('showsDeleted'),
     
+    // Notification test buttons
+    testDiscordBtn: document.getElementById('testDiscordBtn'),
+    testTelegramBtn: document.getElementById('testTelegramBtn'),
+    testEmailBtn: document.getElementById('testEmailBtn'),
+    testWebhookBtn: document.getElementById('testWebhookBtn'),
+    
     // Message container
     messageContainer: document.getElementById('messageContainer'),
     
@@ -453,6 +459,36 @@ async function triggerCleanup(endpoint, buttonElement) {
     }
 }
 
+async function testNotification(channel, buttonElement) {
+    setButtonLoading(buttonElement, true);
+    
+    try {
+        const response = await fetch(`${API_BASE}/notifications/test/${channel}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showMessage(data.message, 'success');
+        } else {
+            showMessage(data.message, 'warning');
+        }
+    } catch (error) {
+        console.error('Error testing notification:', error);
+        showMessage('Failed to test notification: ' + error.message, 'error');
+    } finally {
+        setButtonLoading(buttonElement, false);
+    }
+}
+
 // Event listeners
 elements.refreshStatusBtn.addEventListener('click', () => {
     showMessage('Refreshing dashboard...', 'info');
@@ -469,6 +505,23 @@ elements.tagCleanupBtn.addEventListener('click', () => {
 
 elements.episodeCleanupBtn.addEventListener('click', () => {
     triggerCleanup('/cleanup/episodes', elements.episodeCleanupBtn);
+});
+
+// Notification test buttons
+elements.testDiscordBtn.addEventListener('click', () => {
+    testNotification('discord', elements.testDiscordBtn);
+});
+
+elements.testTelegramBtn.addEventListener('click', () => {
+    testNotification('telegram', elements.testTelegramBtn);
+});
+
+elements.testEmailBtn.addEventListener('click', () => {
+    testNotification('email', elements.testEmailBtn);
+});
+
+elements.testWebhookBtn.addEventListener('click', () => {
+    testNotification('webhook', elements.testWebhookBtn);
 });
 
 if (elements.darkModeToggle) {

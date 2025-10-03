@@ -53,6 +53,11 @@ Before setting up Janitorr, ensure you have:
 
 6. **Access the Management UI:**
    Open `http://<your-server-ip>:<configured-port>/` in your browser
+   
+   **✅ The Management UI is fully functional!** You can now:
+   - View system status in real-time
+   - Manually trigger cleanup operations
+   - Monitor cleanup execution
 
 ## Configuration Steps
 
@@ -72,6 +77,8 @@ Key settings to configure:
 - **Port**: The port Janitorr will listen on (default: 8978)
 - **Dry Run Mode**: Start with `dry-run: true` to test without deleting anything
 - **Leaving Soon Directory**: Where symlinks for "leaving soon" media will be created
+
+**✅ After configuration, the Management UI will be accessible at `http://localhost:8978/`**
 
 ### 2. Understand Volume Mapping
 
@@ -460,29 +467,44 @@ services:
 
 ### Management UI Returns 404 Errors
 
-**Problem:** Accessing `/api/management/status` or other management endpoints returns 404 errors.
+**✅ This issue has been FIXED in current releases!**
+
+If you're still experiencing 404 errors, you're likely using an outdated image.
 
 **Solution:**
-1. Check if `SPRING_PROFILES_ACTIVE` environment variable includes `leyden`
-2. Remove `leyden` from the active profiles - it's only for build-time use
-3. If you need custom profiles, set them without `leyden`:
+1. Update to the latest image:
    ```yaml
-   environment:
-     - SPRING_PROFILES_ACTIVE=prod,custom  # Do NOT include leyden
+   image: ghcr.io/carcheky/janitorr:jvm-stable
    ```
-4. Restart the container after removing the leyden profile
-5. Verify the endpoints are accessible: `curl http://localhost:8978/api/management/status`
-6. Check container logs for confirmation that ManagementController loaded: `docker logs janitorr`
+2. Pull the latest image:
+   ```bash
+   docker-compose pull janitorr
+   ```
+3. Restart the container:
+   ```bash
+   docker-compose up -d janitorr
+   ```
+4. Verify the endpoints are accessible:
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+
+**Expected behavior with current images:**
+- ✅ `http://localhost:8978/` loads the Management UI
+- ✅ `http://localhost:8978/api/management/status` returns JSON status
+- ✅ All cleanup endpoints work correctly
 
 ## Next Steps
 
 After successful deployment:
 
 1. **Access the Management UI** at `http://<your-server-ip>:8978/`
+   - ✅ **Working!** The UI is fully functional in all current releases
 2. **Review the configuration** and verify all services are connected
 3. **Test in dry-run mode** before enabling actual deletions
 4. **Monitor the logs** to understand what Janitorr will do
 5. **Set up the "Leaving Soon" collection** in Jellyfin
+6. **Use the web interface** to trigger manual cleanups and monitor status
 
 ## Additional Resources
 

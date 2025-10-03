@@ -254,6 +254,79 @@ logging:
 - `DEBUG` - Detailed debugging info
 - `TRACE` - Very detailed trace information
 
+### External APIs for Intelligent Cleanup
+
+Janitorr can integrate with external APIs to make smarter cleanup decisions based on ratings, popularity, and trending data.
+
+**Supported APIs:**
+- **TMDB** (The Movie Database) - Ratings, popularity, trending data
+- **OMDb** (IMDb data) - IMDb ratings, Metacritic scores, awards
+- **Trakt.tv** - Watch statistics, collection data, trending information
+
+**Configuration:**
+
+```yaml
+external-apis:
+  enabled: true
+  cache-refresh-interval: 24h
+  
+  tmdb:
+    enabled: true
+    api-key: "your-tmdb-api-key"
+    base-url: "https://api.themoviedb.org/3"
+  
+  omdb:
+    enabled: true
+    api-key: "your-omdb-api-key"
+    base-url: "http://www.omdbapi.com"
+  
+  trakt:
+    enabled: true
+    client-id: "your-trakt-client-id"
+    client-secret: "your-trakt-client-secret"
+    base-url: "https://api.trakt.tv"
+  
+  scoring:
+    tmdb-rating-weight: 0.25
+    imdb-rating-weight: 0.25
+    popularity-weight: 0.20
+    trending-weight: 0.15
+    availability-weight: 0.10
+    collectibility-weight: 0.05
+```
+
+**Getting API Keys:**
+
+1. **TMDB**: Sign up at https://www.themoviedb.org and request an API key at https://www.themoviedb.org/settings/api (free)
+2. **OMDb**: Get an API key at http://www.omdbapi.com/apikey.aspx (free tier available)
+3. **Trakt**: Create an application at https://trakt.tv/oauth/applications
+
+**Smart Cleanup Rules:**
+
+When external APIs are enabled, Janitorr will automatically preserve content that:
+- Has an IMDb rating ≥ 8.0
+- Has a TMDB rating ≥ 8.0
+- Is currently trending
+- Has high collectibility score (rare content)
+- Has an overall intelligence score ≥ 70
+
+**Scoring System:**
+
+The scoring weights determine how much each factor contributes to the overall intelligence score:
+- Higher weight = more influence on decision
+- All weights should sum to approximately 1.0
+- Adjust based on your preferences (e.g., prioritize ratings over trending)
+
+**Benefits:**
+- **Smarter Decisions**: Keep valuable content based on real data
+- **Preserve Quality**: Never delete highly-rated or award-winning content
+- **Follow Trends**: Keep popular and trending media
+- **Save Rare Content**: Protect hard-to-find or collectible items
+
+**Performance:**
+
+API responses are cached for the configured `cache-refresh-interval` (default: 24 hours) to minimize API calls and improve performance.
+
 ## Path Configuration
 
 ### Understanding Path Mapping

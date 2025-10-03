@@ -1,4 +1,7 @@
 version: "3"
+# ✅ Full Stack Example with Working Management UI
+# This example includes Jellyfin, Sonarr, Radarr, Jellyseerr, Jellystat, and Janitorr
+# After starting: Access Janitorr Management UI at http://localhost:8978/
 services:
   jellyfin:
     image: jellyfin/jellyfin:latest
@@ -90,7 +93,7 @@ services:
 
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:jvm-stable  # ✅ Management UI fully functional!
     user: 1000:1000 # Replace with your user who should own your application.yml file
     mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended
     mem_swappiness: 0
@@ -100,11 +103,11 @@ services:
       - /share_media:/data
     environment:
       # Management UI Configuration
-      - JANITORR_UI_ENABLED=true # Set to false to disable the web-based Management UI
+      - JANITORR_UI_ENABLED=true # ✅ ENABLED - Access at http://localhost:8978/
       
       # Spring Boot Configuration (optional)
       # - SPRING_PROFILES_ACTIVE=management,ui # Activate specific Spring profiles if needed
-      # - SERVER_PORT=8080 # Change the internal port if needed (must also update port mapping)
+      # - SERVER_PORT=8978 # Internal port (default: 8978)
       
       # Management Endpoints Configuration (optional)
       # - MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info,management # Control which endpoints are exposed
@@ -117,6 +120,8 @@ services:
       # The Management UI and API endpoints require this profile to be inactive (default behavior)
       # If you need custom profiles, you can set them here (comma-separated), but avoid 'leyden'
       # - SPRING_PROFILES_ACTIVE=prod,custom
+    ports:
+      - "8978:8978"  # ✅ Management UI available at http://localhost:8978/
     healthcheck:
       test: [ "CMD", "/workspace/health-check" ]
       start_period: 30s

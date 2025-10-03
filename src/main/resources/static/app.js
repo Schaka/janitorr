@@ -3,6 +3,7 @@ const API_BASE = '/api/management';
 
 // State
 let statusData = null;
+let darkMode = localStorage.getItem('darkMode') === 'true';
 
 // DOM elements
 const elements = {
@@ -23,28 +24,141 @@ const elements = {
     mediaCleanupBtn: document.getElementById('mediaCleanupBtn'),
     tagCleanupBtn: document.getElementById('tagCleanupBtn'),
     episodeCleanupBtn: document.getElementById('episodeCleanupBtn'),
+    darkModeToggle: document.getElementById('darkModeToggle'),
     
     // Message container
-    messageContainer: document.getElementById('messageContainer')
+    messageContainer: document.getElementById('messageContainer'),
+    
+    // New elements
+    dryRunBanner: document.getElementById('dryRunBanner')
 };
 
 // Utility functions
 function showMessage(message, type = 'info') {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${type}`;
-    messageDiv.textContent = message;
+    messageDiv.innerHTML = `
+        <span class="message-text">${message}</span>
+        <button class="message-close" onclick="this.parentElement.remove()">×</button>
+    `;
     
     elements.messageContainer.appendChild(messageDiv);
     
     // Auto-remove after 5 seconds
     setTimeout(() => {
-        messageDiv.style.opacity = '0';
-        setTimeout(() => messageDiv.remove(), 300);
+        if (messageDiv.parentElement) {
+            messageDiv.style.opacity = '0';
+            setTimeout(() => messageDiv.remove(), 300);
+        }
     }, 5000);
+}
+
+function formatTimestamp(timestamp) {
+    if (!timestamp) return 'Never';
+    
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    let relativeTime;
+    if (diffMins < 1) {
+        relativeTime = 'Just now';
+    } else if (diffMins < 60) {
+        relativeTime = `${diffMins} minute${diffMins !== 1 ? 's' : ''} ago`;
+    } else if (diffHours < 24) {
+        relativeTime = `${diffHours} hour${diffHours !== 1 ? 's' : ''} ago`;
+    } else if (diffDays < 7) {
+        relativeTime = `${diffDays} day${diffDays !== 1 ? 's' : ''} ago`;
+    } else {
+        relativeTime = date.toLocaleDateString();
+    }
+    
+    const timeStr = date.toLocaleString();
+    return `<span title="${timeStr}">${relativeTime}</span>`;
+}
+
+function confirmAction(message) {
+    return new Promise((resolve) => {
+        const modal = document.createElement('div');
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <h3>⚠️ Confirm Action</h3>
+                <p>${message}</p>
+                ${statusData?.dryRun ? '<p class="warning-text"><strong>Note:</strong> Dry-run mode is enabled. No files will be deleted.</p>' : '<p class="warning-text"><strong>Warning:</strong> This action cannot be undone.</p>'}
+                <div class="modal-buttons">
+                    <button class="btn btn-secondary" id="cancelBtn">Cancel</button>
+                    <button class="btn btn-primary" id="confirmBtn">Confirm</button>
+                </div>
+            </div>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        const confirmBtn = modal.querySelector('#confirmBtn');
+        const cancelBtn = modal.querySelector('#cancelBtn');
+        
+        confirmBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(true);
+        });
+        
+        cancelBtn.addEventListener('click', () => {
+            modal.remove();
+            resolve(false);
+        });
+        
+        // Close on escape key
+        const escHandler = (e) => {
+            if (e.key === 'Escape') {
+                modal.remove();
+                document.removeEventListener('keydown', escHandler);
+                resolve(false);
+            }
+        };
+        document.addEventListener('keydown', escHandler);
+        
+        // Focus confirm button
+        setTimeout(() => confirmBtn.focus(), 100);
+    });
+}
+
+function toggleDarkMode() {
+    darkMode = !darkMode;
+    localStorage.setItem('darkMode', darkMode);
+    applyDarkMode();
+}
+
+function applyDarkMode() {
+    if (darkMode) {
+        document.body.classList.add('dark-mode');
+        if (elements.darkModeToggle) {
+            elements.darkModeToggle.textContent = '☀️';
+            elements.darkModeToggle.title = 'Switch to Light Mode';
+        }
+    } else {
+        document.body.classList.remove('dark-mode');
+        if (elements.darkModeToggle) {
+            elements.darkModeToggle.textContent = '🌙';
+            elements.darkModeToggle.title = 'Switch to Dark Mode';
+        }
+    }
 }
 
 function updateStatusDisplay(data) {
     statusData = data;
+    
+    // Update dry-run banner visibility
+    if (elements.dryRunBanner) {
+        if (data.dryRun) {
+            elements.dryRunBanner.style.display = 'flex';
+        } else {
+            elements.dryRunBanner.style.display = 'none';
+        }
+    }
     
     // Update status values
     elements.dryRunStatus.textContent = data.dryRun ? 'Enabled' : 'Disabled';
@@ -62,14 +176,14 @@ function updateStatusDisplay(data) {
     elements.episodeEnabledStatus.textContent = data.episodeDeletionEnabled ? 'Enabled' : 'Disabled';
     elements.episodeEnabledStatus.className = data.episodeDeletionEnabled ? 'status-value enabled' : 'status-value disabled';
     
-    // Update last run status
-    elements.mediaLastRun.textContent = data.hasMediaCleanupRun ? 'Completed' : 'Not yet';
+    // Update last run status with timestamps
+    elements.mediaLastRun.innerHTML = data.hasMediaCleanupRun ? formatTimestamp(data.timestamp) : 'Not yet';
     elements.mediaLastRun.className = data.hasMediaCleanupRun ? 'status-value enabled' : 'status-value';
     
-    elements.tagLastRun.textContent = data.hasTagBasedCleanupRun ? 'Completed' : 'Not yet';
+    elements.tagLastRun.innerHTML = data.hasTagBasedCleanupRun ? formatTimestamp(data.timestamp) : 'Not yet';
     elements.tagLastRun.className = data.hasTagBasedCleanupRun ? 'status-value enabled' : 'status-value';
     
-    elements.episodeLastRun.textContent = data.hasWeeklyEpisodeCleanupRun ? 'Completed' : 'Not yet';
+    elements.episodeLastRun.innerHTML = data.hasWeeklyEpisodeCleanupRun ? formatTimestamp(data.timestamp) : 'Not yet';
     elements.episodeLastRun.className = data.hasWeeklyEpisodeCleanupRun ? 'status-value enabled' : 'status-value';
 }
 
@@ -100,6 +214,17 @@ async function fetchStatus() {
 }
 
 async function triggerCleanup(endpoint, buttonElement) {
+    // Show confirmation dialog
+    const cleanupType = endpoint.split('/').pop().replace('-', ' ');
+    const confirmed = await confirmAction(
+        `Are you sure you want to trigger ${cleanupType} cleanup?`
+    );
+    
+    if (!confirmed) {
+        showMessage('Cleanup cancelled', 'info');
+        return;
+    }
+    
     setButtonLoading(buttonElement, true);
     
     try {
@@ -150,8 +275,29 @@ elements.episodeCleanupBtn.addEventListener('click', () => {
     triggerCleanup('/cleanup/episodes', elements.episodeCleanupBtn);
 });
 
+if (elements.darkModeToggle) {
+    elements.darkModeToggle.addEventListener('click', toggleDarkMode);
+}
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    // Ctrl/Cmd + R: Refresh status
+    if ((e.ctrlKey || e.metaKey) && e.key === 'r') {
+        e.preventDefault();
+        fetchStatus();
+        showMessage('Status refreshed (Ctrl+R)', 'info');
+    }
+    
+    // Ctrl/Cmd + D: Toggle dark mode
+    if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+        e.preventDefault();
+        toggleDarkMode();
+    }
+});
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    applyDarkMode();
     fetchStatus();
     
     // Auto-refresh status every 30 seconds

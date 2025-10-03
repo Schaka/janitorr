@@ -254,6 +254,79 @@ logging:
 - `DEBUG` - Información detallada de depuración
 - `TRACE` - Información de rastreo muy detallada
 
+### APIs Externas para Limpieza Inteligente
+
+Janitorr puede integrarse con APIs externas para tomar decisiones de limpieza más inteligentes basadas en calificaciones, popularidad y datos de tendencias.
+
+**APIs Soportadas:**
+- **TMDB** (The Movie Database) - Calificaciones, popularidad, datos de tendencias
+- **OMDb** (datos de IMDb) - Calificaciones de IMDb, puntuaciones de Metacritic, premios
+- **Trakt.tv** - Estadísticas de visualización, datos de colección, información de tendencias
+
+**Configuración:**
+
+```yaml
+external-apis:
+  enabled: true
+  cache-refresh-interval: 24h
+  
+  tmdb:
+    enabled: true
+    api-key: "tu-clave-api-tmdb"
+    base-url: "https://api.themoviedb.org/3"
+  
+  omdb:
+    enabled: true
+    api-key: "tu-clave-api-omdb"
+    base-url: "http://www.omdbapi.com"
+  
+  trakt:
+    enabled: true
+    client-id: "tu-client-id-trakt"
+    client-secret: "tu-client-secret-trakt"
+    base-url: "https://api.trakt.tv"
+  
+  scoring:
+    tmdb-rating-weight: 0.25
+    imdb-rating-weight: 0.25
+    popularity-weight: 0.20
+    trending-weight: 0.15
+    availability-weight: 0.10
+    collectibility-weight: 0.05
+```
+
+**Obtención de Claves API:**
+
+1. **TMDB**: Regístrate en https://www.themoviedb.org y solicita una clave API en https://www.themoviedb.org/settings/api (gratis)
+2. **OMDb**: Obtén una clave API en http://www.omdbapi.com/apikey.aspx (nivel gratuito disponible)
+3. **Trakt**: Crea una aplicación en https://trakt.tv/oauth/applications
+
+**Reglas de Limpieza Inteligente:**
+
+Cuando las APIs externas están habilitadas, Janitorr preservará automáticamente contenido que:
+- Tenga una calificación de IMDb ≥ 8.0
+- Tenga una calificación de TMDB ≥ 8.0
+- Esté actualmente en tendencia
+- Tenga una alta puntuación de coleccionabilidad (contenido raro)
+- Tenga una puntuación de inteligencia general ≥ 70
+
+**Sistema de Puntuación:**
+
+Los pesos de puntuación determinan cuánto contribuye cada factor a la puntuación general de inteligencia:
+- Mayor peso = más influencia en la decisión
+- Todos los pesos deben sumar aproximadamente 1.0
+- Ajusta según tus preferencias (ej. priorizar calificaciones sobre tendencias)
+
+**Beneficios:**
+- **Decisiones Más Inteligentes**: Mantén contenido valioso basado en datos reales
+- **Preservar Calidad**: Nunca elimines contenido altamente calificado o galardonado
+- **Seguir Tendencias**: Mantén medios populares y en tendencia
+- **Guardar Contenido Raro**: Protege elementos difíciles de encontrar o coleccionables
+
+**Rendimiento:**
+
+Las respuestas de API se almacenan en caché durante el `cache-refresh-interval` configurado (predeterminado: 24 horas) para minimizar las llamadas a API y mejorar el rendimiento.
+
 ## Configuración de Rutas
 
 ### Entendiendo el Mapeo de Rutas

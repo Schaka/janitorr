@@ -44,39 +44,83 @@ Add to your `application.yml`:
 multitenancy:
   enabled: true
   
-  # Optional: Create default admin user on startup
-  default-admin:
-    create-on-startup: true
-    email: "admin@janitorr.local"
-    password: "change-me-please"  # CHANGE THIS!
-  
-  # Optional: JWT authentication (not yet implemented)
+  # Authentication configuration
   auth:
+    # Enable HTTP Basic Auth for multi-tenancy endpoints
+    # IMPORTANT: Set to true in production to protect APIs
+    require-authentication: true
+    
+    # JWT authentication (not yet implemented)
     jwt-enabled: false
     jwt-secret: "your-secret-key-here"
     jwt-expiration-seconds: 86400
+  
+  # Create default admin user on startup
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "change-me-please"  # CHANGE THIS IMMEDIATELY!
 ```
 
-### Security Considerations
+### Authentication & Authorization
 
-**CRITICAL**: The multi-tenancy API endpoints require authentication to prevent unauthorized access.
+**IMPORTANT**: Multi-tenancy endpoints (`/api/users/**` and `/api/tenants/**`) support HTTP Basic Authentication to protect sensitive operations.
 
-**Recommended Security Setup:**
+#### Enable Authentication
 
-1. **Enable Built-in Authentication** (Easiest):
-   ```yaml
-   security:
-     enabled: true
-     username: admin
-     password: your-secure-password
-   ```
-   See the [Security Guide](Security-Guide.md) for detailed configuration.
+Set `multitenancy.auth.require-authentication: true` in your configuration:
 
-2. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication
+```yaml
+multitenancy:
+  enabled: true
+  auth:
+    require-authentication: true  # Enable authentication
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "your-secure-password"
+```
 
-3. **Network Isolation**: Restrict access via firewall rules
+#### Using Authenticated Endpoints
 
-For detailed security setup instructions, see the [Security Guide](Security-Guide.md).
+Once authentication is enabled, all API requests must include HTTP Basic Auth credentials:
+
+```bash
+# Example: Create a user with authentication
+curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-secure-password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newuser@example.com",
+    "password": "user-password",
+    "role": "STANDARD_USER"
+  }'
+```
+
+#### Authorization Rules
+
+- **Tenant Management**: Requires ADMIN role for all operations
+- **User Management**: 
+  - Creating, deleting users, changing roles: ADMIN only
+  - Users can view and update their own profile
+  - Users can change their own password
+  - Listing all users: ADMIN only
+
+#### Backward Compatibility
+
+For backward compatibility, authentication is **disabled by default** (`require-authentication: false`). This allows existing deployments to continue working, but is **NOT RECOMMENDED** for production use.
+
+**⚠️ WARNING**: Running with authentication disabled allows anyone with network access to create, modify, or delete users and tenants.
+
+### Additional Security Options
+
+1. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication in front of Janitorr
+
+2. **Network Isolation**: Restrict access via firewall rules (iptables, cloud security groups)
+
+3. **Built-in Security Module**: See the [Security Guide](Security-Guide.md) for additional security features.
+
+For comprehensive security setup instructions, see the [Security Guide](Security-Guide.md).
 
 ## API Endpoints
 
@@ -214,9 +258,12 @@ DELETE /api/tenants/{tenantId}
 
 ### Family Setup
 
+**Note**: These examples assume authentication is enabled. Add `-u "admin@janitorr.local:password"` to each curl command when `require-authentication: true`.
+
 1. **Create tenant for the family:**
 ```bash
 curl -X POST http://localhost:8978/api/tenants \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{"name": "Smith Family"}'
 ```
@@ -225,6 +272,7 @@ curl -X POST http://localhost:8978/api/tenants \
 ```bash
 # Dad (Admin)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "dad@smith.family",
@@ -234,6 +282,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Mom (Power User)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "mom@smith.family",
@@ -243,6 +292,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Teenager (Standard User)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "teen@smith.family",
@@ -252,6 +302,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Child (Read-Only)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "kid@smith.family",
@@ -263,6 +314,7 @@ curl -X POST http://localhost:8978/api/users \
 3. **Add users to tenant:**
 ```bash
 curl -X POST http://localhost:8978/api/tenants/{tenantId}/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{"userId": "{userId}", "role": "ADMIN"}'
 ```

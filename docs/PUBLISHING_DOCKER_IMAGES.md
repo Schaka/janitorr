@@ -335,5 +335,5 @@ https://github.com/carcheky/janitorr/pkgs/container/janitorr
 
 ---
 
-**Última actualización / Last updated:** Octubre 3, 2025  
+**Última actualización / Last updated:** Octubre 2025 / October 2025  
 **Versión del documento / Document version:** 1.0

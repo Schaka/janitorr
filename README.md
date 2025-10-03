@@ -50,6 +50,15 @@ Comprehensive documentation is available in multiple languages:
   - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
   - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
 
+### Fork-Specific Documentation
+
+This fork includes additional documentation:
+
+- **[FORK_CHANGES.md](FORK_CHANGES.md)** - Complete list of features added in this fork
+- **[MANAGEMENT_UI.md](MANAGEMENT_UI.md)** - Documentation for the web-based management interface
+- **[UPSTREAM_SYNC_STATUS.md](UPSTREAM_SYNC_STATUS.md)** - Sync status with upstream repository
+- **[FORK_MAINTENANCE.md](FORK_MAINTENANCE.md)** - Quick reference guide for fork maintenance
+
 ## Features
 
 - **Web-based Management UI** - Monitor status and manually trigger cleanup functions through a user-friendly web interface

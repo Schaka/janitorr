@@ -59,11 +59,24 @@ multitenancy:
 
 ### Security Considerations
 
-**CRITICAL**: The current implementation does NOT include authentication. The API endpoints are exposed without protection. You **MUST** add one of the following:
+**CRITICAL**: The multi-tenancy API endpoints require authentication to prevent unauthorized access.
 
-1. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication
-2. **Spring Security**: Add Spring Security configuration (future enhancement)
+**Recommended Security Setup:**
+
+1. **Enable Built-in Authentication** (Easiest):
+   ```yaml
+   security:
+     enabled: true
+     username: admin
+     password: your-secure-password
+   ```
+   See the [Security Guide](Security-Guide.md) for detailed configuration.
+
+2. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication
+
 3. **Network Isolation**: Restrict access via firewall rules
+
+For detailed security setup instructions, see the [Security Guide](Security-Guide.md).
 
 ## API Endpoints
 
@@ -312,35 +325,37 @@ Tenant
 
 ## Future Enhancements
 
-### Phase 1: Security (Priority)
-- [ ] Spring Security integration
-- [ ] JWT token generation and validation
-- [ ] BCrypt password hashing
-- [ ] Session management
-- [ ] CSRF protection
+The following enhancements are under consideration and may be implemented in future releases:
 
-### Phase 2: Persistence
-- [ ] JPA entities
-- [ ] H2 database for development
-- [ ] PostgreSQL support for production
-- [ ] Database migration scripts
-- [ ] Backup and restore
+### Phase 1: Security (Priority - Under Consideration)
+- [ ] Spring Security integration (may be added)
+- [ ] JWT token generation and validation (under consideration)
+- [ ] BCrypt password hashing (may be implemented)
+- [ ] Session management (under consideration)
+- [ ] CSRF protection (may be added)
 
-### Phase 3: Advanced Features
-- [ ] OAuth integration (Google, GitHub, Discord)
-- [ ] Two-factor authentication
-- [ ] API key management
-- [ ] Rate limiting
-- [ ] Audit logging
-- [ ] Email notifications
-- [ ] Password recovery
-- [ ] User invitation system
+### Phase 2: Persistence (Under Consideration)
+- [ ] JPA entities (may be implemented)
+- [ ] H2 database for development (under consideration)
+- [ ] PostgreSQL support for production (may be added)
+- [ ] Database migration scripts (under consideration)
+- [ ] Backup and restore (may be implemented)
 
-### Phase 4: UI Integration
-- [ ] Login/logout pages
-- [ ] User management dashboard
-- [ ] Profile settings page
-- [ ] Tenant switcher
+### Phase 3: Advanced Features (Under Consideration)
+- [ ] OAuth integration (Google, GitHub, Discord) (may be added)
+- [ ] Two-factor authentication (under consideration)
+- [ ] API key management (may be implemented)
+- [ ] Rate limiting (under consideration)
+- [ ] Audit logging (may be added)
+- [ ] Email notifications (under consideration)
+- [ ] Password recovery (may be implemented)
+- [ ] User invitation system (under consideration)
+
+### Phase 4: UI Integration (Under Consideration)
+- [ ] Login/logout pages (may be added)
+- [ ] User management dashboard (under consideration)
+- [ ] Profile settings page (may be implemented)
+- [ ] Tenant switcher (under consideration)
 - [ ] Role-based UI components
 
 ### Phase 5: Multi-Tenancy

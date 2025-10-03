@@ -223,15 +223,15 @@ styles.css:
 
 ## 🔜 Future Enhancements (Not Implemented)
 
-The following were proposed but not implemented (can be added later):
+The following were proposed but not implemented and are under consideration for future releases:
 
-- [ ] Real-time logs display
-- [ ] Detailed cleanup statistics
-- [ ] Next scheduled cleanup countdown
-- [ ] Configuration details in UI
-- [ ] More keyboard shortcuts (numeric keys for buttons)
-- [ ] Accessibility improvements (high contrast mode)
-- [ ] Multi-language support
+- [ ] Real-time logs display (may be added)
+- [ ] Detailed cleanup statistics (under consideration)
+- [ ] Next scheduled cleanup countdown (may be implemented)
+- [ ] Configuration details in UI (under consideration)
+- [ ] More keyboard shortcuts (numeric keys for buttons) (may be added)
+- [ ] Accessibility improvements (high contrast mode) (under consideration)
+- [ ] Multi-language support (may be implemented)
 
 ## 🎓 Lessons Learned
 

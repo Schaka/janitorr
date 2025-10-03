@@ -214,7 +214,7 @@ services:
 
 ### 1. Use HTTPS
 
-HTTP Basic Authentication transmits credentials in base64 encoding (not encrypted). Always use HTTPS in production:
+HTTP Basic Authentication transmits credentials in base64-encoded format, which is easily reversible and provides no security protection. Always use HTTPS in production:
 
 - Use a reverse proxy with SSL/TLS certificates
 - Get free certificates from [Let's Encrypt](https://letsencrypt.org/)

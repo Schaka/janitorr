@@ -1,0 +1,145 @@
+# Multi-Tenancy Module
+
+This module provides multi-user and multi-tenancy support for Janitorr.
+
+## Package Structure
+
+```
+multitenancy/
+├── api/                          # REST API controllers
+│   ├── UserManagementController.kt
+│   └── TenantManagementController.kt
+├── config/                       # Configuration
+│   ├── MultiTenancyConfig.kt
+│   ├── MultiTenancyProperties.kt
+│   └── MultiTenancyInitializer.kt
+├── model/                        # Data models
+│   ├── User.kt
+│   ├── UserProfile.kt
+│   └── Tenant.kt
+├── repository/                   # Data access layer
+│   ├── UserRepository.kt
+│   └── TenantRepository.kt
+└── service/                      # Business logic
+    ├── UserService.kt
+    ├── TenantService.kt
+    └── UserContext.kt
+```
+
+## Features
+
+### Implemented ✅
+- User CRUD operations
+- Role-based access control (ADMIN, POWER_USER, STANDARD_USER, READ_ONLY)
+- User profiles with preferences
+- Tenant management
+- User-tenant associations
+- In-memory storage (development)
+- REST API endpoints
+- Default admin user creation
+
+### Not Implemented ⚠️
+- Spring Security integration
+- JWT token authentication
+- BCrypt password hashing (uses simple Base64)
+- Database persistence (uses in-memory)
+- OAuth integration
+- Session management
+- Rate limiting
+- Audit logging
+- Resource quota enforcement
+- Email notifications
+
+## Quick Start
+
+### 1. Enable Multi-Tenancy
+
+Add to `application.yml`:
+
+```yaml
+multitenancy:
+  enabled: true
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "change-me-please"
+```
+
+### 2. Start Janitorr
+
+The default admin user will be created automatically on startup.
+
+### 3. Create Users
+
+```bash
+curl -X POST http://localhost:8978/api/users \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "user@example.com",
+    "password": "password",
+    "role": "STANDARD_USER"
+  }'
+```
+
+## Security Warning
+
+⚠️ **IMPORTANT**: This implementation does NOT include authentication. The API endpoints are publicly accessible. You MUST add authentication before production use.
+
+Options:
+1. Use a reverse proxy with authentication (Nginx, Traefik)
+2. Add Spring Security configuration
+3. Restrict network access via firewall
+
+## Future Enhancements
+
+See the [Multi-Tenancy Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md) for detailed roadmap.
+
+### Priority 1: Security
+- Spring Security integration
+- JWT tokens
+- BCrypt password hashing
+- CSRF protection
+
+### Priority 2: Persistence
+- JPA entities
+- H2/PostgreSQL support
+- Migration scripts
+
+### Priority 3: Advanced Features
+- OAuth (Google, GitHub, Discord)
+- 2FA
+- API keys
+- Rate limiting
+- Audit logging
+
+## Contributing
+
+Areas that need work:
+- [ ] Spring Security configuration
+- [ ] JPA entity mapping
+- [ ] Database migration scripts
+- [ ] OAuth providers
+- [ ] UI components
+- [ ] Unit tests
+- [ ] Integration tests
+- [ ] Performance testing
+
+## Testing
+
+Currently limited testing due to no build environment with Java 25.
+
+To test manually:
+1. Enable multi-tenancy in config
+2. Start Janitorr
+3. Use curl/Postman to test API endpoints
+4. Verify CRUD operations work correctly
+5. Test role-based access (when authentication is added)
+
+## Documentation
+
+- [English Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md)
+- [Guía en Español](../../../docs/wiki/es/Guia-Multi-Tenancy.md)
+
+## License
+
+Same as parent project (see LICENSE.txt)

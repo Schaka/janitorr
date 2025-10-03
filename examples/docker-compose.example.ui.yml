@@ -1,0 +1,61 @@
+# Docker Compose Example - Management UI Access
+# This example demonstrates how to set up Janitorr with the Management UI accessible via browser.
+#
+# The Management UI provides a web-based interface to:
+# - View the current system status and configuration
+# - Manually trigger any of the three cleanup schedules on-demand
+# - Monitor which cleanups have been executed
+# - See real-time feedback on cleanup operations
+#
+# Access the Management UI at: http://<your-server-ip>:8978/
+#
+# Environment Variables:
+# You can customize the paths by setting environment variables, or use the defaults:
+# - JANITORR_CONFIG_PATH: Path to janitorr config directory (default: ./volumes/janitorr-config)
+# - JANITORR_LOGS_PATH: Path to janitorr logs directory (default: ./volumes/janitorr-logs)
+# - JANITORR_DATA_PATH: Path to media data directory (default: ./volumes/data)
+# - PUID: User ID for file ownership (default: 1000)
+# - PGID: Group ID for file ownership (default: 1000)
+#
+# Prerequisites:
+# 1. Create the configuration directory:
+#    mkdir -p ./volumes/janitorr-config ./volumes/janitorr-logs
+#    (or your custom paths from environment variables)
+#
+# 2. Download the application template:
+#    wget -O ./volumes/janitorr-config/application.yml \
+#      https://raw.githubusercontent.com/carcheky/janitorr/main/src/main/resources/application-template.yml
+#
+# 3. Edit the configuration file with your *arr, Jellyfin/Emby, and Jellyseerr API keys:
+#    nano ./volumes/janitorr-config/application.yml
+#
+# 4. Start the service:
+#    docker-compose -f docker-compose.example.ui.yml up -d
+#
+# 5. Access the Management UI:
+#    Open http://<your-server-ip>:8978/ in your browser
+
+version: "3"
+
+services:
+  janitorr:
+    container_name: janitorr
+    image: ghcr.io/carcheky/janitorr:jvm-stable
+    user: ${PUID:-1000}:${PGID:-1000}
+    mem_limit: 256M # Minimum 200M, recommended 256M
+    mem_swappiness: 0
+    volumes:
+      - ${JANITORR_CONFIG_PATH:-./volumes/janitorr-config}/application.yml:/config/application.yml
+      - ${JANITORR_LOGS_PATH:-./volumes/janitorr-logs}:/logs
+      - ${JANITORR_DATA_PATH:-./volumes/data}:/data
+    environment:
+      - THC_PATH=/health
+      - THC_PORT=8081
+    ports:
+      - "8978:8978" # Management UI will be accessible at http://<host-ip>:8978/
+    healthcheck:
+      test: ["CMD", "/workspace/health-check"]
+      start_period: 30s
+      interval: 5s
+      retries: 3
+    restart: unless-stopped

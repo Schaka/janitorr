@@ -85,9 +85,10 @@
                         API Key
                         <input type="password" id="radarr-apikey" placeholder="Your Radarr API key">
                     </label>
-                    <label>
-                        <input type="checkbox" id="radarr-onlyDeleteFiles"> Only Delete Files (NOT RECOMMENDED)
+                    <label for="radarr-onlyDeleteFiles">
+                        <input type="checkbox" id="radarr-onlyDeleteFiles" aria-describedby="radarr-onlyDeleteFiles-warning"> Only Delete Files
                     </label>
+                    <span id="radarr-onlyDeleteFiles-warning" class="warning-message" style="color: #c00; font-weight: bold;">NOT RECOMMENDED</span>
                     <label>
                         <input type="checkbox" id="radarr-importExclusions"> Import Exclusions
                     </label>

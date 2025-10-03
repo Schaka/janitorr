@@ -218,6 +218,22 @@ services:
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/carcheky/janitorr:jvm-develop`.
 The development version of the native image is available as `ghcr.io/carcheky/janitorr:native-develop`.
 
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details on:
+
+- How to submit changes
+- Commit message conventions
+- Development workflow
+- Code style guidelines
+
+### Quick Start for Contributors
+
+1. Fork and clone the repository
+2. Make your changes following [Conventional Commits](https://www.conventionalcommits.org/)
+3. Submit a pull request
+
+All commits must follow the Conventional Commits specification. See the [CI/CD Documentation](docs/CI-CD.md) for more details on our automated release process.
 
 ## JetBrains
 Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.

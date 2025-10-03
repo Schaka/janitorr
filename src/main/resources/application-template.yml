@@ -4,6 +4,13 @@ logging:
   file: # Delete this line and the one below it, to disable file logging
     name: "/logs/janitorr.log"
 
+# Configuration Path Settings
+# These paths can be customized for different deployment scenarios and testing environments
+configuration:
+  paths:
+    config-file: "/config/application.yml" # Path to the main configuration file
+    backup-directory: "/config/backups" # Directory where configuration backups are stored
+
 # Management UI Configuration
 # The web interface for monitoring and manually triggering cleanup operations
 management:

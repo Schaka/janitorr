@@ -3,7 +3,7 @@ services:
 
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:jvm-main
     user: 1000:1000 # Replace with your user who should own your application.yml file
     mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended
     mem_swappiness: 0

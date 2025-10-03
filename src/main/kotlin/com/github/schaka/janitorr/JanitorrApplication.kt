@@ -54,6 +54,9 @@ class JanitorrApplication {
             hints.reflection().registerType(
                 TypeReference.of("com.github.benmanes.caffeine.cache.SSA"),
                 MemberCategory.PUBLIC_FIELDS, MemberCategory.INVOKE_DECLARED_CONSTRUCTORS, MemberCategory.INVOKE_PUBLIC_METHODS)
+
+            // Register static resources for Management UI
+            hints.resources().registerPattern("static/*")
         }
     }
 }

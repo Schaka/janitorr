@@ -11,14 +11,11 @@ import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.CONTENT_TYPE
-import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
-import org.springframework.http.ResponseEntity
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
 @Configuration(proxyBeanMethods = false)
@@ -63,7 +60,7 @@ class JellyfinClientConfig {
 
             if (lastUpdate.plusMinutes(30).isBefore(LocalDateTime.now())) {
                 val userInfo = getUserInfo(properties)
-                accessToken = userInfo.body?.get("AccessToken").toString()
+                accessToken = userInfo?.get("AccessToken").toString()
                 lastUpdate = LocalDateTime.now()
                 log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
             }
@@ -72,11 +69,8 @@ class JellyfinClientConfig {
             template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
         }
 
-        private fun getUserInfo(properties: JellyfinProperties): ResponseEntity<Map<*, *>> {
-            val login = RestTemplate()
-            val headers = HttpHeaders()
-            headers.set(AUTHORIZATION, "MediaBrowser , $janitorrClientString")
-            headers.set(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+        private fun getUserInfo(properties: JellyfinProperties): Map<*, *>? {
+            val webClient = WebClient.builder().build()
 
             val loginInfo = """
                 {
@@ -85,7 +79,14 @@ class JellyfinClientConfig {
                 }
             """.trimIndent()
 
-            return login.exchange("${properties.url}/Users/AuthenticateByName", HttpMethod.POST, HttpEntity(loginInfo, headers), Map::class.java)
+            return webClient.post()
+                .uri("${properties.url}/Users/AuthenticateByName")
+                .header(AUTHORIZATION, "MediaBrowser , $janitorrClientString")
+                .header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
+                .body(BodyInserters.fromValue(loginInfo))
+                .retrieve()
+                .bodyToMono(Map::class.java)
+                .block()
         }
 
     }

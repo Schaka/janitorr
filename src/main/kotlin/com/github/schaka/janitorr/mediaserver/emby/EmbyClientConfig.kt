@@ -10,15 +10,13 @@ import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_FORM_URLENCODED_VALUE
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
-import org.springframework.http.ResponseEntity
 import org.springframework.util.LinkedMultiValueMap
-import org.springframework.web.client.RestTemplate
+import org.springframework.web.reactive.function.BodyInserters
+import org.springframework.web.reactive.function.client.WebClient
 import java.time.LocalDateTime
 
 @Configuration(proxyBeanMethods = false)
@@ -76,7 +74,7 @@ class EmbyClientConfig {
 
             if (lastUpdate.plusMinutes(30).isBefore(LocalDateTime.now())) {
                 val userInfo = getUserInfo(properties)
-                accessToken = userInfo.body?.get("AccessToken").toString()
+                accessToken = userInfo?.get("AccessToken").toString()
                 lastUpdate = LocalDateTime.now()
                 log.info("Logged in to Emby as {} {}", properties.username, accessToken)
             }
@@ -91,20 +89,27 @@ class EmbyClientConfig {
             template.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
         }
 
-        private fun getUserInfo(properties: EmbyProperties): ResponseEntity<Map<*, *>> {
-            val login = RestTemplate()
-            val headers = HttpHeaders()
-            headerMap.map {
-                e -> headers.set(e.key, e.value)
-            }
-            headers.set(AUTHORIZATION, janitorrClientString)
-            headers.set(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
-            headers.set(ACCEPT, MediaType.ALL_VALUE)
+        private fun getUserInfo(properties: EmbyProperties): Map<*, *>? {
+            val webClient = WebClient.builder().build()
 
             val content = LinkedMultiValueMap<String, String>()
             content.add("Username", properties.username)
             content.add("Pw", properties.password)
-            return login.postForEntity("${properties.url}/emby/Users/AuthenticateByName", HttpEntity(content, headers), Map::class.java)
+
+            return webClient.post()
+                .uri("${properties.url}/emby/Users/AuthenticateByName")
+                .headers { headers ->
+                    headerMap.forEach { (key, value) ->
+                        headers.set(key, value)
+                    }
+                    headers.set(AUTHORIZATION, janitorrClientString)
+                    headers.set(CONTENT_TYPE, APPLICATION_FORM_URLENCODED_VALUE)
+                    headers.set(ACCEPT, MediaType.ALL_VALUE)
+                }
+                .body(BodyInserters.fromFormData(content))
+                .retrieve()
+                .bodyToMono(Map::class.java)
+                .block()
         }
 
     }

@@ -93,7 +93,6 @@ abstract class AbstractCleanupSchedule(
     }
 
     protected fun deleteMovies(toDeleteMovies: List<LibraryItem>) {
-        val initialCount = toDeleteMovies.size
         val errors = mutableListOf<String>()
         
         try {

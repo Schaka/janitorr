@@ -4,6 +4,13 @@ logging:
   file: # Delete this line and the one below it, to disable file logging
     name: "/logs/janitorr.log"
 
+# Security Configuration
+# HTTP Basic Authentication for API endpoints
+security:
+  enabled: false # Set to true to enable authentication (RECOMMENDED for production)
+  username: admin # Change this to your desired username
+  password: admin # IMPORTANT: Change this to a secure password!
+
 # Management UI Configuration
 # The web interface for monitoring and manually triggering cleanup operations
 management:

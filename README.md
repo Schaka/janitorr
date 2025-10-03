@@ -48,6 +48,7 @@ Comprehensive documentation is available in multiple languages:
   - [Docker Compose Setup Guide](docs/wiki/en/Docker-Compose-Setup.md)
   - [Configuration Guide](docs/wiki/en/Configuration-Guide.md)
   - [Web Configuration Guide](docs/wiki/en/Web-Configuration-Guide.md) ⭐ NEW
+  - [Security Guide](docs/wiki/en/Security-Guide.md) 🔒 NEW
   - [FAQ](docs/wiki/en/FAQ.md)
   - [Troubleshooting](docs/wiki/en/Troubleshooting.md)
 
@@ -59,6 +60,7 @@ Comprehensive documentation is available in multiple languages:
   - [Guía de Configuración con Docker Compose](docs/wiki/es/Configuracion-Docker-Compose.md)
   - [Guía de Configuración](docs/wiki/es/Guia-Configuracion.md)
   - [Guía de Configuración Web](docs/wiki/es/Guia-Configuracion-Web.md) ⭐ NUEVO
+  - [Guía de Seguridad](docs/wiki/es/Guia-Seguridad.md) 🔒 NUEVO
   - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
   - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
 
@@ -75,6 +77,7 @@ This fork includes additional documentation:
 
 ## Features
 
+- **🔒 HTTP Basic Authentication** - Optional built-in security for API endpoints (configurable, disabled by default)
 - **Web-based Configuration UI** - Complete configuration management via browser with real-time connection testing and validation ⭐ NEW
 - **Web-based Management UI** - Monitor status and manually trigger cleanup functions through a user-friendly web interface
 - Remote deletion, disk space aware deletion as well as tag based delete schedules

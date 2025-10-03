@@ -3,14 +3,11 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
-import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
@@ -24,7 +21,6 @@ import java.time.LocalDateTime
  */
 @Profile("!leyden")
 @Service
-@RegisterReflectionForBinding(classes = [Tag::class,HistoryResponse::class, EpisodeResponse::class])
 class WeeklyEpisodeCleanupSchedule(
         val applicationProperties: ApplicationProperties,
         val sonarrProperties: SonarrProperties,

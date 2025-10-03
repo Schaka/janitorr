@@ -12,10 +12,9 @@ plugins {
 
     id("idea")
     id("org.springframework.boot") version "3.5.6"
-    id("io.spring.dependency-management") version "1.1.7"
     id("org.springframework.boot.aot") version "3.5.6"
+    id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
-    id("org.graalvm.buildtools.native") version "0.11.0"
 
     kotlin("jvm") version "2.2.20"
     kotlin("plugin.spring") version "2.2.20"
@@ -143,21 +142,12 @@ tasks.withType<BootBuildImage> {
     docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
-    val isNative = System.getenv("IMAGE_TYPE") != "jvm"
-    val javaBuildPack = if (isNative ) "paketobuildpacks/java-native-image" else "paketobuildpacks/java"
-    val javaVendor = if (isNative ) "paketobuildpacks/graalvm" else "paketobuildpacks/adoptium"
-
-    // the java-tiny image has locale issues, documented here: https://github.com/paketo-buildpacks/native-image/issues/344
-    // ironically, it works for native images as long as we pass LC_ALL=en_US.UTF-8 during build time
-    // if the native image is built with those parameters, they will be available at runtime, no matter what
+    // "paketobuildpacks/builder-noble-java-tiny" has issues with locale, we can work around that by patching the JDK, but I'd rather not
     builder = "paketobuildpacks/ubuntu-noble-builder-buildpackless"
-    if (isNative) {
-        runImage = "paketobuildpacks/ubuntu-noble-run-tiny"
-    }
     buildpacks = listOf(
         "paketobuildpacks/environment-variables",
-        javaVendor,
-        javaBuildPack,
+        "paketobuildpacks/adoptium",
+        "paketobuildpacks/java",
         "./buildpacks/aot-cache",
         "paketobuildpacks/health-checker",
     )
@@ -166,18 +156,7 @@ tasks.withType<BootBuildImage> {
     tags = project.extra["docker.image.tags"] as List<String>
     createdDate = "now"
 
-    val nativeArguments = mapOf(
-        "BP_NATIVE_IMAGE" to "true",
-        "BPL_SPRING_AOT_ENABLED" to "true",
-        "BP_HEALTH_CHECKER_ENABLED" to "true",
-        "BP_JVM_VERSION" to "25",
-        "BPE_LC_ALL" to "en_US.UTF-8",
-        "LC_ALL" to "en_US.UTF-8",
-        "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
-        "BP_NATIVE_IMAGE_BUILD_ARGUMENTS" to "-march=compatibility -H:+AddAllCharsets",
-    )
-
-    val jvmArguments = mapOf(
+    environment = mapOf(
         "BP_NATIVE_IMAGE" to "false",
         "BP_JVM_CDS_ENABLED" to "false",
         "BP_SPRING_AOT_ENABLED" to "true",
@@ -195,7 +174,4 @@ tasks.withType<BootBuildImage> {
         "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
         "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:ReservedCodeCacheSize=50M -Xss300K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
     )
-
-    // It would also be possible to set this in the graalVmNative block, but we don't want to overwrite Spring's settings
-    environment = if (isNative) nativeArguments else jvmArguments
 }

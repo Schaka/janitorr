@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Janitorr Configuration</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="config-styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⚙️ Janitorr Configuration</h1>
+            <p class="subtitle">Complete configuration management via Web UI</p>
+            <div class="header-actions">
+                <a href="/" class="btn btn-secondary">← Back to Dashboard</a>
+                <button id="testAllBtn" class="btn btn-secondary">🔍 Test All Connections</button>
+                <button id="saveConfigBtn" class="btn btn-primary">💾 Save Configuration</button>
+            </div>
+        </header>
+
+        <!-- Navigation Tabs -->
+        <nav class="tabs">
+            <button class="tab-btn active" data-tab="services">🔌 Services</button>
+            <button class="tab-btn" data-tab="cleanup">🧹 Cleanup</button>
+            <button class="tab-btn" data-tab="filesystem">📁 File System</button>
+            <button class="tab-btn" data-tab="general">⚡ General</button>
+            <button class="tab-btn" data-tab="backup">💾 Backup</button>
+        </nav>
+
+        <!-- Services Tab -->
+        <section id="services-tab" class="tab-content active">
+            <h2>External Services Configuration</h2>
+            
+            <!-- Sonarr -->
+            <div class="config-section">
+                <h3>📺 Sonarr (TV Shows)</h3>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="sonarr-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="sonarr-url" placeholder="http://sonarr:8989">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="sonarr-apikey" placeholder="Your Sonarr API key">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="sonarr-deleteEmptyShows"> Delete Empty Shows
+                    </label>
+                    <label>
+                        <input type="checkbox" id="sonarr-importExclusions"> Import Exclusions
+                    </label>
+                    <label>
+                        Determine Age By
+                        <select id="sonarr-determineAgeBy">
+                            <option value="">Auto (from profile)</option>
+                            <option value="MOST_RECENT">Most Recent</option>
+                            <option value="OLDEST">Oldest</option>
+                        </select>
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="sonarr">🔍 Test Connection</button>
+                        <span class="test-result" id="sonarr-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radarr -->
+            <div class="config-section">
+                <h3>🎬 Radarr (Movies)</h3>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="radarr-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="radarr-url" placeholder="http://radarr:7878">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="radarr-apikey" placeholder="Your Radarr API key">
+                    </label>
+                    <label for="radarr-onlyDeleteFiles">
+                        <input type="checkbox" id="radarr-onlyDeleteFiles" aria-describedby="radarr-onlyDeleteFiles-warning"> Only Delete Files
+                    </label>
+                    <span id="radarr-onlyDeleteFiles-warning" class="warning-message" style="color: #c00; font-weight: bold;">NOT RECOMMENDED</span>
+                    <label>
+                        <input type="checkbox" id="radarr-importExclusions"> Import Exclusions
+                    </label>
+                    <label>
+                        Determine Age By
+                        <select id="radarr-determineAgeBy">
+                            <option value="">Auto (from profile)</option>
+                            <option value="MOST_RECENT">Most Recent</option>
+                            <option value="OLDEST">Oldest</option>
+                        </select>
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="radarr">🔍 Test Connection</button>
+                        <span class="test-result" id="radarr-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jellyfin -->
+            <div class="config-section">
+                <h3>📺 Jellyfin Media Server</h3>
+                <p class="help-text">⚠️ Only one of Jellyfin or Emby can be enabled at a time</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="jellyfin-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="jellyfin-url" placeholder="http://jellyfin:8096">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="jellyfin-apikey" placeholder="Your Jellyfin API key">
+                    </label>
+                    <label>
+                        Username
+                        <input type="text" id="jellyfin-username" placeholder="Janitorr">
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" id="jellyfin-password" placeholder="Password">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="jellyfin-delete"> Allow Deletion
+                    </label>
+                    <label>
+                        Leaving Soon Type
+                        <select id="jellyfin-leavingSoonType">
+                            <option value="MOVIES_AND_TV">Movies and TV</option>
+                            <option value="MOVIES">Movies Only</option>
+                            <option value="TV">TV Only</option>
+                            <option value="NONE">None</option>
+                        </select>
+                    </label>
+                    <label>
+                        Leaving Soon TV Collection
+                        <input type="text" id="jellyfin-leavingSoonTv" placeholder="Shows (Leaving Soon)">
+                    </label>
+                    <label>
+                        Leaving Soon Movies Collection
+                        <input type="text" id="jellyfin-leavingSoonMovies" placeholder="Movies (Leaving Soon)">
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="jellyfin">🔍 Test Connection</button>
+                        <span class="test-result" id="jellyfin-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Emby -->
+            <div class="config-section">
+                <h3>📺 Emby Media Server</h3>
+                <p class="help-text">⚠️ Only one of Jellyfin or Emby can be enabled at a time</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="emby-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="emby-url" placeholder="http://emby:8096">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="emby-apikey" placeholder="Your Emby API key">
+                    </label>
+                    <label>
+                        Username
+                        <input type="text" id="emby-username" placeholder="Janitorr">
+                    </label>
+                    <label>
+                        Password
+                        <input type="password" id="emby-password" placeholder="Password">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="emby-delete"> Allow Deletion
+                    </label>
+                    <label>
+                        Leaving Soon Type
+                        <select id="emby-leavingSoonType">
+                            <option value="MOVIES_AND_TV">Movies and TV</option>
+                            <option value="MOVIES">Movies Only</option>
+                            <option value="TV">TV Only</option>
+                            <option value="NONE">None</option>
+                        </select>
+                    </label>
+                    <label>
+                        Leaving Soon TV Collection
+                        <input type="text" id="emby-leavingSoonTv" placeholder="Shows (Leaving Soon)">
+                    </label>
+                    <label>
+                        Leaving Soon Movies Collection
+                        <input type="text" id="emby-leavingSoonMovies" placeholder="Movies (Leaving Soon)">
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="emby">🔍 Test Connection</button>
+                        <span class="test-result" id="emby-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jellyseerr -->
+            <div class="config-section">
+                <h3>🎫 Jellyseerr/Overseerr</h3>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="jellyseerr-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="jellyseerr-url" placeholder="http://jellyseerr:5055">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="jellyseerr-apikey" placeholder="Your Jellyseerr API key">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="jellyseerr-matchServer"> Match Server (for multiple instances)
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="jellyseerr">🔍 Test Connection</button>
+                        <span class="test-result" id="jellyseerr-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jellystat -->
+            <div class="config-section">
+                <h3>📊 Jellystat</h3>
+                <p class="help-text">⚠️ Only one of Jellystat or Streamystats can be enabled at a time</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="jellystat-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="jellystat-url" placeholder="http://jellystat:3000">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="jellystat-apikey" placeholder="Your Jellystat API key">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="jellystat-wholeTvShow"> Whole TV Show
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="jellystat">🔍 Test Connection</button>
+                        <span class="test-result" id="jellystat-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Streamystats -->
+            <div class="config-section">
+                <h3>📊 Streamystats</h3>
+                <p class="help-text">⚠️ Only one of Jellystat or Streamystats can be enabled at a time</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="streamystats-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="streamystats-url" placeholder="http://streamystats:3000">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="streamystats-apikey" placeholder="Your Streamystats API key">
+                    </label>
+                    <label>
+                        <input type="checkbox" id="streamystats-wholeTvShow"> Whole TV Show
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="streamystats">🔍 Test Connection</button>
+                        <span class="test-result" id="streamystats-test-result"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bazarr -->
+            <div class="config-section">
+                <h3>📝 Bazarr (Optional)</h3>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="bazarr-enabled"> Enabled
+                    </label>
+                    <div></div>
+                    <label>
+                        URL
+                        <input type="text" id="bazarr-url" placeholder="http://bazarr:6767">
+                    </label>
+                    <label>
+                        API Key
+                        <input type="password" id="bazarr-apikey" placeholder="Your Bazarr API key">
+                    </label>
+                    <div class="test-container">
+                        <button class="btn btn-small btn-test" data-service="bazarr">🔍 Test Connection</button>
+                        <span class="test-result" id="bazarr-test-result"></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Cleanup Tab -->
+        <section id="cleanup-tab" class="tab-content">
+            <h2>Cleanup Configuration</h2>
+            
+            <!-- Media Deletion -->
+            <div class="config-section">
+                <h3>🗑️ Media Deletion</h3>
+                <p class="help-text">Automatically delete movies and TV shows based on age and disk space</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="media-deletion-enabled"> Enable Media Deletion
+                    </label>
+                    <div></div>
+                    <h4 style="grid-column: 1 / -1;">Movie Expiration (Disk % → Days)</h4>
+                    <div style="grid-column: 1 / -1;">
+                        <div id="movie-expiration-container" class="expiration-list"></div>
+                        <button type="button" class="btn btn-small" id="add-movie-expiration">+ Add Rule</button>
+                    </div>
+                    <h4 style="grid-column: 1 / -1;">Season Expiration (Disk % → Days)</h4>
+                    <div style="grid-column: 1 / -1;">
+                        <div id="season-expiration-container" class="expiration-list"></div>
+                        <button type="button" class="btn btn-small" id="add-season-expiration">+ Add Rule</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tag-Based Deletion -->
+            <div class="config-section">
+                <h3>🏷️ Tag-Based Deletion</h3>
+                <p class="help-text">Delete media based on tags and schedules</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="tag-deletion-enabled"> Enable Tag-Based Deletion
+                    </label>
+                    <div></div>
+                    <label>
+                        Minimum Free Disk %
+                        <input type="number" id="tag-deletion-minFreeDisk" min="0" max="100" step="0.1">
+                    </label>
+                    <div></div>
+                    <h4 style="grid-column: 1 / -1;">Tag Schedules</h4>
+                    <div style="grid-column: 1 / -1;">
+                        <div id="tag-schedules-container" class="schedule-list"></div>
+                        <button type="button" class="btn btn-small" id="add-tag-schedule">+ Add Schedule</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Episode Deletion -->
+            <div class="config-section">
+                <h3>📺 Episode Deletion</h3>
+                <p class="help-text">Manage episodes of tagged shows</p>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="episode-deletion-enabled"> Enable Episode Deletion
+                    </label>
+                    <div></div>
+                    <label>
+                        Tag
+                        <input type="text" id="episode-deletion-tag" placeholder="janitorr_daily">
+                    </label>
+                    <label>
+                        Max Episodes to Keep
+                        <input type="number" id="episode-deletion-maxEpisodes" min="1" max="1000">
+                    </label>
+                    <label>
+                        Max Age (days)
+                        <input type="number" id="episode-deletion-maxAge" min="1" max="365">
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- File System Tab -->
+        <section id="filesystem-tab" class="tab-content">
+            <h2>File System Configuration</h2>
+            
+            <div class="config-section">
+                <h3>📁 File System Settings</h3>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="filesystem-access"> Enable File System Access
+                    </label>
+                    <div></div>
+                    <label>
+                        <input type="checkbox" id="filesystem-validateSeeding"> Validate Seeding
+                    </label>
+                    <label>
+                        <input type="checkbox" id="filesystem-fromScratch"> Rebuild From Scratch
+                    </label>
+                    <label>
+                        Leaving Soon Directory (Janitorr)
+                        <input type="text" id="filesystem-leavingSoonDir" placeholder="/data/media/leaving-soon">
+                    </label>
+                    <label>
+                        Leaving Soon Directory (Media Server)
+                        <input type="text" id="filesystem-mediaServerLeavingSoonDir" placeholder="/data/media/leaving-soon">
+                    </label>
+                    <label>
+                        Free Space Check Directory
+                        <input type="text" id="filesystem-freeSpaceCheckDir" placeholder="/">
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- General Tab -->
+        <section id="general-tab" class="tab-content">
+            <h2>General Application Settings</h2>
+            
+            <div class="config-section">
+                <h3>⚙️ Application Behavior</h3>
+                <div class="form-grid">
+                    <label class="important">
+                        <input type="checkbox" id="app-dryRun"> Dry Run Mode (RECOMMENDED for testing)
+                    </label>
+                    <div></div>
+                    <label>
+                        <input type="checkbox" id="app-runOnce"> Run Once and Exit
+                    </label>
+                    <label>
+                        <input type="checkbox" id="app-wholeTvShow"> Whole TV Show Mode
+                    </label>
+                    <label>
+                        <input type="checkbox" id="app-wholeShowSeedingCheck"> Whole Show Seeding Check
+                    </label>
+                    <div></div>
+                    <label>
+                        Leaving Soon Warning (days)
+                        <input type="number" id="app-leavingSoon" min="1" max="90">
+                    </label>
+                    <div></div>
+                    <h4 style="grid-column: 1 / -1;">Exclusion Tags</h4>
+                    <div style="grid-column: 1 / -1;">
+                        <div id="exclusion-tags-container" class="tag-list"></div>
+                        <button type="button" class="btn btn-small" id="add-exclusion-tag">+ Add Tag</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>🔧 Management UI</h3>
+                <div class="form-grid">
+                    <label>
+                        <input type="checkbox" id="management-ui-enabled"> Enable Management UI
+                    </label>
+                </div>
+            </div>
+        </section>
+
+        <!-- Backup Tab -->
+        <section id="backup-tab" class="tab-content">
+            <h2>Backup & Restore</h2>
+            
+            <div class="config-section">
+                <h3>💾 Configuration Backup</h3>
+                <div class="backup-actions">
+                    <button class="btn btn-primary" id="createBackupBtn">Create Backup Now</button>
+                    <button class="btn btn-secondary" id="exportConfigBtn">📥 Export Configuration</button>
+                    <button class="btn btn-secondary" id="importConfigBtn">📤 Import Configuration</button>
+                    <button class="btn btn-danger" id="resetConfigBtn">🔄 Reset to Defaults</button>
+                    <input type="file" id="importFileInput" accept=".yml,.yaml" style="display: none;">
+                </div>
+            </div>
+
+            <div class="config-section">
+                <h3>📋 Available Backups</h3>
+                <div id="backups-list" class="backups-container">
+                    <p class="loading">Loading backups...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Messages -->
+        <section class="message-section">
+            <div id="messageContainer"></div>
+        </section>
+    </div>
+
+    <script src="config.js"></script>
+</body>
+</html>

@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.multitenancy.api
 import com.github.schaka.janitorr.multitenancy.model.User
 import com.github.schaka.janitorr.multitenancy.model.UserProfile
 import com.github.schaka.janitorr.multitenancy.model.UserRole
+import com.github.schaka.janitorr.multitenancy.security.AuthorizationUtils
 import com.github.schaka.janitorr.multitenancy.service.UserService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
@@ -19,6 +20,15 @@ import org.springframework.web.bind.annotation.*
  * - Password management
  * 
  * Only available when multi-tenancy is enabled.
+ * 
+ * Authorization:
+ * - Creating users: ADMIN only
+ * - Listing all users: ADMIN only
+ * - Getting user details: ADMIN or the user themselves
+ * - Updating profile: ADMIN or the user themselves
+ * - Changing role: ADMIN only
+ * - Enabling/disabling: ADMIN only
+ * - Deleting users: ADMIN only
  */
 @ConditionalOnProperty(prefix = "multitenancy", name = ["enabled"], havingValue = "true")
 @RestController
@@ -33,9 +43,12 @@ class UserManagementController(
     
     /**
      * Create a new user
+     * Requires: ADMIN role
      */
     @PostMapping
     fun createUser(@RequestBody request: CreateUserRequest): ResponseEntity<UserResponse> {
+        AuthorizationUtils.requireUserManagementAccess()
+        
         return try {
             val user = userService.createUser(
                 email = request.email,
@@ -55,19 +68,25 @@ class UserManagementController(
     
     /**
      * Get all users
+     * Requires: ADMIN role
      * TODO: Add pagination and filtering
      */
     @GetMapping
     fun getAllUsers(): ResponseEntity<List<UserResponse>> {
+        AuthorizationUtils.requireAdmin()
+        
         val users = userService.getAllUsers()
         return ResponseEntity.ok(users.map { it.toResponse() })
     }
     
     /**
      * Get user by ID
+     * Requires: ADMIN role or the user themselves
      */
     @GetMapping("/{userId}")
     fun getUserById(@PathVariable userId: String): ResponseEntity<UserResponse> {
+        AuthorizationUtils.requireUserAccess(userId)
+        
         val user = userService.findById(userId)
         return user?.let { ResponseEntity.ok(it.toResponse()) }
             ?: ResponseEntity.notFound().build()
@@ -75,9 +94,12 @@ class UserManagementController(
     
     /**
      * Get user profile
+     * Requires: ADMIN role or the user themselves
      */
     @GetMapping("/{userId}/profile")
     fun getUserProfile(@PathVariable userId: String): ResponseEntity<UserProfile> {
+        AuthorizationUtils.requireUserAccess(userId)
+        
         val profile = userService.getUserProfile(userId)
         return profile?.let { ResponseEntity.ok(it) }
             ?: ResponseEntity.notFound().build()
@@ -85,12 +107,15 @@ class UserManagementController(
     
     /**
      * Update user profile
+     * Requires: ADMIN role or the user themselves
      */
     @PutMapping("/{userId}/profile")
     fun updateUserProfile(
         @PathVariable userId: String,
         @RequestBody profile: UserProfile
     ): ResponseEntity<UserProfile> {
+        AuthorizationUtils.requireUserAccess(userId)
+        
         if (profile.userId != userId) {
             return ResponseEntity.badRequest().build()
         }
@@ -100,12 +125,15 @@ class UserManagementController(
     
     /**
      * Update user role
+     * Requires: ADMIN role
      */
     @PatchMapping("/{userId}/role")
     fun updateUserRole(
         @PathVariable userId: String,
         @RequestBody request: UpdateRoleRequest
     ): ResponseEntity<UserResponse> {
+        AuthorizationUtils.requireUserManagementAccess()
+        
         val success = userService.updateRole(userId, request.role)
         if (!success) {
             return ResponseEntity.notFound().build()
@@ -117,12 +145,15 @@ class UserManagementController(
     
     /**
      * Enable/disable user
+     * Requires: ADMIN role
      */
     @PatchMapping("/{userId}/enabled")
     fun setUserEnabled(
         @PathVariable userId: String,
         @RequestBody request: SetEnabledRequest
     ): ResponseEntity<UserResponse> {
+        AuthorizationUtils.requireUserManagementAccess()
+        
         val success = userService.setUserEnabled(userId, request.enabled)
         if (!success) {
             return ResponseEntity.notFound().build()
@@ -134,12 +165,15 @@ class UserManagementController(
     
     /**
      * Change user password
+     * Requires: ADMIN role or the user themselves
      */
     @PostMapping("/{userId}/password")
     fun changePassword(
         @PathVariable userId: String,
         @RequestBody request: ChangePasswordRequest
     ): ResponseEntity<Map<String, String>> {
+        AuthorizationUtils.requireUserAccess(userId)
+        
         val success = userService.updatePassword(userId, request.newPassword)
         return if (success) {
             ResponseEntity.ok(mapOf("message" to "Password updated successfully"))
@@ -150,9 +184,12 @@ class UserManagementController(
     
     /**
      * Delete user
+     * Requires: ADMIN role
      */
     @DeleteMapping("/{userId}")
     fun deleteUser(@PathVariable userId: String): ResponseEntity<Void> {
+        AuthorizationUtils.requireUserManagementAccess()
+        
         val success = userService.deleteUser(userId)
         return if (success) {
             ResponseEntity.noContent().build()

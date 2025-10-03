@@ -436,7 +436,7 @@ async function saveConfiguration() {
 }
 
 // Test Connections
-async function testConnection(service) {
+async function testConnection(event, service) {
     const testBtn = event.target;
     const resultSpan = document.getElementById(`${service}-test-result`);
     

@@ -115,7 +115,6 @@ abstract class AbstractCleanupSchedule(
     }
 
     protected fun deleteTvShows(toDeleteShows: List<LibraryItem>) {
-        val initialCount = toDeleteShows.size
         val errors = mutableListOf<String>()
         
         try {

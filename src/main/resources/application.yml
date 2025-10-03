@@ -16,11 +16,15 @@ logging:
       clean-history-on-start: true
 
 management:
+  ui:
+    enabled: ${JANITORR_UI_ENABLED:true}
   server:
     port: 8081
   endpoints:
     web:
       base-path: "/"
+      exposure:
+        include: ${MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE:health,info,management}
   endpoint:
     health:
       probes:

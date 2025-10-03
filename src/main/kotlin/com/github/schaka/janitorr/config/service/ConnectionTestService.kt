@@ -5,9 +5,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
-import org.springframework.web.client.RestTemplate
-import org.springframework.web.client.HttpClientErrorException
-import org.springframework.web.client.ResourceAccessException
+import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.net.URI
 
 /**
@@ -32,7 +31,7 @@ class ConnectionTestService {
         private val log = LoggerFactory.getLogger(ConnectionTestService::class.java)
     }
 
-    private val restTemplate = RestTemplate()
+    private val webClient = WebClient.builder().build()
 
     /**
      * Test all enabled service connections
@@ -60,31 +59,25 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/api/v3/system/status"
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("X-Api-Key", config.apiKey)
-            }
-            val request = org.springframework.http.HttpEntity<String>(headers)
             
-            val response = restTemplate.exchange(
-                url,
-                org.springframework.http.HttpMethod.GET,
-                request,
-                String::class.java
-            )
+            val response = webClient.get()
+                .uri(url)
+                .header("X-Api-Key", config.apiKey)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
             
-            if (response.statusCode.is2xxSuccessful) {
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Sonarr successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Sonarr: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Sonarr: ${response?.statusCode}")
             }
-        } catch (e: HttpClientErrorException) {
+        } catch (e: WebClientResponseException) {
             if (e.statusCode.value() == 401) {
                 ConnectionTestResult(false, "❌ Authentication failed. Check API key.", e.message)
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Sonarr at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Sonarr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -101,31 +94,25 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/api/v3/system/status"
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("X-Api-Key", config.apiKey)
-            }
-            val request = org.springframework.http.HttpEntity<String>(headers)
             
-            val response = restTemplate.exchange(
-                url,
-                org.springframework.http.HttpMethod.GET,
-                request,
-                String::class.java
-            )
+            val response = webClient.get()
+                .uri(url)
+                .header("X-Api-Key", config.apiKey)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
             
-            if (response.statusCode.is2xxSuccessful) {
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Radarr successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Radarr: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Radarr: ${response?.statusCode}")
             }
-        } catch (e: HttpClientErrorException) {
+        } catch (e: WebClientResponseException) {
             if (e.statusCode.value() == 401) {
                 ConnectionTestResult(false, "❌ Authentication failed. Check API key.", e.message)
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Radarr at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Radarr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -142,15 +129,18 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/System/Info/Public"
-            val response = restTemplate.getForEntity(url, String::class.java)
             
-            if (response.statusCode.is2xxSuccessful) {
+            val response = webClient.get()
+                .uri(url)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
+            
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Jellyfin successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Jellyfin: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Jellyfin: ${response?.statusCode}")
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Jellyfin at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Jellyfin connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -167,15 +157,18 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/System/Info/Public"
-            val response = restTemplate.getForEntity(url, String::class.java)
             
-            if (response.statusCode.is2xxSuccessful) {
+            val response = webClient.get()
+                .uri(url)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
+            
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Emby successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Emby: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Emby: ${response?.statusCode}")
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Emby at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Emby connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -192,31 +185,25 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/api/v1/status"
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("X-Api-Key", config.apiKey)
-            }
-            val request = org.springframework.http.HttpEntity<String>(headers)
             
-            val response = restTemplate.exchange(
-                url,
-                org.springframework.http.HttpMethod.GET,
-                request,
-                String::class.java
-            )
+            val response = webClient.get()
+                .uri(url)
+                .header("X-Api-Key", config.apiKey)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
             
-            if (response.statusCode.is2xxSuccessful) {
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Jellyseerr successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Jellyseerr: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Jellyseerr: ${response?.statusCode}")
             }
-        } catch (e: HttpClientErrorException) {
+        } catch (e: WebClientResponseException) {
             if (e.statusCode.value() == 401) {
                 ConnectionTestResult(false, "❌ Authentication failed. Check API key.", e.message)
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Jellyseerr at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Jellyseerr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -233,31 +220,25 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/api/getInfo"
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("X-API-Token", config.apiKey)
-            }
-            val request = org.springframework.http.HttpEntity<String>(headers)
             
-            val response = restTemplate.exchange(
-                url,
-                org.springframework.http.HttpMethod.GET,
-                request,
-                String::class.java
-            )
+            val response = webClient.get()
+                .uri(url)
+                .header("X-API-Token", config.apiKey)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
             
-            if (response.statusCode.is2xxSuccessful) {
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Jellystat successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Jellystat: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Jellystat: ${response?.statusCode}")
             }
-        } catch (e: HttpClientErrorException) {
+        } catch (e: WebClientResponseException) {
             if (e.statusCode.value() == 401) {
                 ConnectionTestResult(false, "❌ Authentication failed. Check API key.", e.message)
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Jellystat at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Jellystat connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -274,31 +255,25 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/api/getInfo"
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("X-API-Token", config.apiKey)
-            }
-            val request = org.springframework.http.HttpEntity<String>(headers)
             
-            val response = restTemplate.exchange(
-                url,
-                org.springframework.http.HttpMethod.GET,
-                request,
-                String::class.java
-            )
+            val response = webClient.get()
+                .uri(url)
+                .header("X-API-Token", config.apiKey)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
             
-            if (response.statusCode.is2xxSuccessful) {
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Streamystats successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Streamystats: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Streamystats: ${response?.statusCode}")
             }
-        } catch (e: HttpClientErrorException) {
+        } catch (e: WebClientResponseException) {
             if (e.statusCode.value() == 401) {
                 ConnectionTestResult(false, "❌ Authentication failed. Check API key.", e.message)
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Streamystats at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Streamystats connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -315,31 +290,25 @@ class ConnectionTestService {
         
         return try {
             val url = "${config.url.trimEnd('/')}/api/system/status"
-            val headers = org.springframework.http.HttpHeaders().apply {
-                set("X-Api-Key", config.apiKey)
-            }
-            val request = org.springframework.http.HttpEntity<String>(headers)
             
-            val response = restTemplate.exchange(
-                url,
-                org.springframework.http.HttpMethod.GET,
-                request,
-                String::class.java
-            )
+            val response = webClient.get()
+                .uri(url)
+                .header("X-Api-Key", config.apiKey)
+                .retrieve()
+                .toEntity(String::class.java)
+                .block()
             
-            if (response.statusCode.is2xxSuccessful) {
+            if (response != null && response.statusCode.is2xxSuccessful) {
                 ConnectionTestResult(true, "✅ Connected to Bazarr successfully", response.body)
             } else {
-                ConnectionTestResult(false, "❌ Unexpected response from Bazarr: ${response.statusCode}")
+                ConnectionTestResult(false, "❌ Unexpected response from Bazarr: ${response?.statusCode}")
             }
-        } catch (e: HttpClientErrorException) {
+        } catch (e: WebClientResponseException) {
             if (e.statusCode.value() == 401) {
                 ConnectionTestResult(false, "❌ Authentication failed. Check API key.", e.message)
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
-        } catch (e: ResourceAccessException) {
-            ConnectionTestResult(false, "❌ Cannot reach Bazarr at ${config.url}. Check URL and network.", e.message)
         } catch (e: Exception) {
             log.error("Error testing Bazarr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())

@@ -266,21 +266,23 @@ Test coverage:
 
 ## 🔮 Future Enhancements
 
-### Short Term
-1. **Complete Action Integration** - Connect ActionExecutor with existing Sonarr/Radarr services
-2. **Extended Conditions** - Add IMDB rating via API, file format detection
-3. **Rule Templates** - Pre-built rules for common scenarios
+The following enhancements are under consideration and may be implemented in future releases:
 
-### Medium Term
-1. **Scheduled Execution** - Cron-based automatic rule execution
-2. **Rule Chaining** - Execute rules in sequence with dependencies
-3. **Notifications** - Full Discord/Email integration
+### Short Term (Under Consideration)
+1. **Complete Action Integration** - May connect ActionExecutor with existing Sonarr/Radarr services
+2. **Extended Conditions** - May add IMDB rating via API, file format detection
+3. **Rule Templates** - May include pre-built rules for common scenarios
 
-### Long Term
-1. **Advanced Scripting** - JavaScript/Lua support for complex logic
-2. **Rule Sharing** - Import/export rules between instances
-3. **Analytics Dashboard** - Track rule execution statistics
-4. **Multi-tenancy** - Different rule sets per library
+### Medium Term (Under Consideration)
+1. **Scheduled Execution** - May include cron-based automatic rule execution
+2. **Rule Chaining** - May allow rules to execute in sequence with dependencies
+3. **Notifications** - May integrate with Discord/Email
+
+### Long Term (Under Consideration)
+1. **Advanced Scripting** - May add JavaScript/Lua support for complex logic
+2. **Rule Sharing** - May enable import/export of rules between instances
+3. **Analytics Dashboard** - May track rule execution statistics
+4. **Multi-tenancy** - May support different rule sets per library
 
 ## 🎨 Design Decisions
 

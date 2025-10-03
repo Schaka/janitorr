@@ -153,4 +153,4 @@ Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> 
 
 * [<img src="images/logos/idea.svg" alt="Idea" width="32"> IntelliJ Idea](https://www.jetbrains.com/idea/)
 * [<img src="images/logos/webstorm.svg" alt="WebStorm" width="32"> WebStorm](http://www.jetbrains.com/webstorm/)
-* [<img src="imageslogos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)
+* [<img src="images/logos/rider.svg" alt="Rider" width="32"> Rider](http://www.jetbrains.com/rider/)

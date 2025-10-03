@@ -3,6 +3,8 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.notifications.CleanupStats
+import com.github.schaka.janitorr.notifications.NotificationService
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -26,6 +28,7 @@ abstract class AbstractCleanupSchedule(
     protected val runOnce: RunOnce,
     protected val sonarrService: ServarrService,
     protected val radarrService: ServarrService,
+    protected val notificationService: NotificationService,
 ) {
 
     companion object {
@@ -90,25 +93,65 @@ abstract class AbstractCleanupSchedule(
     }
 
     protected fun deleteMovies(toDeleteMovies: List<LibraryItem>) {
-        radarrService.removeEntries(toDeleteMovies)
+        val initialCount = toDeleteMovies.size
+        val errors = mutableListOf<String>()
+        
+        try {
+            radarrService.removeEntries(toDeleteMovies)
 
-        val cannotDeleteMovies = toDeleteMovies.filter { it.seeding }
-        val deletedMovies = toDeleteMovies.filter { !it.seeding }
+            val cannotDeleteMovies = toDeleteMovies.filter { it.seeding }
+            val deletedMovies = toDeleteMovies.filter { !it.seeding }
 
-        jellyseerrService.cleanupRequests(deletedMovies)
-        mediaServerService.cleanupMovies(deletedMovies)
-        mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
+            jellyseerrService.cleanupRequests(deletedMovies)
+            mediaServerService.cleanupMovies(deletedMovies)
+            mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
+            
+            sendCleanupNotification(deletedMovies.size, errors)
+        } catch (e: Exception) {
+            log.error("Error during movie cleanup", e)
+            errors.add("Movie cleanup error: ${e.message}")
+            sendCleanupNotification(0, errors)
+        }
     }
 
     protected fun deleteTvShows(toDeleteShows: List<LibraryItem>) {
-        sonarrService.removeEntries(toDeleteShows)
+        val initialCount = toDeleteShows.size
+        val errors = mutableListOf<String>()
+        
+        try {
+            sonarrService.removeEntries(toDeleteShows)
 
-        val cannotDeleteShow = toDeleteShows.filter { it.seeding }
-        val deletedShows = toDeleteShows.filter { !it.seeding }
+            val cannotDeleteShow = toDeleteShows.filter { it.seeding }
+            val deletedShows = toDeleteShows.filter { !it.seeding }
 
-        jellyseerrService.cleanupRequests(deletedShows)
-        mediaServerService.cleanupTvShows(deletedShows)
-        mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
+            jellyseerrService.cleanupRequests(deletedShows)
+            mediaServerService.cleanupTvShows(deletedShows)
+            mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
+            
+            sendCleanupNotification(deletedShows.size, errors)
+        } catch (e: Exception) {
+            log.error("Error during TV show cleanup", e)
+            errors.add("TV show cleanup error: ${e.message}")
+            sendCleanupNotification(0, errors)
+        }
+    }
+    
+    private fun sendCleanupNotification(filesDeleted: Int, errors: List<String>) {
+        try {
+            val stats = CleanupStats(
+                cleanupType = cleanupType.name,
+                filesDeleted = filesDeleted,
+                spaceFreeGB = if (fileSystemProperties.access) {
+                    val filesystem = File(fileSystemProperties.freeSpaceCheckDir)
+                    filesystem.usableSpace.toDouble() / (1024.0 * 1024.0 * 1024.0)
+                } else 0.0,
+                dryRun = applicationProperties.dryRun,
+                errors = errors
+            )
+            notificationService.sendCleanupComplete(stats)
+        } catch (e: Exception) {
+            log.error("Error sending cleanup notification", e)
+        }
     }
 
     private fun logKeep(item: LibraryItem) {

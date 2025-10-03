@@ -44,26 +44,83 @@ Add to your `application.yml`:
 multitenancy:
   enabled: true
   
-  # Optional: Create default admin user on startup
-  default-admin:
-    create-on-startup: true
-    email: "admin@janitorr.local"
-    password: "change-me-please"  # CHANGE THIS!
-  
-  # Optional: JWT authentication (not yet implemented)
+  # Authentication configuration
   auth:
+    # Enable HTTP Basic Auth for multi-tenancy endpoints
+    # IMPORTANT: Set to true in production to protect APIs
+    require-authentication: true
+    
+    # JWT authentication (not yet implemented)
     jwt-enabled: false
     jwt-secret: "your-secret-key-here"
     jwt-expiration-seconds: 86400
+  
+  # Create default admin user on startup
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "change-me-please"  # CHANGE THIS IMMEDIATELY!
 ```
 
-### Security Considerations
+### Authentication & Authorization
 
-**CRITICAL**: The current implementation does NOT include authentication. The API endpoints are exposed without protection. You **MUST** add one of the following:
+**IMPORTANT**: Multi-tenancy endpoints (`/api/users/**` and `/api/tenants/**`) support HTTP Basic Authentication to protect sensitive operations.
 
-1. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication
-2. **Spring Security**: Add Spring Security configuration (future enhancement)
-3. **Network Isolation**: Restrict access via firewall rules
+#### Enable Authentication
+
+Set `multitenancy.auth.require-authentication: true` in your configuration:
+
+```yaml
+multitenancy:
+  enabled: true
+  auth:
+    require-authentication: true  # Enable authentication
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "your-secure-password"
+```
+
+#### Using Authenticated Endpoints
+
+Once authentication is enabled, all API requests must include HTTP Basic Auth credentials:
+
+```bash
+# Example: Create a user with authentication
+curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-secure-password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "newuser@example.com",
+    "password": "user-password",
+    "role": "STANDARD_USER"
+  }'
+```
+
+#### Authorization Rules
+
+- **Tenant Management**: Requires ADMIN role for all operations
+- **User Management**: 
+  - Creating, deleting users, changing roles: ADMIN only
+  - Users can view and update their own profile
+  - Users can change their own password
+  - Listing all users: ADMIN only
+
+#### Backward Compatibility
+
+For backward compatibility, authentication is **disabled by default** (`require-authentication: false`). This allows existing deployments to continue working, but is **NOT RECOMMENDED** for production use.
+
+**⚠️ WARNING**: Running with authentication disabled allows anyone with network access to create, modify, or delete users and tenants.
+
+### Additional Security Options
+
+1. **Reverse Proxy Authentication**: Use Nginx, Traefik, or Caddy with authentication in front of Janitorr
+
+2. **Network Isolation**: Restrict access via firewall rules (iptables, cloud security groups)
+
+3. **Built-in Security Module**: See the [Security Guide](Security-Guide.md) for additional security features.
+
+For comprehensive security setup instructions, see the [Security Guide](Security-Guide.md).
 
 ## API Endpoints
 
@@ -201,9 +258,12 @@ DELETE /api/tenants/{tenantId}
 
 ### Family Setup
 
+**Note**: These examples assume authentication is enabled. Add `-u "admin@janitorr.local:password"` to each curl command when `require-authentication: true`.
+
 1. **Create tenant for the family:**
 ```bash
 curl -X POST http://localhost:8978/api/tenants \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{"name": "Smith Family"}'
 ```
@@ -212,6 +272,7 @@ curl -X POST http://localhost:8978/api/tenants \
 ```bash
 # Dad (Admin)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "dad@smith.family",
@@ -221,6 +282,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Mom (Power User)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "mom@smith.family",
@@ -230,6 +292,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Teenager (Standard User)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "teen@smith.family",
@@ -239,6 +302,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Child (Read-Only)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "kid@smith.family",
@@ -250,6 +314,7 @@ curl -X POST http://localhost:8978/api/users \
 3. **Add users to tenant:**
 ```bash
 curl -X POST http://localhost:8978/api/tenants/{tenantId}/users \
+  -u "admin@janitorr.local:your-password" \
   -H "Content-Type: application/json" \
   -d '{"userId": "{userId}", "role": "ADMIN"}'
 ```
@@ -312,35 +377,37 @@ Tenant
 
 ## Future Enhancements
 
-### Phase 1: Security (Priority)
-- [ ] Spring Security integration
-- [ ] JWT token generation and validation
-- [ ] BCrypt password hashing
-- [ ] Session management
-- [ ] CSRF protection
+The following enhancements are under consideration and may be implemented in future releases:
 
-### Phase 2: Persistence
-- [ ] JPA entities
-- [ ] H2 database for development
-- [ ] PostgreSQL support for production
-- [ ] Database migration scripts
-- [ ] Backup and restore
+### Phase 1: Security (Priority - Under Consideration)
+- [ ] Spring Security integration (may be added)
+- [ ] JWT token generation and validation (under consideration)
+- [ ] BCrypt password hashing (may be implemented)
+- [ ] Session management (under consideration)
+- [ ] CSRF protection (may be added)
 
-### Phase 3: Advanced Features
-- [ ] OAuth integration (Google, GitHub, Discord)
-- [ ] Two-factor authentication
-- [ ] API key management
-- [ ] Rate limiting
-- [ ] Audit logging
-- [ ] Email notifications
-- [ ] Password recovery
-- [ ] User invitation system
+### Phase 2: Persistence (Under Consideration)
+- [ ] JPA entities (may be implemented)
+- [ ] H2 database for development (under consideration)
+- [ ] PostgreSQL support for production (may be added)
+- [ ] Database migration scripts (under consideration)
+- [ ] Backup and restore (may be implemented)
 
-### Phase 4: UI Integration
-- [ ] Login/logout pages
-- [ ] User management dashboard
-- [ ] Profile settings page
-- [ ] Tenant switcher
+### Phase 3: Advanced Features (Under Consideration)
+- [ ] OAuth integration (Google, GitHub, Discord) (may be added)
+- [ ] Two-factor authentication (under consideration)
+- [ ] API key management (may be implemented)
+- [ ] Rate limiting (under consideration)
+- [ ] Audit logging (may be added)
+- [ ] Email notifications (under consideration)
+- [ ] Password recovery (may be implemented)
+- [ ] User invitation system (under consideration)
+
+### Phase 4: UI Integration (Under Consideration)
+- [ ] Login/logout pages (may be added)
+- [ ] User management dashboard (under consideration)
+- [ ] Profile settings page (may be implemented)
+- [ ] Tenant switcher (under consideration)
 - [ ] Role-based UI components
 
 ### Phase 5: Multi-Tenancy

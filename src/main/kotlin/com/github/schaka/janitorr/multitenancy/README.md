@@ -37,6 +37,9 @@ multitenancy/
 - In-memory storage (development)
 - REST API endpoints
 - Default admin user creation
+- **HTTP Basic Authentication** for API endpoints
+- **Role-based authorization** (ADMIN for management, users can access own data)
+- Configurable authentication (can be disabled for backward compatibility)
 
 ### Not Implemented ⚠️
 - Spring Security integration
@@ -59,6 +62,11 @@ Add to `application.yml`:
 ```yaml
 multitenancy:
   enabled: true
+  
+  # Enable authentication (recommended for production)
+  auth:
+    require-authentication: true
+  
   default-admin:
     create-on-startup: true
     email: "admin@janitorr.local"
@@ -69,10 +77,11 @@ multitenancy:
 
 The default admin user will be created automatically on startup.
 
-### 3. Create Users
+### 3. Create Users (with authentication)
 
 ```bash
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:change-me-please" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "user@example.com",
@@ -81,36 +90,64 @@ curl -X POST http://localhost:8978/api/users \
   }'
 ```
 
+**Note**: When `require-authentication: false` (default for backward compatibility), omit the `-u` flag. However, this is **NOT RECOMMENDED** for production.
+
+## Authentication & Authorization
+
+### HTTP Basic Authentication
+
+The module supports HTTP Basic Authentication to protect sensitive API endpoints:
+
+- **Configuration**: Set `multitenancy.auth.require-authentication: true`
+- **Endpoints Protected**: `/api/users/**` and `/api/tenants/**`
+- **How it Works**: Uses HTTP Basic Auth with credentials validated against user database
+
+### Authorization Rules
+
+- **Tenant Operations**: All require ADMIN role
+- **User Management**:
+  - Create/delete users, change roles: ADMIN only
+  - View/update own profile: User or ADMIN
+  - Change own password: User or ADMIN
+  - List all users: ADMIN only
+
+### Backward Compatibility
+
+Authentication is **disabled by default** (`require-authentication: false`) for backward compatibility. Existing deployments continue to work without changes, but **enabling authentication is strongly recommended** for production.
+
 ## Security Warning
 
-⚠️ **IMPORTANT**: This implementation does NOT include authentication. The API endpoints are publicly accessible. You MUST add authentication before production use.
+⚠️ **IMPORTANT**: HTTP Basic Authentication is now available for API endpoint protection.
 
-Options:
-1. Use a reverse proxy with authentication (Nginx, Traefik)
-2. Add Spring Security configuration
+**Production Recommendation:**
+Enable authentication by setting `multitenancy.auth.require-authentication: true` in your configuration.
+
+**Additional Security Options:**
+1. **Enable Built-in Authentication** (Recommended): Configure `multitenancy.auth.require-authentication: true` - See [Multi-Tenancy Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md)
+2. Use a reverse proxy with authentication (Nginx, Traefik)
 3. Restrict network access via firewall
 
 ## Future Enhancements
 
-See the [Multi-Tenancy Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md) for detailed roadmap.
+The following enhancements are under consideration and may be implemented in future releases. See the [Multi-Tenancy Guide](../../../docs/wiki/en/Multi-Tenancy-Guide.md) for detailed roadmap.
 
-### Priority 1: Security
-- Spring Security integration
-- JWT tokens
-- BCrypt password hashing
-- CSRF protection
+### Priority 1: Security (Under Consideration)
+- Spring Security integration (may be added)
+- JWT tokens (under consideration)
+- BCrypt password hashing (may be implemented)
+- CSRF protection (under consideration)
 
-### Priority 2: Persistence
-- JPA entities
-- H2/PostgreSQL support
-- Migration scripts
+### Priority 2: Persistence (Under Consideration)
+- JPA entities (may be added)
+- H2/PostgreSQL support (under consideration)
+- Migration scripts (may be implemented)
 
-### Priority 3: Advanced Features
-- OAuth (Google, GitHub, Discord)
-- 2FA
-- API keys
-- Rate limiting
-- Audit logging
+### Priority 3: Advanced Features (Under Consideration)
+- OAuth (Google, GitHub, Discord) (may be added)
+- 2FA (under consideration)
+- API keys (may be implemented)
+- Rate limiting (under consideration)
+- Audit logging (may be added)
 
 ## Contributing
 

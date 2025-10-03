@@ -44,26 +44,83 @@ Agrega a tu `application.yml`:
 multitenancy:
   enabled: true
   
-  # Opcional: Crear usuario admin por defecto al iniciar
-  default-admin:
-    create-on-startup: true
-    email: "admin@janitorr.local"
-    password: "change-me-please"  # ¡CAMBIA ESTO!
-  
-  # Opcional: Autenticación JWT (aún no implementado)
+  # Configuración de autenticación
   auth:
+    # Habilitar HTTP Basic Auth para endpoints de multi-tenancy
+    # IMPORTANTE: Establecer en true en producción para proteger APIs
+    require-authentication: true
+    
+    # Autenticación JWT (aún no implementado)
     jwt-enabled: false
     jwt-secret: "tu-clave-secreta-aqui"
     jwt-expiration-seconds: 86400
+  
+  # Crear usuario admin por defecto al iniciar
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "change-me-please"  # ¡CAMBIA ESTO INMEDIATAMENTE!
 ```
 
-### Consideraciones de Seguridad
+### Autenticación y Autorización
 
-**CRÍTICO**: La implementación actual NO incluye autenticación. Los endpoints de la API están expuestos sin protección. **DEBES** agregar una de las siguientes opciones:
+**IMPORTANTE**: Los endpoints de multi-tenancy (`/api/users/**` y `/api/tenants/**`) soportan Autenticación HTTP Basic para proteger operaciones sensibles.
 
-1. **Autenticación con Proxy Inverso**: Usa Nginx, Traefik, o Caddy con autenticación
-2. **Spring Security**: Agregar configuración de Spring Security (mejora futura)
-3. **Aislamiento de Red**: Restringir acceso mediante reglas de firewall
+#### Habilitar Autenticación
+
+Establece `multitenancy.auth.require-authentication: true` en tu configuración:
+
+```yaml
+multitenancy:
+  enabled: true
+  auth:
+    require-authentication: true  # Habilitar autenticación
+  default-admin:
+    create-on-startup: true
+    email: "admin@janitorr.local"
+    password: "tu-contraseña-segura"
+```
+
+#### Usar Endpoints Autenticados
+
+Una vez habilitada la autenticación, todas las peticiones a la API deben incluir credenciales HTTP Basic Auth:
+
+```bash
+# Ejemplo: Crear un usuario con autenticación
+curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:tu-contraseña-segura" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "nuevousuario@ejemplo.com",
+    "password": "contraseña-usuario",
+    "role": "STANDARD_USER"
+  }'
+```
+
+#### Reglas de Autorización
+
+- **Gestión de Tenants**: Requiere rol ADMIN para todas las operaciones
+- **Gestión de Usuarios**: 
+  - Crear, eliminar usuarios, cambiar roles: Solo ADMIN
+  - Los usuarios pueden ver y actualizar su propio perfil
+  - Los usuarios pueden cambiar su propia contraseña
+  - Listar todos los usuarios: Solo ADMIN
+
+#### Compatibilidad hacia Atrás
+
+Para compatibilidad hacia atrás, la autenticación está **deshabilitada por defecto** (`require-authentication: false`). Esto permite que los despliegues existentes continúen funcionando, pero **NO SE RECOMIENDA** para uso en producción.
+
+**⚠️ ADVERTENCIA**: Ejecutar con autenticación deshabilitada permite que cualquiera con acceso a la red pueda crear, modificar o eliminar usuarios y tenants.
+
+### Opciones de Seguridad Adicionales
+
+1. **Autenticación con Proxy Inverso**: Usa Nginx, Traefik, o Caddy con autenticación frente a Janitorr
+
+2. **Aislamiento de Red**: Restringir acceso mediante reglas de firewall (iptables, grupos de seguridad en la nube)
+
+3. **Módulo de Seguridad Integrado**: Ver la [Guía de Seguridad](Guia-Seguridad.md) para características de seguridad adicionales.
+
+Para instrucciones completas de configuración de seguridad, ver la [Guía de Seguridad](Guia-Seguridad.md).
 
 ## Endpoints de la API
 
@@ -201,9 +258,12 @@ DELETE /api/tenants/{tenantId}
 
 ### Configuración Familiar
 
+**Nota**: Estos ejemplos asumen que la autenticación está habilitada. Agrega `-u "admin@janitorr.local:contraseña"` a cada comando curl cuando `require-authentication: true`.
+
 1. **Crear tenant para la familia:**
 ```bash
 curl -X POST http://localhost:8978/api/tenants \
+  -u "admin@janitorr.local:tu-contraseña" \
   -H "Content-Type: application/json" \
   -d '{"name": "Familia García"}'
 ```
@@ -212,6 +272,7 @@ curl -X POST http://localhost:8978/api/tenants \
 ```bash
 # Padre (Admin)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:tu-contraseña" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "papa@garcia.familia",
@@ -221,6 +282,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Madre (Power User)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:tu-contraseña" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "mama@garcia.familia",
@@ -230,6 +292,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Adolescente (Standard User)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:tu-contraseña" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "adolescente@garcia.familia",
@@ -239,6 +302,7 @@ curl -X POST http://localhost:8978/api/users \
 
 # Niño (Read-Only)
 curl -X POST http://localhost:8978/api/users \
+  -u "admin@janitorr.local:tu-contraseña" \
   -H "Content-Type: application/json" \
   -d '{
     "email": "niño@garcia.familia",
@@ -250,6 +314,7 @@ curl -X POST http://localhost:8978/api/users \
 3. **Agregar usuarios al tenant:**
 ```bash
 curl -X POST http://localhost:8978/api/tenants/{tenantId}/users \
+  -u "admin@janitorr.local:tu-contraseña" \
   -H "Content-Type: application/json" \
   -d '{"userId": "{userId}", "role": "ADMIN"}'
 ```
@@ -312,35 +377,37 @@ Tenant
 
 ## Mejoras Futuras
 
-### Fase 1: Seguridad (Prioridad)
-- [ ] Integración con Spring Security
-- [ ] Generación y validación de tokens JWT
-- [ ] Hash de contraseñas BCrypt
-- [ ] Gestión de sesiones
-- [ ] Protección CSRF
+Las siguientes mejoras están bajo consideración y pueden implementarse en versiones futuras:
 
-### Fase 2: Persistencia
-- [ ] Entidades JPA
-- [ ] Base de datos H2 para desarrollo
-- [ ] Soporte PostgreSQL para producción
-- [ ] Scripts de migración de base de datos
-- [ ] Backup y restauración
+### Fase 1: Seguridad (Prioridad - Bajo Consideración)
+- [ ] Integración con Spring Security (puede agregarse)
+- [ ] Generación y validación de tokens JWT (bajo consideración)
+- [ ] Hash de contraseñas BCrypt (puede implementarse)
+- [ ] Gestión de sesiones (bajo consideración)
+- [ ] Protección CSRF (puede agregarse)
 
-### Fase 3: Características Avanzadas
-- [ ] Integración OAuth (Google, GitHub, Discord)
-- [ ] Autenticación de dos factores
-- [ ] Gestión de claves API
-- [ ] Limitación de tasa
-- [ ] Log de auditoría
-- [ ] Notificaciones por email
-- [ ] Recuperación de contraseña
-- [ ] Sistema de invitación de usuarios
+### Fase 2: Persistencia (Bajo Consideración)
+- [ ] Entidades JPA (puede implementarse)
+- [ ] Base de datos H2 para desarrollo (bajo consideración)
+- [ ] Soporte PostgreSQL para producción (puede agregarse)
+- [ ] Scripts de migración de base de datos (bajo consideración)
+- [ ] Backup y restauración (puede implementarse)
 
-### Fase 4: Integración UI
-- [ ] Páginas de login/logout
-- [ ] Dashboard de gestión de usuarios
-- [ ] Página de configuración de perfil
-- [ ] Selector de tenant
+### Fase 3: Características Avanzadas (Bajo Consideración)
+- [ ] Integración OAuth (Google, GitHub, Discord) (puede agregarse)
+- [ ] Autenticación de dos factores (bajo consideración)
+- [ ] Gestión de claves API (puede implementarse)
+- [ ] Limitación de tasa (bajo consideración)
+- [ ] Log de auditoría (puede agregarse)
+- [ ] Notificaciones por email (bajo consideración)
+- [ ] Recuperación de contraseña (puede implementarse)
+- [ ] Sistema de invitación de usuarios (bajo consideración)
+
+### Fase 4: Integración UI (Bajo Consideración)
+- [ ] Páginas de login/logout (puede agregarse)
+- [ ] Dashboard de gestión de usuarios (bajo consideración)
+- [ ] Página de configuración de perfil (puede implementarse)
+- [ ] Selector de tenant (bajo consideración)
 - [ ] Componentes UI basados en roles
 
 ### Fase 5: Multi-Tenancy

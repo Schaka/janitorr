@@ -11,6 +11,13 @@ configuration:
     config-file: "/config/application.yml" # Path to the main configuration file
     backup-directory: "/config/backups" # Directory where configuration backups are stored
 
+# Security Configuration
+# HTTP Basic Authentication for API endpoints
+security:
+  enabled: false # Set to true to enable authentication (RECOMMENDED for production)
+  username: admin # Change this to your desired username
+  password: admin # IMPORTANT: Change this to a secure password!
+
 # Management UI Configuration
 # The web interface for monitoring and manually triggering cleanup operations
 management:
@@ -21,13 +28,50 @@ management:
       exposure:
         include: health,info,management # Endpoints available through the API
 
-# Rule Engine Configuration (Advanced)
-# Custom cleanup rules with drag-and-drop visual builder
-rule-engine:
-  enabled: false # Set to true to enable the visual rule builder and custom rules
-  rules-directory: "/config/rules" # Directory where custom rules are stored
-  max-rules-per-execution: 100 # Maximum number of rules to process in one execution
-  enable-scheduled-rules: false # Set to true to enable automatic execution of scheduled rules
+# Notification System Configuration
+# Send notifications about cleanup operations, errors, and system status through multiple channels
+notifications:
+  enabled: false # Set to true to enable notifications (MUST enable at least one channel below)
+  
+  # Discord Webhook - Rich embeds with cleanup statistics
+  discord:
+    enabled: false
+    webhook-url: "" # Discord webhook URL (e.g., https://discord.com/api/webhooks/...)
+    username: "Janitorr" # Bot display name
+    avatar-url: "" # Optional: Custom avatar URL for the bot
+  
+  # Telegram Bot - Real-time push notifications
+  telegram:
+    enabled: false
+    bot-token: "" # Telegram bot token from @BotFather
+    chat-id: "" # Chat ID where notifications will be sent
+  
+  # Email (SMTP) - Detailed HTML email reports
+  email:
+    enabled: false
+    host: "smtp.gmail.com" # SMTP server host
+    port: 587 # SMTP port (587 for TLS, 465 for SSL)
+    username: "" # SMTP username
+    password: "" # SMTP password
+    from: "" # Sender email address
+    to: # List of recipient email addresses
+      - ""
+    use-tls: true # Use TLS encryption
+  
+  # Generic Webhook - JSON payload for custom integrations (Slack, Teams, etc.)
+  webhook:
+    enabled: false
+    url: "" # Webhook endpoint URL
+    method: "POST" # HTTP method (POST or PUT)
+    headers: {} # Optional: Custom headers (e.g., Authorization: Bearer token)
+    retry-count: 3 # Number of retry attempts on failure
+  
+  # Web Push - Browser notifications (experimental, not fully implemented)
+  web-push:
+    enabled: false
+    public-key: "" # VAPID public key
+    private-key: "" # VAPID private key
+
 
 # File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to create "Leaving Soon" collections in Jellyfin
 # Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
@@ -145,25 +189,3 @@ clients:
     whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
     url: "http://streamystats:3000"
     api-key: "jellystat-key" # Jellyfin API key
-
-# AI/ML Intelligence Engine (Future Feature - Currently in Planning Phase)
-# This feature uses machine learning to optimize cleanup decisions based on viewing patterns
-# Status: Disabled by default - Architecture documentation available in docs/AI_ML_ENGINE_ARCHITECTURE.md
-ai:
-  enabled: false # AI features are disabled by default and not yet implemented
-  model-path: /config/models # Where to store trained ML models
-  training:
-    enabled: false # Manual training only (automatic training not yet implemented)
-    schedule: "0 0 3 * * ?" # 3 AM daily (if/when automatic training is implemented)
-    min-data-points: 1000 # Minimum viewing history entries before training
-    historical-data-days: 90 # Days of history to use for training
-  inference:
-    cache-ttl: 3600 # Cache predictions for 1 hour (seconds)
-    batch-size: 100 # Items per batch for library scoring
-    confidence-threshold: 0.7 # Minimum confidence (0.0-1.0) to act on predictions
-    timeout-ms: 100 # Maximum time to wait for a prediction (milliseconds)
-  features:
-    external-apis: false # Disable external data sources (privacy-preserving)
-    user-feedback: true # Learn from user corrections (when implemented)
-    natural-language: false # Natural language query interface (future)
-    computer-vision: false # Computer vision features (future)

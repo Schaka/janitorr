@@ -7,10 +7,21 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Dry-run banner -->
+    <div id="dryRunBanner" class="dry-run-banner" style="display: none;">
+        <span class="banner-icon">ℹ️</span>
+        <span class="banner-text">
+            <strong>Dry-Run Mode Active:</strong> No files will be deleted. This is a simulation mode.
+        </span>
+    </div>
+
     <div class="container">
         <header>
             <h1>🧹 Janitorr Management</h1>
             <p class="subtitle">Manage and manually launch cleanup functions</p>
+            <div style="margin-top: 15px;">
+                <a href="/config.html" class="btn btn-primary" style="text-decoration: none; display: inline-block;">⚙️ Configuration</a>
+            </div>
         </header>
 
         <section class="status-section">

@@ -490,20 +490,28 @@ Common issues and their solutions when running Janitorr.
 
 ## Management UI Issues
 
+**✅ Note:** The Management UI is fully functional in current releases. Most common issues have been resolved.
+
 ### UI Not Accessible
 
-**Symptoms:** Cannot access the web UI at `http://localhost:8080/`
+**Symptoms:** Cannot access the web UI at `http://localhost:8978/`
 
 **Solutions:**
 
-1. **Check if UI is enabled:**
+1. **Verify you're using the latest image:**
+   ```bash
+   docker-compose pull janitorr
+   docker-compose up -d janitorr
+   ```
+
+2. **Check if UI is enabled:**
    ```bash
    docker logs janitorr | grep "Management UI"
    ```
    
    Should show:
    ```
-   INFO - Management UI is ENABLED and available at http://localhost:8080/
+   INFO - Management UI is ENABLED and available at http://localhost:8978/
    ```
 
 2. **Verify environment variable:**
@@ -511,72 +519,86 @@ Common issues and their solutions when running Janitorr.
    docker exec janitorr printenv | grep JANITORR_UI_ENABLED
    ```
    
-   Should return `JANITORR_UI_ENABLED=true`
+   Should return `JANITORR_UI_ENABLED=true` (or nothing, as true is the default)
 
 3. **Check port mapping:**
    ```yaml
    ports:
-     - "8080:8080"  # Make sure this is in your docker-compose.yml
+     - "8978:8978"  # Make sure this is in your docker-compose.yml
    ```
 
-4. **Verify configuration file:**
+4. **Test the endpoint:**
    ```bash
-   docker exec janitorr cat /config/application.yml | grep -A 3 "management:"
+   curl http://localhost:8978/api/management/status
    ```
    
-   Should show:
-   ```yaml
-   management:
-     ui:
-       enabled: true
-   ```
+   Should return JSON with system status.
 
 ### UI Shows 404 Error
 
+**✅ This issue has been FIXED in current releases!**
+
+If you're seeing 404 errors on the Management UI:
+
 **Symptoms:** Accessing root URL returns 404 Not Found
 
-**Common Causes:**
-- UI is disabled
-- Using `leyden` profile (native image compilation)
-- Static resources not available
+**Solution:**
 
-**Solutions:**
-
-1. **Enable UI via environment variable:**
-   ```yaml
-   environment:
-     - JANITORR_UI_ENABLED=true
-   ```
-
-2. **Check active profiles:**
+1. **Update to the latest image:**
    ```bash
-   docker logs janitorr | grep "spring.profiles.active"
+   docker-compose pull janitorr
+   docker-compose up -d janitorr
    ```
    
-   If you see `leyden` profile, the UI is disabled by design.
-
-3. **Restart container after configuration change:**
-   ```bash
-   docker-compose restart janitorr
+2. **Verify the image tag:**
+   ```yaml
+   image: ghcr.io/carcheky/janitorr:jvm-stable  # Use this or jvm-main
    ```
+
+3. **Clear browser cache and retry**
+
+**Expected behavior with current images:**
+- ✅ `http://localhost:8978/` shows the Management UI
+- ✅ All buttons and features work correctly
+- ✅ API endpoints return proper responses
 
 ### API Endpoints Return 404
 
-**Symptoms:** `/api/management/status` returns 404
+**✅ This issue has been FIXED in current releases!**
+
+If `/api/management/status` returns 404:
+
+**Solution:**
+1. **Update to the latest image** as described above
+2. **Verify the endpoint:**
+   ```bash
+   curl http://localhost:8978/api/management/status
+   ```
+3. **Check container logs:**
+   ```bash
+   docker logs janitorr | grep "Management"
+   ```
+
+### UI Features Not Working
+
+**Symptoms:** Buttons don't respond or cleanups don't trigger
 
 **Solutions:**
 
-1. **Verify UI is enabled** (same as above)
+1. **Check browser console for errors:**
+   - Open browser developer tools (F12)
+   - Look for JavaScript errors in the Console tab
 
-2. **Check controller is loaded:**
+2. **Verify API connectivity:**
    ```bash
-   docker logs janitorr | grep ManagementController
+   curl -X POST http://localhost:8978/api/management/cleanup/media
    ```
 
-3. **Test with curl:**
+3. **Check Janitorr logs:**
    ```bash
-   curl http://localhost:8080/api/management/status
+   docker logs -f janitorr
    ```
+   Watch for cleanup execution messages.
 
 ### Disabling the UI
 

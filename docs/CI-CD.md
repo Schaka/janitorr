@@ -185,8 +185,6 @@ All workflows support manual triggering via the GitHub Actions UI:
 The following secrets must be configured in GitHub repository settings:
 
 - `GITHUB_TOKEN`: Automatically provided by GitHub Actions
-- `DOCKERHUB_USER`: Docker Hub username (for rate limit avoidance)
-- `DOCKERHUB_PASSWORD`: Docker Hub password/token
 
 ## Troubleshooting
 
@@ -213,9 +211,8 @@ If a release is not created after merging to main:
 If Docker image builds fail:
 
 1. Check the Actions logs for specific errors
-2. Verify Docker Hub credentials are valid
-3. Ensure sufficient disk space in runners
-4. Check for Gradle build errors
+2. Ensure sufficient disk space in runners
+3. Check for Gradle build errors
 
 ## Best Practices
 

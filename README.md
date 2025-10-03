@@ -47,6 +47,7 @@ Comprehensive documentation is available in multiple languages:
   - [Wiki Home](docs/wiki/en/Home.md)
   - [Docker Compose Setup Guide](docs/wiki/en/Docker-Compose-Setup.md)
   - [Configuration Guide](docs/wiki/en/Configuration-Guide.md)
+  - [Web Configuration Guide](docs/wiki/en/Web-Configuration-Guide.md) ⭐ NEW
   - [FAQ](docs/wiki/en/FAQ.md)
   - [Troubleshooting](docs/wiki/en/Troubleshooting.md)
 
@@ -54,6 +55,7 @@ Comprehensive documentation is available in multiple languages:
   - [Inicio de la Wiki](docs/wiki/es/Home.md)
   - [Guía de Configuración con Docker Compose](docs/wiki/es/Configuracion-Docker-Compose.md)
   - [Guía de Configuración](docs/wiki/es/Guia-Configuracion.md)
+  - [Guía de Configuración Web](docs/wiki/es/Guia-Configuracion-Web.md) ⭐ NUEVO
   - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
   - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
 
@@ -70,6 +72,7 @@ This fork includes additional documentation:
 
 ## Features
 
+- **Web-based Configuration UI** - Complete configuration management via browser with real-time connection testing and validation ⭐ NEW
 - **Web-based Management UI** - Monitor status and manually trigger cleanup functions through a user-friendly web interface
 - Remote deletion, disk space aware deletion as well as tag based delete schedules
 - Exclude items from deletion via tags in Sonarr/Radarr
@@ -93,9 +96,16 @@ This fork includes additional documentation:
 
 ### Management UI ✅
 
-**🎉 The Management UI is fully functional and ready to use!**
+Janitorr includes a comprehensive web-based management interface accessible at `http://<host>:<port>/` when the application is running.
 
-Janitorr includes a **web-based management interface** accessible at `http://<host>:<port>/` when the application is running.
+The management UI allows you to:
+- **View system status** - Monitor current configuration and cleanup state
+- **Manually trigger cleanups** - Run any cleanup function on-demand
+- **Configure via Web UI** - Complete configuration management without editing YAML files
+- **Test connections** - Verify connectivity to all external services (Sonarr, Radarr, Jellyfin, etc.)
+- **Manage backups** - Create, restore, import, and export configurations
+- **Real-time validation** - Test and validate settings before saving
+- See real-time feedback on cleanup operations
 
 ![Management UI Working](https://img.shields.io/badge/Status-✅%20Fully%20Functional-brightgreen.svg?style=for-the-badge)
 

@@ -38,7 +38,8 @@ class MediaCleanupSchedule(
     runOnce: RunOnce,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService) {
+    notificationService: com.github.schaka.janitorr.notifications.NotificationService,
+) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService, notificationService) {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

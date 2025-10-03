@@ -4,10 +4,12 @@
 
 The Janitorr Management UI provides a web-based interface to monitor and manually trigger cleanup functions. This allows administrators to:
 
-- View the current system status and configuration
-- Manually trigger any of the three cleanup schedules on-demand
-- Monitor which cleanups have been executed
-- See real-time feedback on cleanup operations
+- **View real-time analytics**: Dashboard with cleanup statistics, charts, and visualizations
+- **Monitor system metrics**: Track total files deleted, space freed, and media type distribution
+- **View the current system status and configuration**
+- **Manually trigger any of the three cleanup schedules on-demand**
+- **Monitor which cleanups have been executed**
+- **See real-time feedback on cleanup operations**
 
 ## Accessing the UI
 
@@ -94,6 +96,29 @@ services:
 
 ## Features
 
+### Dashboard Analytics
+
+The dashboard provides real-time analytics and visualizations of cleanup operations:
+
+#### Quick Stats Cards
+- **Total Files Deleted**: Cumulative count of all deleted files
+- **Space Freed**: Total disk space recovered (displayed in GB)
+- **Movies Cleaned**: Number of movies removed
+- **Shows Cleaned**: Number of TV shows removed
+
+#### Cleanup Activity Chart
+A dual-axis bar chart showing:
+- Files deleted per day (left axis)
+- Space freed per day in GB (right axis)
+- Shows the last 30 cleanup events aggregated by date
+
+#### Media Type Distribution Chart
+A doughnut chart displaying:
+- Breakdown of deletions by media type (movies, shows, episodes)
+- Visual representation of cleanup patterns
+
+**Note:** Dashboard data is stored in-memory and will reset on application restart. Charts auto-refresh every 30 seconds.
+
 ### System Status
 
 The status section displays:
@@ -150,6 +175,57 @@ Returns the current system status and configuration.
   "hasMediaCleanupRun": true,
   "hasTagBasedCleanupRun": false,
   "hasWeeklyEpisodeCleanupRun": false,
+  "timestamp": 1234567890
+}
+```
+
+### GET /api/management/metrics/summary
+Returns summary statistics for all cleanup operations.
+
+**Response:**
+```json
+{
+  "totalFilesDeleted": 150,
+  "totalSpaceFreed": 50000000000,
+  "totalSpaceFreedGB": "46.57",
+  "mediaTypeCounts": {
+    "movies": 50,
+    "shows": 30,
+    "episodes": 70
+  },
+  "timestamp": 1234567890
+}
+```
+
+### GET /api/management/metrics/cleanup-history
+Returns the cleanup history events (last 100 events).
+
+**Response:**
+```json
+{
+  "events": [
+    {
+      "timestamp": "2024-01-15T10:30:00",
+      "type": "movies",
+      "filesDeleted": 5,
+      "spaceFreed": 15000000000
+    }
+  ],
+  "timestamp": 1234567890
+}
+```
+
+### GET /api/management/metrics/media-types
+Returns media type distribution.
+
+**Response:**
+```json
+{
+  "distribution": {
+    "movies": 50,
+    "shows": 30,
+    "episodes": 70
+  },
   "timestamp": 1234567890
 }
 ```

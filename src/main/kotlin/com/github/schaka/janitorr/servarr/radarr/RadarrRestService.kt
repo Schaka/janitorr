@@ -74,7 +74,8 @@ class RadarrRestService(
                                         movie.movieFile!!.path,
                                         tmdbId = movie.tmdbId,
                                         imdbId = movie.imdbId,
-                                        tags = allTags.filter { tag -> movie.tags.contains(tag.id) }.map { tag -> tag.label }
+                                        tags = allTags.filter { tag -> movie.tags.contains(tag.id) }.map { tag -> tag.label },
+                                        sizeInBytes = movie.movieFile?.size ?: 0L
                                 )
                             }
                             .sortedWith(byDate(historySort))

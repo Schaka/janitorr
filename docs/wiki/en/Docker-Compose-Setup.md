@@ -285,14 +285,24 @@ This ensures the container is healthy before routing traffic to it.
 
 ### Stable Releases
 
+#### JVM Images (Recommended)
+- `ghcr.io/carcheky/janitorr:latest` - Latest stable JVM image (alias for jvm-stable)
 - `ghcr.io/carcheky/janitorr:jvm-stable` - Latest stable JVM image (recommended)
-- `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Specific JVM version
+- `ghcr.io/carcheky/janitorr:v1.x.x` - Specific version (e.g., v1.9.0)
+- `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Specific JVM version with prefix
+
+#### Native Images (Deprecated)
+- `ghcr.io/carcheky/janitorr:native-latest` - Latest stable native image (deprecated)
 - `ghcr.io/carcheky/janitorr:native-stable` - Latest stable native image (deprecated)
 - `ghcr.io/carcheky/janitorr:native-v1.x.x` - Specific native version
 
 ### Development Builds
 
-- `ghcr.io/carcheky/janitorr:jvm-develop` - Latest development build (JVM)
+- `ghcr.io/carcheky/janitorr:main` - Latest main branch build (JVM)
+- `ghcr.io/carcheky/janitorr:jvm-main` - Latest main branch build (JVM, with prefix)
+- `ghcr.io/carcheky/janitorr:develop` - Latest development build (JVM)
+- `ghcr.io/carcheky/janitorr:jvm-develop` - Latest development build (JVM, with prefix)
+- `ghcr.io/carcheky/janitorr:native-main` - Latest main branch build (native)
 - `ghcr.io/carcheky/janitorr:native-develop` - Latest development build (native)
 
 > **Warning:** Development builds may be unstable. Use for testing only.

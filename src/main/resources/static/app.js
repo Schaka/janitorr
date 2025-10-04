@@ -32,6 +32,12 @@ const elements = {
     testEmailBtn: document.getElementById('testEmailBtn'),
     testWebhookBtn: document.getElementById('testWebhookBtn'),
     
+    // Notification test buttons
+    testDiscordBtn: document.getElementById('testDiscordBtn'),
+    testTelegramBtn: document.getElementById('testTelegramBtn'),
+    testEmailBtn: document.getElementById('testEmailBtn'),
+    testWebhookBtn: document.getElementById('testWebhookBtn'),
+    
     // Message container
     messageContainer: document.getElementById('messageContainer'),
     

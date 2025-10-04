@@ -33,6 +33,7 @@ class WeeklyEpisodeCleanupSchedule(
         val sonarrProperties: SonarrProperties,
         val sonarrClient: SonarrClient,
         val runOnce: RunOnce,
+        val metricsService: com.github.schaka.janitorr.metrics.MetricsService,
         val notificationService: com.github.schaka.janitorr.notifications.NotificationService,
 
         var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
@@ -61,6 +62,39 @@ class WeeklyEpisodeCleanupSchedule(
 
         val today = LocalDateTime.now()
         val series = sonarrClient.getAllSeries().filter { it.tags.contains(episodeTag.id) }
+<<<<<<< HEAD
+        
+        var totalEpisodesDeleted = 0
+        var totalSpaceFreed = 0L
+
+        for (show in series) {
+            val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
+            val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
+                .filter { it.airDate != null }
+                .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
+                .toMutableList()
+
+            val episodesHistory = sonarrClient.getHistory(show.id, latestSeason.seasonNumber)
+                    .sortedBy { parseDate(it.date)}
+                    .distinctBy { it.episodeId }
+
+            log.info("Deleting single episodes of ${show.title}")
+
+            // Delete by age
+            for (episodeHistory in episodesHistory) {
+                val episode = episodes.first{ it.seriesId == episodeHistory.seriesId && it.id == episodeHistory.episodeId }
+                val grabDate = parseDate(episodeHistory.date)
+                if (grabDate + applicationProperties.episodeDeletion.maxAge <= today) {
+                    log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because of its age")
+
+                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                        if (!applicationProperties.dryRun) {
+                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                            episodes.remove(episode)
+                            totalEpisodesDeleted++
+                            // Track file size if available
+                            episode.episodeFile?.size?.let { totalSpaceFreed += it }
+=======
         var totalEpisodesDeleted = 0
         val errors = mutableListOf<String>()
 
@@ -94,6 +128,7 @@ class WeeklyEpisodeCleanupSchedule(
                                 }
                                 episodesDeletedForShow++
                             }
+>>>>>>> main
                         }
                     }
 
@@ -105,12 +140,21 @@ class WeeklyEpisodeCleanupSchedule(
                         for (episode in episodes) {
                             log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because there are too many episodes")
 
+<<<<<<< HEAD
+                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                        if (!applicationProperties.dryRun) {
+                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                            totalEpisodesDeleted++
+                            // Track file size if available
+                            episode.episodeFile?.size?.let { totalSpaceFreed += it }
+=======
                             if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                                 if (!applicationProperties.dryRun) {
                                     sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                                 }
                                 episodesDeletedForShow++
                             }
+>>>>>>> main
                         }
                     }
                     
@@ -127,6 +171,11 @@ class WeeklyEpisodeCleanupSchedule(
             log.error("Error during episode cleanup", e)
             errors.add("Episode cleanup error: ${e.message}")
             sendCleanupNotification(totalEpisodesDeleted, errors)
+        }
+        
+        // Record metrics for deleted episodes
+        if (totalEpisodesDeleted > 0) {
+            metricsService.recordCleanup("episodes", totalEpisodesDeleted, totalSpaceFreed)
         }
 
         runOnce.hasWeeklyEpisodeCleanupRun = true

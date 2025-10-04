@@ -76,6 +76,50 @@ notifications:
     private-key: "" # VAPID private key
 
 
+# Notification System Configuration
+# Send notifications about cleanup operations, errors, and system status through multiple channels
+notifications:
+  enabled: false # Set to true to enable notifications (MUST enable at least one channel below)
+  
+  # Discord Webhook - Rich embeds with cleanup statistics
+  discord:
+    enabled: false
+    webhook-url: "" # Discord webhook URL (e.g., https://discord.com/api/webhooks/...)
+    username: "Janitorr" # Bot display name
+    avatar-url: "" # Optional: Custom avatar URL for the bot
+  
+  # Telegram Bot - Real-time push notifications
+  telegram:
+    enabled: false
+    bot-token: "" # Telegram bot token from @BotFather
+    chat-id: "" # Chat ID where notifications will be sent
+  
+  # Email (SMTP) - Detailed HTML email reports
+  email:
+    enabled: false
+    host: "smtp.gmail.com" # SMTP server host
+    port: 587 # SMTP port (587 for TLS, 465 for SSL)
+    username: "" # SMTP username
+    password: "" # SMTP password
+    from: "" # Sender email address
+    to: # List of recipient email addresses
+      - ""
+    use-tls: true # Use TLS encryption
+  
+  # Generic Webhook - JSON payload for custom integrations (Slack, Teams, etc.)
+  webhook:
+    enabled: false
+    url: "" # Webhook endpoint URL
+    method: "POST" # HTTP method (POST or PUT)
+    headers: {} # Optional: Custom headers (e.g., Authorization: Bearer token)
+    retry-count: 3 # Number of retry attempts on failure
+  
+  # Web Push - Browser notifications (experimental, not fully implemented)
+  web-push:
+    enabled: false
+    public-key: "" # VAPID public key
+    private-key: "" # VAPID private key
+
 # File system access (same mapping as Sonarr, Radarr and Jellyfin) is required to create "Leaving Soon" collections in Jellyfin
 # Currently, Jellyfin does not support an easy way to add only a few seasons or movies to a collection, we need access to temporary symlinks
 # Additionally, checks to prevent deletion on currently still seeding media currently require file system access as well

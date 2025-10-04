@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.multitenancy.model.UserRole
 import com.github.schaka.janitorr.multitenancy.repository.TenantRepository
 import com.github.schaka.janitorr.multitenancy.repository.TenantUserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -14,6 +15,12 @@ import java.util.*
  * Service for tenant management operations.
  */
 @Service
+@ConditionalOnProperty(
+    prefix = "multitenancy",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false
+)
 class TenantService(
     private val tenantRepository: TenantRepository,
     private val tenantUserRepository: TenantUserRepository

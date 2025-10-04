@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.multitenancy.model.UserRole
 import com.github.schaka.janitorr.multitenancy.repository.UserProfileRepository
 import com.github.schaka.janitorr.multitenancy.repository.UserRepository
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import java.util.*
@@ -16,6 +17,12 @@ import java.util.*
  * Handles user creation, authentication, and profile management.
  */
 @Service
+@ConditionalOnProperty(
+    prefix = "multitenancy",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false
+)
 class UserService(
     private val userRepository: UserRepository,
     private val userProfileRepository: UserProfileRepository

@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.multitenancy.service.UserService
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Component
 import org.springframework.web.servlet.HandlerInterceptor
 import java.util.*
@@ -21,6 +22,12 @@ import java.util.*
  * - Can be disabled via configuration
  */
 @Component
+@ConditionalOnProperty(
+    prefix = "multitenancy",
+    name = ["enabled"],
+    havingValue = "true",
+    matchIfMissing = false
+)
 class BasicAuthInterceptor(
     private val userService: UserService,
     private val properties: MultiTenancyProperties

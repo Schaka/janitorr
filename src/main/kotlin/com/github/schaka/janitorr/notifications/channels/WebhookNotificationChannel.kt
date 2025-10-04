@@ -3,6 +3,8 @@ package com.github.schaka.janitorr.notifications.channels
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.schaka.janitorr.notifications.NotificationEvent
 import com.github.schaka.janitorr.notifications.config.WebhookProperties
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.net.http.HttpClient
@@ -70,7 +72,11 @@ class WebhookNotificationChannel(
                 lastException = e
                 log.warn("Error sending webhook notification on attempt ${attempt + 1}", e)
                 if (attempt < properties.retryCount - 1) {
+<<<<<<< HEAD
                     Thread.sleep(1000L * (attempt + 1)) // Exponential backoff
+=======
+                    runBlocking { delay(1000L * (attempt + 1)) } // Exponential backoff
+>>>>>>> main
                 }
             }
         }

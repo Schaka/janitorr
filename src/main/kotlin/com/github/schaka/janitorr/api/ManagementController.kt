@@ -5,7 +5,6 @@ import com.github.schaka.janitorr.cleanup.RunOnce
 import com.github.schaka.janitorr.cleanup.TagBasedCleanupSchedule
 import com.github.schaka.janitorr.cleanup.WeeklyEpisodeCleanupSchedule
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.metrics.MetricsService
 import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Profile
@@ -42,7 +41,6 @@ class ManagementController(
     private val weeklyEpisodeCleanupSchedule: WeeklyEpisodeCleanupSchedule,
     private val applicationProperties: ApplicationProperties,
     private val runOnce: RunOnce,
-    private val metricsService: MetricsService,
     private val notificationService: com.github.schaka.janitorr.notifications.NotificationService
 ) {
 
@@ -124,41 +122,38 @@ class ManagementController(
             "timestamp" to System.currentTimeMillis()
         )
     }
-
-    @GetMapping("/metrics/summary")
-    fun getMetricsSummary(): Map<String, Any> {
-        val summary = metricsService.getSummary()
-        return mapOf(
-            "totalFilesDeleted" to summary.totalFilesDeleted,
-            "totalSpaceFreed" to summary.totalSpaceFreed,
-            "totalSpaceFreedGB" to String.format("%.2f", summary.totalSpaceFreed / 1024.0 / 1024.0 / 1024.0),
-            "mediaTypeCounts" to summary.mediaTypeCounts,
-            "timestamp" to System.currentTimeMillis()
-        )
-    }
-
-    @GetMapping("/metrics/cleanup-history")
-    fun getCleanupHistory(): Map<String, Any> {
-        val history = metricsService.getCleanupHistory(100)
-        return mapOf(
-            "events" to history.map { event ->
-                mapOf(
-                    "timestamp" to event.timestamp.toString(),
-                    "type" to event.type,
-                    "filesDeleted" to event.filesDeleted,
-                    "spaceFreed" to event.spaceFreed
-                )
-            },
-            "timestamp" to System.currentTimeMillis()
-        )
-    }
-
-    @GetMapping("/metrics/media-types")
-    fun getMediaTypeDistribution(): Map<String, Any> {
-        return mapOf(
-            "distribution" to metricsService.getMediaTypeDistribution(),
-            "timestamp" to System.currentTimeMillis()
-        )
+    
+    @PostMapping("/notifications/test/{channel}")
+    fun testNotification(@org.springframework.web.bind.annotation.PathVariable channel: String): Map<String, Any> {
+        log.info("Testing notification channel: $channel")
+        return try {
+            val notificationChannel = com.github.schaka.janitorr.notifications.NotificationChannel.valueOf(channel.uppercase())
+            val success = notificationService.testNotification(notificationChannel)
+            
+            mapOf(
+                "success" to success,
+                "message" to if (success) {
+                    "Test notification sent successfully to $channel"
+                } else {
+                    "Failed to send test notification to $channel. Check if the channel is enabled and configured."
+                },
+                "timestamp" to System.currentTimeMillis()
+            )
+        } catch (e: IllegalArgumentException) {
+            log.error("Invalid notification channel: $channel", e)
+            mapOf(
+                "success" to false,
+                "message" to "Invalid notification channel: $channel. Valid channels are: ${com.github.schaka.janitorr.notifications.NotificationChannel.entries.joinToString()}",
+                "timestamp" to System.currentTimeMillis()
+            )
+        } catch (e: Exception) {
+            log.error("Error testing notification channel: $channel", e)
+            mapOf(
+                "success" to false,
+                "message" to "Error: ${e.message}",
+                "timestamp" to System.currentTimeMillis()
+            )
+        }
     }
     
     @PostMapping("/notifications/test/{channel}")

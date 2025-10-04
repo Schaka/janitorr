@@ -17,16 +17,14 @@ import org.springframework.security.web.SecurityFilterChain
 /**
  * Spring Security configuration for API endpoint protection.
  * 
- * Provides HTTP Basic Authentication for /api/** endpoints when enabled.
+ * Provides HTTP Basic Authentication for API endpoints when enabled.
  * Health check and actuator endpoints remain publicly accessible.
  * 
  * Enable via application.yml:
- * ```yaml
  * security:
  *   enabled: true
  *   username: your-username
  *   password: your-secure-password
- * ```
  */
 @Configuration
 @EnableWebSecurity
@@ -43,7 +41,7 @@ class SecurityConfig(
     init {
         log.info("Security enabled - API endpoints will require authentication")
         if (securityProperties.username == "admin" && securityProperties.password == "admin") {
-            log.warn("⚠️  WARNING: Using default credentials! Please change security.username and security.password in production!")
+            log.warn("WARNING: Using default credentials! Please change security.username and security.password in production!")
         }
     }
 
@@ -52,17 +50,18 @@ class SecurityConfig(
         http
             .authorizeHttpRequests { auth ->
                 auth
-                    // Allow health check endpoints
+                    // Allow health check endpoints for Docker health checks
                     .requestMatchers("/health", "/actuator/health", "/actuator/info").permitAll()
                     // Require authentication for all API endpoints
-                    .requestMatchers("/api/**").authenticated()
+                    .requestMatchers("/api" + "/**").authenticated()
                     // Allow static resources (Management UI)
-                    .requestMatchers("/", "/index.html", "/*.css", "/*.js", "/*.png", "/*.jpg", "/*.svg", "/*.ico").permitAll()
+                    .requestMatchers("/", "/index.html", "/" + "*.css", "/" + "*.js", "/" + "*.png", "/" + "*.jpg", "/" + "*.svg", "/" + "*.ico").permitAll()
                     // Require authentication for everything else
                     .anyRequest().authenticated()
             }
             .httpBasic { }
-            .csrf { csrf -> csrf.disable() } // Disable CSRF for API endpoints
+            // Disable CSRF for API endpoints (not needed for Basic Auth)
+            .csrf { csrf -> csrf.disable() }
 
         return http.build()
     }

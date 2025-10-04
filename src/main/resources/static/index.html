@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Janitorr Management UI</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 <body>
     <!-- Dry-run banner -->
@@ -18,61 +17,14 @@
 
     <div class="container">
         <header>
-            <h1>🧹 Janitorr Management</h1>
-            <p class="subtitle">Manage and manually launch cleanup functions</p>
-            <nav class="nav-links" style="margin-top: 1rem;">
-                <a href="rule-builder.html" style="color: #3b82f6; text-decoration: none; font-weight: 500;">🧩 Rule Builder →</a>
-            </nav>
+            <div class="header-content">
+                <div>
+                    <h1>🧹 Janitorr Management</h1>
+                    <p class="subtitle">Manage and manually launch cleanup functions</p>
+                </div>
+                <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+            </div>
         </header>
-
-        <!-- Dashboard Analytics Section -->
-        <section class="dashboard-section">
-            <h2>📊 Dashboard Analytics</h2>
-            
-            <!-- Quick Stats Cards -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">🗑️</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Total Files Deleted</div>
-                        <div id="totalFilesDeleted" class="stat-value">0</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">💾</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Space Freed</div>
-                        <div id="totalSpaceFreed" class="stat-value">0 GB</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">🎬</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Movies Cleaned</div>
-                        <div id="moviesDeleted" class="stat-value">0</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📺</div>
-                    <div class="stat-content">
-                        <div class="stat-label">Shows Cleaned</div>
-                        <div id="showsDeleted" class="stat-value">0</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts Row -->
-            <div class="charts-row">
-                <div class="chart-container">
-                    <h3>Cleanup Activity (Last 30 Events)</h3>
-                    <canvas id="cleanupHistoryChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <h3>Media Type Distribution</h3>
-                    <canvas id="mediaTypeChart"></canvas>
-                </div>
-            </div>
-        </section>
 
         <section class="status-section">
             <h2>System Status</h2>

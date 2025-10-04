@@ -19,9 +19,8 @@ class MetricsServiceTest {
 
         val summary = metricsService.getSummary()
         
-        // Account for sample data initialized in the service
-        assertTrue(summary.totalFilesDeleted >= 5)
-        assertTrue(summary.totalSpaceFreed >= 1_000_000_000L)
+        assertEquals(5, summary.totalFilesDeleted)
+        assertEquals(1_000_000_000L, summary.totalSpaceFreed)
     }
 
     @Test
@@ -33,8 +32,8 @@ class MetricsServiceTest {
         
         assertTrue(distribution.containsKey("movies"))
         assertTrue(distribution.containsKey("shows"))
-        assertTrue(distribution["movies"]!! >= 3)
-        assertTrue(distribution["shows"]!! >= 2)
+        assertEquals(3, distribution["movies"])
+        assertEquals(2, distribution["shows"])
     }
 
     @Test
@@ -43,8 +42,10 @@ class MetricsServiceTest {
 
         val history = metricsService.getCleanupHistory(10)
         
-        assertTrue(history.isNotEmpty())
-        assertTrue(history.any { it.type == "episodes" })
+        assertEquals(1, history.size)
+        assertEquals("episodes", history[0].type)
+        assertEquals(10, history[0].filesDeleted)
+        assertEquals(2_000_000_000L, history[0].spaceFreed)
     }
 
     @Test
@@ -68,8 +69,7 @@ class MetricsServiceTest {
 
         val summary = service.getSummary()
 
-        // Check that totals include our recorded events (plus sample data)
-        assertTrue(summary.totalFilesDeleted >= 8)
-        assertTrue(summary.totalSpaceFreed >= 8_000_000_000L)
+        assertEquals(8, summary.totalFilesDeleted)
+        assertEquals(8_000_000_000L, summary.totalSpaceFreed)
     }
 }

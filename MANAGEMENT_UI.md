@@ -314,9 +314,13 @@ The `leyden` profile is only used during Docker image builds for AOT cache gener
 
 ## Security Considerations
 
-- The management UI has no authentication by default
-- Consider using a reverse proxy with authentication if exposing to the internet
-- The UI only provides read access to configuration and the ability to trigger cleanups
+- **Built-in Authentication Available**: Janitorr now includes optional HTTP Basic Authentication
+  - Set `security.enabled: true` in `application.yml` to enable it
+  - See the [Security Guide](docs/wiki/en/Security-Guide.md) for full configuration details
+- The management UI and API endpoints have no authentication by default (for backward compatibility)
+- **IMPORTANT**: Enable authentication or use a reverse proxy with authentication if exposing to the internet
+- Alternative: Use a reverse proxy (Nginx, Traefik, Caddy) with authentication
+- The UI provides read access to configuration and the ability to trigger cleanups
 - No configuration changes can be made through the UI (configuration is read-only)
 
 ## Troubleshooting

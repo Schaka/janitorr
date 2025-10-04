@@ -1,3 +1,6 @@
+server:
+  port: 8978 # Port Janitorr listens on
+
 logging:
   level:
     com.github.schaka: INFO # Set to DEBUG or TRACE to get more info about what Janitorr is doing

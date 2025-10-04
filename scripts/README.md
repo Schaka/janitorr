@@ -14,10 +14,10 @@ Verifies that Docker images are available in GitHub Container Registry (GHCR).
 ```
 
 **What it checks:**
-- ✅ Stable images (`jvm-stable`, `native-stable`)
-- ✅ Version-tagged images (e.g., `jvm-v1.0.0`)
-- ✅ Branch images (`jvm-main`, `jvm-develop`)
-- ✅ Platform-specific images (`jvm-amd64-main`, `jvm-arm64-main`)
+- ✅ Stable images (`latest` for both janitorr and janitorr-native)
+- ✅ Version-tagged images (e.g., `1.0.0`)
+- ✅ Branch images (`main`, `develop`)
+- ✅ Platform-specific images (`amd64-main`, `arm64-main`)
 
 **Requirements:**
 - `curl` (usually pre-installed)
@@ -30,9 +30,9 @@ Verifies that Docker images are available in GitHub Container Registry (GHCR).
 
 🔍 Verificando imágenes estables (recomendadas para producción):
 ================================================================
-Verificando ghcr.io/carcheky/janitorr:jvm-stable... ✅ Disponible
-Verificando ghcr.io/carcheky/janitorr:jvm-v1.0.0... ⚠️  No disponible o requiere autenticación (código: 404)
-Verificando ghcr.io/carcheky/janitorr:native-stable... ✅ Disponible
+Verificando ghcr.io/carcheky/janitorr:latest... ✅ Disponible
+Verificando ghcr.io/carcheky/janitorr:1.0.0... ⚠️  No disponible o requiere autenticación (código: 404)
+Verificando ghcr.io/carcheky/janitorr-native:latest... ✅ Disponible
 ```
 
 **Note:** Some images may show as "not available" if they haven't been published yet (e.g., no version tags exist yet, or the workflow hasn't run).

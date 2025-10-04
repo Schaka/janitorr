@@ -127,12 +127,12 @@ test:                Any        No release      -
 ## Docker Image Tags
 
 ```
-Branch/Tag          JVM Image Tags                Native Image Tags
-────────────────────────────────────────────────────────────────────────
-main               jvm-main                      native-main
-develop            jvm-develop                   native-develop
-v1.0.0 (tag)       jvm-stable, jvm-v1.0.0       native-stable, native-v1.0.0
-v1.1.0-develop.1   jvm-develop                   native-develop
+Branch/Tag          JVM Image (janitorr)          Native Image (janitorr-native)
+────────────────────────────────────────────────────────────────────────────────
+main               main                           main
+develop            develop                        develop
+v1.0.0 (tag)       latest, 1.0.0                 latest, 1.0.0
+v1.1.0-develop.1   develop                        develop
 ```
 
 ## Workflow Jobs

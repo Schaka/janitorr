@@ -54,7 +54,7 @@ Docker images will be automatically created when:
 6. El workflow:
    - Compilará el código
    - Construirá imágenes para amd64 y arm64
-   - Las publicará en `ghcr.io/carcheky/janitorr:jvm-main` (o `jvm-develop`)
+   - Las publicará en `ghcr.io/carcheky/janitorr:main` (o `develop`)
 
 ### English
 
@@ -78,7 +78,7 @@ Docker images will be automatically created when:
 6. The workflow will:
    - Compile the code
    - Build images for amd64 and arm64
-   - Publish them to `ghcr.io/carcheky/janitorr:jvm-main` (or `jvm-develop`)
+   - Publish them to `ghcr.io/carcheky/janitorr:main` (or `develop`)
 
 **Tiempo estimado / Estimated time:** 15-20 minutos / minutes
 
@@ -256,7 +256,7 @@ https://github.com/carcheky/janitorr/pkgs/container/janitorr
 
 - [ ] Ejecutar workflow "JVM Image" manualmente / Run "JVM Image" workflow manually
 - [ ] Verificar build exitoso / Verify successful build
-- [ ] Probar imagen: `docker pull ghcr.io/carcheky/janitorr:jvm-main`
+- [ ] Probar imagen: `docker pull ghcr.io/carcheky/janitorr:main`
 - [ ] Verificar Management UI funciona / Verify Management UI works
 
 ### Publicar Primera Versión Estable / Publish First Stable Release

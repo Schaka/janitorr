@@ -115,11 +115,12 @@ extra {
 
     // Use dynamic repository owner from GITHUB_REPOSITORY or fall back to schaka
     val repoOwner = System.getenv("GITHUB_REPOSITORY")?.split("/")?.get(0) ?: "schaka"
-    val containerImageName = "ghcr.io/$repoOwner/${project.name}"
-
     val imageType = System.getenv("IMAGE_TYPE") ?: "jvm"
+    val imageSuffix = if (imageType == "native") "-native" else ""
+    val containerImageName = "ghcr.io/$repoOwner/${project.name}$imageSuffix"
+
     val platform = System.getenv("TARGET_PLATFORM") ?: "amd64"
-    val baseTag = "$imageType-$platform"
+    val baseTag = "$platform"
 
     val containerImageTags = listOf("$containerImageName:$baseTag", "$containerImageName:$baseTag-$shortCommit", "$containerImageName:$baseTag-$branch")
 

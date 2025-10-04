@@ -201,7 +201,7 @@ version: "3"
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:native-stable
+    image: ghcr.io/carcheky/janitorr-native:latest
     user: 1000:1000
     volumes:
       - /appdata/janitorr/config/application.yml:/config/application.yml
@@ -286,24 +286,22 @@ Esto asegura que el contenedor esté saludable antes de enrutar tráfico hacia �
 ### Versiones Estables
 
 #### Imágenes JVM (Recomendadas)
-- `ghcr.io/carcheky/janitorr:latest` - Última imagen JVM estable (alias de jvm-stable)
-- `ghcr.io/carcheky/janitorr:jvm-stable` - Última imagen JVM estable (recomendada)
-- `ghcr.io/carcheky/janitorr:v1.x.x` - Versión específica (ej., v1.9.0)
-- `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Versión JVM específica con prefijo
+- `ghcr.io/carcheky/janitorr:latest` - Última imagen JVM estable (recomendada)
+- `ghcr.io/carcheky/janitorr:1.x.x` - Versión específica (ej., 1.9.0)
 
 #### Imágenes Nativas (Obsoletas)
-- `ghcr.io/carcheky/janitorr:native-latest` - Última imagen nativa estable (obsoleta)
-- `ghcr.io/carcheky/janitorr:native-stable` - Última imagen nativa estable (obsoleta)
-- `ghcr.io/carcheky/janitorr:native-v1.x.x` - Versión nativa específica
+- `ghcr.io/carcheky/janitorr-native:latest` - Última imagen nativa estable (obsoleta)
+- `ghcr.io/carcheky/janitorr-native:1.x.x` - Versión nativa específica
 
 ### Compilaciones de Desarrollo
 
+#### Imágenes JVM
 - `ghcr.io/carcheky/janitorr:main` - Última compilación de la rama main (JVM)
-- `ghcr.io/carcheky/janitorr:jvm-main` - Última compilación de la rama main (JVM, con prefijo)
 - `ghcr.io/carcheky/janitorr:develop` - Última compilación de desarrollo (JVM)
-- `ghcr.io/carcheky/janitorr:jvm-develop` - Última compilación de desarrollo (JVM, con prefijo)
-- `ghcr.io/carcheky/janitorr:native-main` - Última compilación de la rama main (nativa)
-- `ghcr.io/carcheky/janitorr:native-develop` - Última compilación de desarrollo (nativa)
+
+#### Imágenes Nativas (Obsoletas)
+- `ghcr.io/carcheky/janitorr-native:main` - Última compilación de la rama main (nativa)
+- `ghcr.io/carcheky/janitorr-native:develop` - Última compilación de desarrollo (nativa)
 
 > **Advertencia:** Las compilaciones de desarrollo pueden ser inestables. Usa solo para pruebas.
 

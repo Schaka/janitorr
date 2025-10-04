@@ -82,21 +82,33 @@ Based on commit messages:
 ## Commit Message Format
 
 ```
-<type>(<scope>): <subject>
+<type>[(<scope>)]: <subject>
 
 [optional body]
 
 [optional footer]
 ```
 
+**Note:** Scope is optional. Both formats are valid:
+- `feat: add feature` (without scope)
+- `feat(media): add feature` (with scope)
+
 **Valid types:** feat, fix, docs, style, refactor, perf, test, build, ci, chore, revert
 
 **Examples:**
 
 ```bash
+# With scope
 feat(media): add Plex support
 fix(cleanup): resolve symlink deletion issue
+
+# Without scope
+feat: add new feature
+fix: resolve bug
 docs: update Docker setup guide
+chore: update dependencies
+
+# Breaking change
 feat(api)!: change response format
 
 BREAKING CHANGE: API structure has changed

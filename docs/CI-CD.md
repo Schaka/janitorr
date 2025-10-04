@@ -90,8 +90,12 @@ All commit messages must follow the [Conventional Commits](https://www.conventio
 ### Format
 
 ```
-<type>(<scope>): <subject>
+<type>[(<scope>)]: <subject>
 ```
+
+**Note:** Scope (the part in parentheses) is optional. You can use either:
+- `feat: add new feature` (without scope)
+- `feat(media): add new feature` (with scope)
 
 ### Valid Types
 
@@ -110,13 +114,19 @@ All commit messages must follow the [Conventional Commits](https://www.conventio
 ### Examples
 
 ```bash
-# Feature
+# Feature (with scope)
 git commit -m "feat(media): add support for Plex"
 
-# Bug fix
+# Feature (without scope)
+git commit -m "feat: add support for user profiles"
+
+# Bug fix (with scope)
 git commit -m "fix(cleanup): resolve symlink deletion issue"
 
-# Documentation
+# Bug fix (without scope)
+git commit -m "fix: resolve memory leak"
+
+# Documentation (without scope)
 git commit -m "docs: update Docker setup guide"
 
 # Breaking change

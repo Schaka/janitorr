@@ -116,14 +116,13 @@ class SonarrRestService(
             }
 
             val fileResponse = sonarrClient.getEpisodeFile(episodeResponse.episodeFileId!!)
-            
-            // Calculate total size of all episodes in the season
-            val totalSeasonSize = episodeResponses
-                .filter { ep -> ep.hasFile && ep.episodeFile != null }
+            // Calculate total size for all episode files in this season
+            val totalSize = episodeResponses
+                .filter { ep -> ep.hasFile && ep.episodeFileId != null }
                 .mapNotNull { ep -> ep.episodeFile?.size }
                 .sum()
 
-            it.copy(filePath = fileResponse.path!!, fileSize = totalSeasonSize)
+            it.copy(filePath = fileResponse.path!!, sizeInBytes = totalSize)
         }.filterNotNull()
     }
 

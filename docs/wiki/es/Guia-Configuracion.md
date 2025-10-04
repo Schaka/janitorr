@@ -254,78 +254,53 @@ logging:
 - `DEBUG` - Información detallada de depuración
 - `TRACE` - Información de rastreo muy detallada
 
-### APIs Externas para Limpieza Inteligente
+## Configuración de la Interfaz de Gestión
 
-Janitorr puede integrarse con APIs externas para tomar decisiones de limpieza más inteligentes basadas en calificaciones, popularidad y datos de tendencias.
+La Interfaz de Gestión está habilitada por defecto al usar la imagen JVM.
 
-**APIs Soportadas:**
-- **TMDB** (The Movie Database) - Calificaciones, popularidad, datos de tendencias
-- **OMDb** (datos de IMDb) - Calificaciones de IMDb, puntuaciones de Metacritic, premios
-- **Trakt.tv** - Estadísticas de visualización, datos de colección, información de tendencias
+### Configuración de Puerto
 
-**Configuración:**
+La UI usa el mismo puerto que la aplicación principal:
 
 ```yaml
-external-apis:
-  enabled: true
-  cache-refresh-interval: 24h
-  
-  tmdb:
-    enabled: true
-    api-key: "tu-clave-api-tmdb"
-    base-url: "https://api.themoviedb.org/3"
-  
-  omdb:
-    enabled: true
-    api-key: "tu-clave-api-omdb"
-    base-url: "http://www.omdbapi.com"
-  
-  trakt:
-    enabled: true
-    client-id: "tu-client-id-trakt"
-    client-secret: "tu-client-secret-trakt"
-    base-url: "https://api.trakt.tv"
-  
-  scoring:
-    tmdb-rating-weight: 0.25
-    imdb-rating-weight: 0.25
-    popularity-weight: 0.20
-    trending-weight: 0.15
-    availability-weight: 0.10
-    collectibility-weight: 0.05
+server:
+  port: 8978  # Cambia para usar un puerto diferente
 ```
 
-**Obtención de Claves API:**
+### Accediendo a la UI
 
-1. **TMDB**: Regístrate en https://www.themoviedb.org y solicita una clave API en https://www.themoviedb.org/settings/api (gratis)
-2. **OMDb**: Obtén una clave API en http://www.omdbapi.com/apikey.aspx (nivel gratuito disponible)
-3. **Trakt**: Crea una aplicación en https://trakt.tv/oauth/applications
+Una vez que Janitorr esté ejecutándose:
+```
+http://<ip-de-tu-servidor>:8978/
+```
 
-**Reglas de Limpieza Inteligente:**
+### Mapeo de Puerto en Docker
 
-Cuando las APIs externas están habilitadas, Janitorr preservará automáticamente contenido que:
-- Tenga una calificación de IMDb ≥ 8.0
-- Tenga una calificación de TMDB ≥ 8.0
-- Esté actualmente en tendencia
-- Tenga una alta puntuación de coleccionabilidad (contenido raro)
-- Tenga una puntuación de inteligencia general ≥ 70
+Mapea el puerto en docker-compose.yml:
+```yaml
+ports:
+  - "8978:8978"  # host:contenedor
+```
 
-**Sistema de Puntuación:**
+Para usar un puerto de host diferente:
+```yaml
+ports:
+  - "9000:8978"  # Acceder en http://localhost:9000/
+```
 
-Los pesos de puntuación determinan cuánto contribuye cada factor a la puntuación general de inteligencia:
-- Mayor peso = más influencia en la decisión
-- Todos los pesos deben sumar aproximadamente 1.0
-- Ajusta según tus preferencias (ej. priorizar calificaciones sobre tendencias)
+### Requisitos de Imagen
 
-**Beneficios:**
-- **Decisiones Más Inteligentes**: Mantén contenido valioso basado en datos reales
-- **Preservar Calidad**: Nunca elimines contenido altamente calificado o galardonado
-- **Seguir Tendencias**: Mantén medios populares y en tendencia
-- **Guardar Contenido Raro**: Protege elementos difíciles de encontrar o coleccionables
+⚠️ **Importante:** La Interfaz de Gestión solo está disponible en la imagen JVM.
 
-**Rendimiento:**
+```yaml
+# ✅ Incluye Interfaz de Gestión
+image: ghcr.io/carcheky/janitorr:jvm-stable
 
-Las respuestas de API se almacenan en caché durante el `cache-refresh-interval` configurado (predeterminado: 24 horas) para minimizar las llamadas a API y mejorar el rendimiento.
+# ❌ NO incluye Interfaz de Gestión (obsoleta)
+image: ghcr.io/carcheky/janitorr:native-stable
+```
+
+Para documentación completa de la UI, consulta [MANAGEMENT_UI.md](../../MANAGEMENT_UI.md).
 
 ## Configuración de Rutas
 
@@ -430,104 +405,6 @@ schedule: "0 0 0 1 * ?"
 schedule: "0 0 2 ? * MON-FRI"
 ```
 
-## Motor de Inteligencia IA/ML (Característica Futura)
-
-> **Estado:** 🚧 Fase de Planificación - No Implementada Aún  
-> **Prioridad:** Baja (Característica Futura Avanzada)
-
-El Motor de Inteligencia IA/ML es una característica futura que utilizará aprendizaje automático para optimizar las decisiones de limpieza basándose en patrones de visualización y preferencias del usuario.
-
-### Descripción General
-
-Cuando se implemente, esta característica:
-- Analizará el historial de visualización para predecir qué medios deben conservarse
-- Aprenderá de las decisiones y preferencias del usuario
-- Proporcionará recomendaciones inteligentes con explicaciones
-- Optimizará el momento de limpieza basándose en patrones de uso
-
-### Configuración
-
-La característica de IA puede configurarse en `application.yml`, pero está **deshabilitada por defecto**:
-
-```yaml
-ai:
-  enabled: false  # Características de IA no implementadas aún
-  model-path: /config/models
-  training:
-    enabled: false
-    schedule: "0 0 3 * * ?"
-    min-data-points: 1000
-    historical-data-days: 90
-  inference:
-    cache-ttl: 3600
-    batch-size: 100
-    confidence-threshold: 0.7
-    timeout-ms: 100
-  features:
-    external-apis: false  # Preservación de privacidad, solo local
-    user-feedback: true   # Aprender de correcciones
-    natural-language: false  # Característica futura
-    computer-vision: false   # Característica futura
-```
-
-### Documentación de Arquitectura
-
-Para información detallada sobre la arquitectura de IA/ML planificada:
-- **Inglés:** [AI/ML Engine Architecture](../../AI_ML_ENGINE_ARCHITECTURE.md)
-- **Español:** [Arquitectura del Motor IA/ML](../../ARQUITECTURA_MOTOR_IA_ML.md)
-
-### Características Clave (Planificadas)
-
-#### Modelo de Puntuación de Contenido
-- Predice probabilidad de conservar/eliminar para cada elemento multimedia
-- Considera: frecuencia de visualización, antigüedad, preferencias de género, impacto de almacenamiento
-- Proporciona puntuaciones de confianza y explicaciones
-
-#### Reconocimiento de Patrones
-- Detecta horarios y hábitos de visualización
-- Identifica patrones de maratón para series activas
-- Reconoce preferencias estacionales
-
-#### Análisis Predictivo
-- Pronostica necesidades de almacenamiento
-- Sugiere momento óptimo de limpieza
-- Recomienda contenido a conservar basándose en tendencias
-
-### Privacidad y Ética
-
-El motor de IA está diseñado con la privacidad en mente:
-- **Procesamiento Local:** Todo ML se ejecuta localmente, sin compartir datos externos
-- **Anonimización:** Los IDs de usuario se hashean antes de procesarse
-- **Transparencia:** Todas las decisiones vienen con explicaciones
-- **Control del Usuario:** Fácil opt-out y capacidad de anulación
-- **Retención de Datos:** Datos de entrenamiento purgados después de 90 días
-
-### Estado Actual
-
-Esta característica está en la fase de arquitectura y planificación. El código base incluye:
-- Estructura de configuración (`AIProperties`)
-- Modelos de datos para características ML (`MediaFeatures`, `ViewingSession`)
-- Interfaces de servicio (`InferenceEngine`, `ContentScoringModel`)
-- Implementaciones placeholder
-
-**Para contribuir o seguir el progreso:**
-- Revisa la documentación de arquitectura
-- Proporciona retroalimentación sobre requisitos de características
-- Sugiere algoritmos ML y enfoques
-
-### ¿Cuándo Estará Disponible?
-
-Esta es una característica compleja a largo plazo. Cronograma de implementación:
-- **Fase 1:** Infraestructura de recopilación de datos (2-3 meses)
-- **Fase 2:** Modelos ML centrales (3-4 meses)
-- **Fase 3:** Características de inteligencia (2-3 meses)
-- **Fase 4:** Integración de UI (2 meses)
-- **Fase 5:** Características avanzadas (3-4 meses)
-
-**Tiempo estimado total:** 12-16 meses
-
-Consulta [GitHub Issues](https://github.com/carcheky/janitorr/issues) para estado actual y discusiones.
-
 ## Consideraciones de Seguridad
 
 ### Claves API
@@ -549,6 +426,43 @@ Si expones la Interfaz de Gestión:
 - Usa un proxy inverso con autenticación
 - Considera usar HTTPS
 - Restringe el acceso por IP si es posible
+
+### Acceso a la Interfaz de Gestión
+
+La Interfaz de Gestión no tiene autenticación integrada. Para asegurarla:
+
+**Opción 1: Sin acceso externo (recomendado para la mayoría)**
+```yaml
+# docker-compose.yml
+ports:
+  # Elimina o comenta la sección de puertos
+  # - "8978:8978"  # No exponer al host
+```
+Accede a la UI solo desde otros contenedores en la misma red Docker.
+
+**Opción 2: Proxy inverso con autenticación**
+
+Usa Nginx, Traefik o similar con autenticación básica:
+
+```nginx
+# Ejemplo Nginx
+location / {
+    auth_basic "Janitorr Admin";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://janitorr:8978;
+}
+```
+
+**Opción 3: Restricción por IP**
+
+Restringe el acceso a IPs específicas:
+```nginx
+location / {
+    allow 192.168.1.0/24;  # Tu red local
+    deny all;
+    proxy_pass http://janitorr:8978;
+}
+```
 
 ## Ejemplo de Configuración Completa
 
@@ -630,6 +544,7 @@ dry-run: true
 - [Configuración con Docker Compose](Configuracion-Docker-Compose.md) - Guía completa de implementación
 - [Preguntas Frecuentes](Preguntas-Frecuentes.md) - Preguntas comunes
 - [Solución de Problemas](Solucion-Problemas.md) - Resolución detallada de problemas
+- [Guía de Interfaz de Gestión](../../MANAGEMENT_UI.md) - Documentación de la interfaz web
 
 ---
 

@@ -254,78 +254,53 @@ logging:
 - `DEBUG` - Detailed debugging info
 - `TRACE` - Very detailed trace information
 
-### External APIs for Intelligent Cleanup
+## Management UI Configuration
 
-Janitorr can integrate with external APIs to make smarter cleanup decisions based on ratings, popularity, and trending data.
+The Management UI is enabled by default when using the JVM image.
 
-**Supported APIs:**
-- **TMDB** (The Movie Database) - Ratings, popularity, trending data
-- **OMDb** (IMDb data) - IMDb ratings, Metacritic scores, awards
-- **Trakt.tv** - Watch statistics, collection data, trending information
+### Port Configuration
 
-**Configuration:**
+The UI uses the same port as the main application:
 
 ```yaml
-external-apis:
-  enabled: true
-  cache-refresh-interval: 24h
-  
-  tmdb:
-    enabled: true
-    api-key: "your-tmdb-api-key"
-    base-url: "https://api.themoviedb.org/3"
-  
-  omdb:
-    enabled: true
-    api-key: "your-omdb-api-key"
-    base-url: "http://www.omdbapi.com"
-  
-  trakt:
-    enabled: true
-    client-id: "your-trakt-client-id"
-    client-secret: "your-trakt-client-secret"
-    base-url: "https://api.trakt.tv"
-  
-  scoring:
-    tmdb-rating-weight: 0.25
-    imdb-rating-weight: 0.25
-    popularity-weight: 0.20
-    trending-weight: 0.15
-    availability-weight: 0.10
-    collectibility-weight: 0.05
+server:
+  port: 8978  # Change to use a different port
 ```
 
-**Getting API Keys:**
+### Accessing the UI
 
-1. **TMDB**: Sign up at https://www.themoviedb.org and request an API key at https://www.themoviedb.org/settings/api (free)
-2. **OMDb**: Get an API key at http://www.omdbapi.com/apikey.aspx (free tier available)
-3. **Trakt**: Create an application at https://trakt.tv/oauth/applications
+Once Janitorr is running:
+```
+http://<your-server-ip>:8978/
+```
 
-**Smart Cleanup Rules:**
+### Docker Port Mapping
 
-When external APIs are enabled, Janitorr will automatically preserve content that:
-- Has an IMDb rating ≥ 8.0
-- Has a TMDB rating ≥ 8.0
-- Is currently trending
-- Has high collectibility score (rare content)
-- Has an overall intelligence score ≥ 70
+Map the port in docker-compose.yml:
+```yaml
+ports:
+  - "8978:8978"  # host:container
+```
 
-**Scoring System:**
+To use a different host port:
+```yaml
+ports:
+  - "9000:8978"  # Access at http://localhost:9000/
+```
 
-The scoring weights determine how much each factor contributes to the overall intelligence score:
-- Higher weight = more influence on decision
-- All weights should sum to approximately 1.0
-- Adjust based on your preferences (e.g., prioritize ratings over trending)
+### Image Requirements
 
-**Benefits:**
-- **Smarter Decisions**: Keep valuable content based on real data
-- **Preserve Quality**: Never delete highly-rated or award-winning content
-- **Follow Trends**: Keep popular and trending media
-- **Save Rare Content**: Protect hard-to-find or collectible items
+⚠️ **Important:** The Management UI is only available in the JVM image.
 
-**Performance:**
+```yaml
+# ✅ Includes Management UI
+image: ghcr.io/carcheky/janitorr:jvm-stable
 
-API responses are cached for the configured `cache-refresh-interval` (default: 24 hours) to minimize API calls and improve performance.
+# ❌ Does NOT include Management UI (deprecated)
+image: ghcr.io/carcheky/janitorr:native-stable
+```
+
+For complete UI documentation, see [MANAGEMENT_UI.md](../../MANAGEMENT_UI.md).
 
 ## Path Configuration
 
@@ -430,104 +405,6 @@ schedule: "0 0 0 1 * ?"
 schedule: "0 0 2 ? * MON-FRI"
 ```
 
-## AI/ML Intelligence Engine (Future Feature)
-
-> **Status:** 🚧 Planning Phase - Not Yet Implemented  
-> **Priority:** Low (Advanced Future Feature)
-
-The AI/ML Intelligence Engine is a future feature that will use machine learning to optimize cleanup decisions based on viewing patterns and user preferences.
-
-### Overview
-
-When implemented, this feature will:
-- Analyze viewing history to predict which media should be kept
-- Learn from user decisions and preferences
-- Provide intelligent recommendations with explanations
-- Optimize cleanup timing based on usage patterns
-
-### Configuration
-
-The AI feature can be configured in `application.yml`, but is **disabled by default**:
-
-```yaml
-ai:
-  enabled: false  # AI features are not yet implemented
-  model-path: /config/models
-  training:
-    enabled: false
-    schedule: "0 0 3 * * ?"
-    min-data-points: 1000
-    historical-data-days: 90
-  inference:
-    cache-ttl: 3600
-    batch-size: 100
-    confidence-threshold: 0.7
-    timeout-ms: 100
-  features:
-    external-apis: false  # Privacy-preserving, local-only
-    user-feedback: true   # Learn from corrections
-    natural-language: false  # Future feature
-    computer-vision: false   # Future feature
-```
-
-### Architecture Documentation
-
-For detailed information about the planned AI/ML architecture:
-- **English:** [AI/ML Engine Architecture](../../AI_ML_ENGINE_ARCHITECTURE.md)
-- **Spanish:** [Arquitectura del Motor IA/ML](../../ARQUITECTURA_MOTOR_IA_ML.md)
-
-### Key Features (Planned)
-
-#### Content Scoring Model
-- Predicts keep/delete probability for each media item
-- Considers: watch frequency, recency, genre preferences, storage impact
-- Provides confidence scores and explanations
-
-#### Pattern Recognition
-- Detects viewing schedules and habits
-- Identifies binge-watching patterns for active series
-- Recognizes seasonal preferences
-
-#### Predictive Analytics
-- Forecasts storage needs
-- Suggests optimal cleanup timing
-- Recommends content to keep based on trends
-
-### Privacy & Ethics
-
-The AI engine is designed with privacy in mind:
-- **Local Processing:** All ML runs locally, no external data sharing
-- **Anonymization:** User IDs are hashed before processing
-- **Transparency:** All decisions come with explanations
-- **User Control:** Easy opt-out and override capability
-- **Data Retention:** Training data purged after 90 days
-
-### Current Status
-
-This feature is in the architecture and planning phase. The codebase includes:
-- Configuration structure (`AIProperties`)
-- Data models for ML features (`MediaFeatures`, `ViewingSession`)
-- Service interfaces (`InferenceEngine`, `ContentScoringModel`)
-- Placeholder implementations
-
-**To contribute or track progress:**
-- Review architecture documentation
-- Provide feedback on feature requirements
-- Suggest ML algorithms and approaches
-
-### When Will This Be Available?
-
-This is a complex, long-term feature. Implementation timeline:
-- **Phase 1:** Data collection infrastructure (2-3 months)
-- **Phase 2:** Core ML models (3-4 months)
-- **Phase 3:** Intelligence features (2-3 months)
-- **Phase 4:** UI integration (2 months)
-- **Phase 5:** Advanced features (3-4 months)
-
-**Total estimated time:** 12-16 months
-
-See [GitHub Issues](https://github.com/carcheky/janitorr/issues) for current status and discussions.
-
 ## Security Considerations
 
 ### API Keys
@@ -549,6 +426,43 @@ If exposing the Management UI:
 - Use a reverse proxy with authentication
 - Consider using HTTPS
 - Restrict access by IP if possible
+
+### Management UI Access
+
+The Management UI has no built-in authentication. To secure it:
+
+**Option 1: No external access (recommended for most users)**
+```yaml
+# docker-compose.yml
+ports:
+  # Remove or comment out the ports section
+  # - "8978:8978"  # Don't expose to host
+```
+Access the UI only from other containers on the same Docker network.
+
+**Option 2: Reverse proxy with authentication**
+
+Use Nginx, Traefik, or similar with basic auth:
+
+```nginx
+# Nginx example
+location / {
+    auth_basic "Janitorr Admin";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://janitorr:8978;
+}
+```
+
+**Option 3: IP restriction**
+
+Restrict access to specific IPs:
+```nginx
+location / {
+    allow 192.168.1.0/24;  # Your local network
+    deny all;
+    proxy_pass http://janitorr:8978;
+}
+```
 
 ## Example Complete Configuration
 
@@ -630,6 +544,7 @@ dry-run: true
 - [Docker Compose Setup](Docker-Compose-Setup.md) - Complete deployment guide
 - [FAQ](FAQ.md) - Common questions
 - [Troubleshooting](Troubleshooting.md) - Detailed problem solving
+- [Management UI Guide](../../MANAGEMENT_UI.md) - Web interface documentation
 
 ---
 

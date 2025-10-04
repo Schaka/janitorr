@@ -29,7 +29,7 @@ data class LibraryItem(
         val extraFiles: MutableList<String> = mutableListOf(),
 
         // File size in bytes for tracking space freed during cleanup
-        val fileSize: Long = 0L
+        val sizeInBytes: Long = 0L
 
 )
 {

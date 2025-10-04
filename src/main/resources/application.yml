@@ -8,6 +8,9 @@ spring:
     virtual:
       enabled: true
 
+server:
+  port: 8978
+
 logging:
   logback:
     rollingpolicy:

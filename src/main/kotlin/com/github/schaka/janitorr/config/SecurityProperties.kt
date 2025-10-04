@@ -6,12 +6,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties
  * Configuration properties for API security.
  * 
  * Controls HTTP Basic Authentication for API endpoints.
- * When enabled, all /api/** endpoints require authentication.
  */
 @ConfigurationProperties(prefix = "security")
 data class SecurityProperties(
     /**
-     * Enable/disable HTTP Basic Authentication.
+     * Enable or disable HTTP Basic Authentication.
      * Default: false (disabled for backward compatibility)
      */
     val enabled: Boolean = false,

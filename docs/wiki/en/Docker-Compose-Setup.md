@@ -167,7 +167,7 @@ version: "3"
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     user: 1000:1000 # Replace with your user ID
     mem_limit: 256M # Minimum 200M, recommended 256M
     mem_swappiness: 0
@@ -400,7 +400,7 @@ services:
 
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     user: 1000:1000
     mem_limit: 256M
     mem_swappiness: 0
@@ -484,7 +484,7 @@ If you're still experiencing 404 errors, you're likely using an outdated image.
 **Solution:**
 1. Update to the latest image:
    ```yaml
-   image: ghcr.io/carcheky/janitorr:jvm-stable
+   image: ghcr.io/carcheky/janitorr:latest
    ```
 2. Pull the latest image:
    ```bash

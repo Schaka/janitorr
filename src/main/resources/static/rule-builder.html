@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rule Builder - Janitorr</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="rule-builder.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧩 Rule Builder</h1>
+            <p class="subtitle">Create custom cleanup rules with drag-and-drop interface</p>
+            <nav class="nav-links">
+                <a href="index.html">← Back to Dashboard</a>
+            </nav>
+        </header>
+
+        <div class="rule-builder-layout">
+            <!-- Toolbox Panel -->
+            <aside class="toolbox-panel">
+                <h3>Conditions</h3>
+                <div class="condition-blocks">
+                    <div class="block-item" draggable="true" data-type="age">
+                        📅 Media Age
+                    </div>
+                    <div class="block-item" draggable="true" data-type="size">
+                        💾 File Size
+                    </div>
+                    <div class="block-item" draggable="true" data-type="rating">
+                        ⭐ Rating
+                    </div>
+                    <div class="block-item" draggable="true" data-type="disk-usage">
+                        📊 Disk Usage
+                    </div>
+                    <div class="block-item" draggable="true" data-type="plays">
+                        ▶️ Play Count
+                    </div>
+                    <div class="block-item" draggable="true" data-type="tag">
+                        🏷️ Tag
+                    </div>
+                </div>
+
+                <h3 class="mt-4">Actions</h3>
+                <div class="action-blocks">
+                    <div class="block-item action-block" draggable="true" data-type="delete">
+                        🗑️ Delete File
+                    </div>
+                    <div class="block-item action-block" draggable="true" data-type="log">
+                        📝 Log Action
+                    </div>
+                    <div class="block-item action-block" draggable="true" data-type="tag-add">
+                        ➕ Add Tag
+                    </div>
+                    <div class="block-item action-block" draggable="true" data-type="notify">
+                        🔔 Notify
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Main Editor -->
+            <main class="editor-panel">
+                <div class="editor-header">
+                    <input type="text" id="ruleName" class="rule-name-input" placeholder="Rule Name" />
+                    <div class="editor-actions">
+                        <select id="logicOperator" class="logic-operator">
+                            <option value="AND">AND (All conditions)</option>
+                            <option value="OR">OR (Any condition)</option>
+                        </select>
+                        <label class="toggle-label">
+                            <input type="checkbox" id="ruleEnabled" checked />
+                            <span>Enabled</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="rule-canvas">
+                    <div class="conditions-zone drop-zone" id="conditionsZone">
+                        <h4>IF (Conditions)</h4>
+                        <div class="drop-area" id="conditionsArea">
+                            <p class="placeholder">Drag conditions here</p>
+                        </div>
+                    </div>
+
+                    <div class="actions-zone drop-zone" id="actionsZone">
+                        <h4>THEN (Actions)</h4>
+                        <div class="drop-area" id="actionsArea">
+                            <p class="placeholder">Drag actions here</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="editor-footer">
+                    <button id="newRuleBtn" class="btn btn-secondary">New Rule</button>
+                    <button id="validateBtn" class="btn btn-secondary">Validate</button>
+                    <button id="previewBtn" class="btn btn-info">Preview</button>
+                    <button id="saveBtn" class="btn btn-primary">Save Rule</button>
+                    <button id="testBtn" class="btn btn-success">Test Rule</button>
+                </div>
+            </main>
+
+            <!-- Rules List -->
+            <aside class="rules-list-panel">
+                <h3>Saved Rules</h3>
+                <div id="rulesList" class="rules-list">
+                    <p class="placeholder">No rules created yet</p>
+                </div>
+            </aside>
+        </div>
+
+        <!-- Preview Modal -->
+        <div id="previewModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Rule Preview</h2>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div id="previewResults">
+                        <p>Loading...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Message Container -->
+        <section class="message-section">
+            <div id="messageContainer"></div>
+        </section>
+    </div>
+
+    <script src="rule-builder.js"></script>
+</body>
+</html>

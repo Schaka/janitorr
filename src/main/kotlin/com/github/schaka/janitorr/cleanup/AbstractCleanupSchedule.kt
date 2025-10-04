@@ -3,11 +3,14 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.notifications.CleanupStats
+import com.github.schaka.janitorr.notifications.NotificationService
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
+import com.github.schaka.janitorr.metrics.MetricsService
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import org.slf4j.LoggerFactory
@@ -26,6 +29,8 @@ abstract class AbstractCleanupSchedule(
     protected val runOnce: RunOnce,
     protected val sonarrService: ServarrService,
     protected val radarrService: ServarrService,
+    protected val metricsService: MetricsService,
+    protected val notificationService: NotificationService,
 ) {
 
     companion object {
@@ -90,25 +95,75 @@ abstract class AbstractCleanupSchedule(
     }
 
     protected fun deleteMovies(toDeleteMovies: List<LibraryItem>) {
-        radarrService.removeEntries(toDeleteMovies)
+        val initialCount = toDeleteMovies.size
+        val errors = mutableListOf<String>()
+        
+        try {
+            radarrService.removeEntries(toDeleteMovies)
 
-        val cannotDeleteMovies = toDeleteMovies.filter { it.seeding }
-        val deletedMovies = toDeleteMovies.filter { !it.seeding }
+            val cannotDeleteMovies = toDeleteMovies.filter { it.seeding }
+            val deletedMovies = toDeleteMovies.filter { !it.seeding }
 
-        jellyseerrService.cleanupRequests(deletedMovies)
-        mediaServerService.cleanupMovies(deletedMovies)
-        mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
+            // Calculate space freed from successfully deleted movies
+            val spaceFreed = deletedMovies.sumOf { it.sizeInBytes }
+            if (deletedMovies.isNotEmpty()) {
+                metricsService.recordCleanup("movies", deletedMovies.size, spaceFreed)
+            }
+
+            jellyseerrService.cleanupRequests(deletedMovies)
+            mediaServerService.cleanupMovies(deletedMovies)
+            mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
+            
+            sendCleanupNotification(deletedMovies.size, errors, spaceFreed)
+        } catch (e: Exception) {
+            log.error("Error during movie cleanup", e)
+            errors.add("Movie cleanup error: ${e.message}")
+            sendCleanupNotification(0, errors, 0L)
+        }
     }
 
     protected fun deleteTvShows(toDeleteShows: List<LibraryItem>) {
-        sonarrService.removeEntries(toDeleteShows)
+        val initialCount = toDeleteShows.size
+        val errors = mutableListOf<String>()
+        
+        try {
+            sonarrService.removeEntries(toDeleteShows)
 
-        val cannotDeleteShow = toDeleteShows.filter { it.seeding }
-        val deletedShows = toDeleteShows.filter { !it.seeding }
+            val cannotDeleteShow = toDeleteShows.filter { it.seeding }
+            val deletedShows = toDeleteShows.filter { !it.seeding }
 
-        jellyseerrService.cleanupRequests(deletedShows)
-        mediaServerService.cleanupTvShows(deletedShows)
-        mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
+            // Calculate space freed from successfully deleted shows/seasons
+            val spaceFreed = deletedShows.sumOf { it.sizeInBytes }
+            if (deletedShows.isNotEmpty()) {
+                val type = if (applicationProperties.wholeTvShow) "shows" else "episodes"
+                metricsService.recordCleanup(type, deletedShows.size, spaceFreed)
+            }
+
+            jellyseerrService.cleanupRequests(deletedShows)
+            mediaServerService.cleanupTvShows(deletedShows)
+            mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
+            
+            sendCleanupNotification(deletedShows.size, errors, spaceFreed)
+        } catch (e: Exception) {
+            log.error("Error during TV show cleanup", e)
+            errors.add("TV show cleanup error: ${e.message}")
+            sendCleanupNotification(0, errors, 0L)
+        }
+    }
+    
+    private fun sendCleanupNotification(filesDeleted: Int, errors: List<String>, spaceFreedBytes: Long = 0L) {
+        try {
+            val stats = CleanupStats(
+                cleanupType = cleanupType.name,
+                filesDeleted = filesDeleted,
+                spaceFreeGB = spaceFreedBytes.toDouble() / (1024.0 * 1024.0 * 1024.0),
+                dryRun = applicationProperties.dryRun,
+                errors = errors
+            )
+            notificationService.sendCleanupComplete(stats)
+        } catch (e: Exception) {
+            log.error("Error sending cleanup notification", e)
+        }
     }
 
     private fun logKeep(item: LibraryItem) {

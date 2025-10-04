@@ -7,10 +7,23 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Dry-run banner -->
+    <div id="dryRunBanner" class="dry-run-banner" style="display: none;">
+        <span class="banner-icon">ℹ️</span>
+        <span class="banner-text">
+            <strong>Dry-Run Mode Active:</strong> No files will be deleted. This is a simulation mode.
+        </span>
+    </div>
+
     <div class="container">
         <header>
-            <h1>🧹 Janitorr Management</h1>
-            <p class="subtitle">Manage and manually launch cleanup functions</p>
+            <div class="header-content">
+                <div>
+                    <h1>🧹 Janitorr Management</h1>
+                    <p class="subtitle">Manage and manually launch cleanup functions</p>
+                </div>
+                <button id="darkModeToggle" class="dark-mode-toggle" title="Toggle Dark Mode">🌙</button>
+            </div>
         </header>
 
         <section class="status-section">
@@ -71,6 +84,36 @@
                         <span id="episodeLastRun" class="status-value">Not yet</span>
                     </div>
                     <button id="episodeCleanupBtn" class="btn btn-primary">Run Episode Cleanup</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="notifications-section">
+            <h2>Notification Testing</h2>
+            <p>Test your configured notification channels to ensure they are working correctly.</p>
+            <div class="notifications-grid">
+                <div class="notification-card">
+                    <h3>🟣 Discord</h3>
+                    <p>Test Discord webhook notifications</p>
+                    <button id="testDiscordBtn" class="btn btn-secondary">Test Discord</button>
+                </div>
+
+                <div class="notification-card">
+                    <h3>✈️ Telegram</h3>
+                    <p>Test Telegram bot notifications</p>
+                    <button id="testTelegramBtn" class="btn btn-secondary">Test Telegram</button>
+                </div>
+
+                <div class="notification-card">
+                    <h3>📧 Email</h3>
+                    <p>Test email (SMTP) notifications</p>
+                    <button id="testEmailBtn" class="btn btn-secondary">Test Email</button>
+                </div>
+
+                <div class="notification-card">
+                    <h3>🔗 Webhook</h3>
+                    <p>Test generic webhook notifications</p>
+                    <button id="testWebhookBtn" class="btn btn-secondary">Test Webhook</button>
                 </div>
             </div>
         </section>

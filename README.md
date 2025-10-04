@@ -5,6 +5,7 @@
 [![Native Image](https://github.com/carcheky/janitorr/workflows/Native%20images/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/native-image.yml)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
+[![Management UI](https://img.shields.io/badge/Management%20UI-✅%20Working-brightgreen.svg)](#management-ui)
 
 <p align="center">
     <img src="images/logos/janitorr_icon.png" width=384>
@@ -46,13 +47,20 @@ Comprehensive documentation is available in multiple languages:
   - [Wiki Home](docs/wiki/en/Home.md)
   - [Docker Compose Setup Guide](docs/wiki/en/Docker-Compose-Setup.md)
   - [Configuration Guide](docs/wiki/en/Configuration-Guide.md)
+  - [Web Configuration Guide](docs/wiki/en/Web-Configuration-Guide.md) ⭐ NEW
+  - [Security Guide](docs/wiki/en/Security-Guide.md) 🔒 NEW
   - [FAQ](docs/wiki/en/FAQ.md)
   - [Troubleshooting](docs/wiki/en/Troubleshooting.md)
+
+- **🏗️ Architecture Documentation**
+  - [Plugin System Architecture](docs/architecture/README.md) - Future extensibility framework (design phase)
 
 - **🇪🇸 Documentación en Español**
   - [Inicio de la Wiki](docs/wiki/es/Home.md)
   - [Guía de Configuración con Docker Compose](docs/wiki/es/Configuracion-Docker-Compose.md)
   - [Guía de Configuración](docs/wiki/es/Guia-Configuracion.md)
+  - [Guía de Configuración Web](docs/wiki/es/Guia-Configuracion-Web.md) ⭐ NUEVO
+  - [Guía de Seguridad](docs/wiki/es/Guia-Seguridad.md) 🔒 NUEVO
   - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
   - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
 
@@ -69,6 +77,8 @@ This fork includes additional documentation:
 
 ## Features
 
+- **🔒 HTTP Basic Authentication** - Optional built-in security for API endpoints (configurable, disabled by default)
+- **Web-based Configuration UI** - Complete configuration management via browser with real-time connection testing and validation ⭐ NEW
 - **Web-based Management UI** - Monitor status and manually trigger cleanup functions through a user-friendly web interface
 - Remote deletion, disk space aware deletion as well as tag based delete schedules
 - Exclude items from deletion via tags in Sonarr/Radarr
@@ -90,17 +100,36 @@ This fork includes additional documentation:
 - **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
 - Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
 
-### Management UI
+### Management UI ✅
 
-Janitorr includes a web-based management interface accessible at `http://<host>:<port>/` when the application is running.
+Janitorr includes a comprehensive web-based management interface accessible at `http://<host>:<port>/` when the application is running.
 
 The management UI allows you to:
-- View the current system status and configuration
-- Manually trigger any cleanup function on-demand
-- Monitor which cleanups have been executed
+- **View system status** - Monitor current configuration and cleanup state
+- **Manually trigger cleanups** - Run any cleanup function on-demand
+- **Configure via Web UI** - Complete configuration management without editing YAML files
+- **Test connections** - Verify connectivity to all external services (Sonarr, Radarr, Jellyfin, etc.)
+- **Manage backups** - Create, restore, import, and export configurations
+- **Real-time validation** - Test and validate settings before saving
 - See real-time feedback on cleanup operations
 
-For more details, see [MANAGEMENT_UI.md](MANAGEMENT_UI.md).
+![Management UI Working](https://img.shields.io/badge/Status-✅%20Fully%20Functional-brightgreen.svg?style=for-the-badge)
+
+**Features:**
+- ✅ **Web Interface**: Modern, responsive UI accessible from any browser
+- ✅ **System Status**: View current configuration and cleanup status in real-time
+- ✅ **Manual Triggers**: Execute any cleanup function on-demand with one click
+- ✅ **Live Monitoring**: Track which cleanups have been executed and when
+- ✅ **Instant Feedback**: See real-time feedback on cleanup operations
+
+**Quick Start:**
+1. Start Janitorr with Docker Compose (see [setup guide](#setting-up-docker))
+2. Open your browser to `http://localhost:8978/` (or your configured port)
+3. View status and trigger manual cleanups instantly!
+
+**Available at:** `http://<your-server-ip>:8978/`
+
+For detailed documentation, see [MANAGEMENT_UI.md](MANAGEMENT_UI.md).
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.
@@ -169,6 +198,11 @@ media-server-leaving-soon-dir: "/library/leaving-soon"
 ```
 
 **You may also check out [this example](examples/example-compose.yml) of a full stack setup.**
+
+**After starting Janitorr:**
+- ✅ Access the Management UI at `http://localhost:8978/` (or your configured port)
+- ✅ All API endpoints available at `http://localhost:8978/api/management/`
+- ✅ Trigger manual cleanups instantly from the web interface
 
 ### Docker config
 

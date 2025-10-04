@@ -40,7 +40,8 @@ class ManagementController(
     private val tagBasedCleanupSchedule: TagBasedCleanupSchedule,
     private val weeklyEpisodeCleanupSchedule: WeeklyEpisodeCleanupSchedule,
     private val applicationProperties: ApplicationProperties,
-    private val runOnce: RunOnce
+    private val runOnce: RunOnce,
+    private val notificationService: com.github.schaka.janitorr.notifications.NotificationService
 ) {
 
     companion object {
@@ -120,5 +121,38 @@ class ManagementController(
             "hasWeeklyEpisodeCleanupRun" to runOnce.hasWeeklyEpisodeCleanupRun,
             "timestamp" to System.currentTimeMillis()
         )
+    }
+    
+    @PostMapping("/notifications/test/{channel}")
+    fun testNotification(@org.springframework.web.bind.annotation.PathVariable channel: String): Map<String, Any> {
+        log.info("Testing notification channel: $channel")
+        return try {
+            val notificationChannel = com.github.schaka.janitorr.notifications.NotificationChannel.valueOf(channel.uppercase())
+            val success = notificationService.testNotification(notificationChannel)
+            
+            mapOf(
+                "success" to success,
+                "message" to if (success) {
+                    "Test notification sent successfully to $channel"
+                } else {
+                    "Failed to send test notification to $channel. Check if the channel is enabled and configured."
+                },
+                "timestamp" to System.currentTimeMillis()
+            )
+        } catch (e: IllegalArgumentException) {
+            log.error("Invalid notification channel: $channel", e)
+            mapOf(
+                "success" to false,
+                "message" to "Invalid notification channel: $channel. Valid channels are: ${com.github.schaka.janitorr.notifications.NotificationChannel.entries.joinToString()}",
+                "timestamp" to System.currentTimeMillis()
+            )
+        } catch (e: Exception) {
+            log.error("Error testing notification channel: $channel", e)
+            mapOf(
+                "success" to false,
+                "message" to "Error: ${e.message}",
+                "timestamp" to System.currentTimeMillis()
+            )
+        }
     }
 }

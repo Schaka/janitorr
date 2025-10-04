@@ -1,3 +1,20 @@
+
+# 🚨 CRITICAL: Conventional Commits are MANDATORY 🚨
+
+Any commit (manual or automatic, including Copilot agents) that does NOT follow the Conventional Commits format will be rejected and the PR will be closed automatically.
+
+Copilot agents MUST read and follow these instructions. No exceptions.
+
+Format:
+<type>[(<scope>)]: <subject>
+
+Examples:
+feat: add new feature
+fix(cleanup): resolve issue
+docs: update documentation
+
+❌ Commits like "Initial plan", "Update", "WIP", etc. are strictly forbidden.
+
 # GitHub Copilot Instructions for Janitorr
 
 ## Quick Reference

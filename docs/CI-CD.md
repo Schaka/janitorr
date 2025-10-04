@@ -33,9 +33,9 @@ Builds multi-platform JVM Docker images for x86_64 and ARM64 architectures.
 - **combine-images**: Creates multi-arch manifest
 
 **Output Images:**
-- `ghcr.io/carcheky/janitorr:jvm-main` (main branch)
-- `ghcr.io/carcheky/janitorr:jvm-develop` (develop branch)
-- `ghcr.io/carcheky/janitorr:jvm-stable` (tagged releases)
+- `ghcr.io/carcheky/janitorr:jvm-main` and `ghcr.io/carcheky/janitorr:main` (main branch)
+- `ghcr.io/carcheky/janitorr:jvm-develop` and `ghcr.io/carcheky/janitorr:develop` (develop branch)
+- `ghcr.io/carcheky/janitorr:jvm-stable`, `ghcr.io/carcheky/janitorr:latest`, `ghcr.io/carcheky/janitorr:jvm-v1.x.x`, and `ghcr.io/carcheky/janitorr:v1.x.x` (tagged releases)
 
 ### 3. Native Image Build (`native-image.yml`)
 
@@ -49,7 +49,7 @@ Builds multi-platform GraalVM native Docker images for x86_64 and ARM64 architec
 **Output Images:**
 - `ghcr.io/carcheky/janitorr:native-main` (main branch)
 - `ghcr.io/carcheky/janitorr:native-develop` (develop branch)
-- `ghcr.io/carcheky/janitorr:native-stable` (tagged releases)
+- `ghcr.io/carcheky/janitorr:native-stable`, `ghcr.io/carcheky/janitorr:native-latest`, and `ghcr.io/carcheky/janitorr:native-v1.x.x` (tagged releases)
 
 ## Semantic Release
 
@@ -151,24 +151,34 @@ Docker images are automatically built and published to GitHub Container Registry
 
 | Branch/Tag | JVM Image | Native Image |
 |------------|-----------|--------------|
-| `main` | `jvm-main` | `native-main` |
-| `develop` | `jvm-develop` | `native-develop` |
-| `v1.0.0` tag | `jvm-stable`, `jvm-v1.0.0` | `native-stable`, `native-v1.0.0` |
+| `main` | `jvm-main`, `main` | `native-main` |
+| `develop` | `jvm-develop`, `develop` | `native-develop` |
+| `v1.0.0` tag | `jvm-stable`, `latest`, `jvm-v1.0.0`, `v1.0.0` | `native-stable`, `native-latest`, `native-v1.0.0` |
 
 ### Using Images
 
 ```yaml
-# Latest stable JVM image
+# Latest stable JVM image (recommended)
+image: ghcr.io/carcheky/janitorr:latest
+# Or explicitly:
 image: ghcr.io/carcheky/janitorr:jvm-stable
 
+# Latest main branch (JVM)
+image: ghcr.io/carcheky/janitorr:main
+
 # Development JVM image
-image: ghcr.io/carcheky/janitorr:jvm-develop
+image: ghcr.io/carcheky/janitorr:develop
 
-# Latest stable native image
-image: ghcr.io/carcheky/janitorr:native-stable
+# Latest stable native image (deprecated)
+image: ghcr.io/carcheky/janitorr:native-latest
 
-# Specific version
+# Specific version (JVM)
+image: ghcr.io/carcheky/janitorr:v1.0.0
+# Or with prefix:
 image: ghcr.io/carcheky/janitorr:jvm-v1.0.0
+
+# Specific native version
+image: ghcr.io/carcheky/janitorr:native-v1.0.0
 ```
 
 ## Manual Workflow Triggers

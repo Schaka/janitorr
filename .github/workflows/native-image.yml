@@ -119,6 +119,8 @@ jobs:
           tags: |
             ghcr.io/${{ github.repository_owner }}/janitorr:native-${{ steps.branch_name.outputs.value }}
             ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-stable', github.repository_owner)) || '' }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-latest', github.repository_owner)) || '' }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-{1}', github.repository_owner, steps.branch_name.outputs.value)) || '' }}
           sources: |
             ghcr.io/${{ github.repository_owner }}/janitorr:native-amd64-${{ steps.branch_name.outputs.value }}
             ghcr.io/${{ github.repository_owner }}/janitorr:native-arm64-${{ steps.branch_name.outputs.value }}

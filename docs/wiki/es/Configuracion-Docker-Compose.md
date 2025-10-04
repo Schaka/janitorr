@@ -167,7 +167,7 @@ version: "3"
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     user: 1000:1000 # Reemplaza con tu ID de usuario
     mem_limit: 256M # Mínimo 200M, recomendado 256M
     mem_swappiness: 0
@@ -285,14 +285,24 @@ Esto asegura que el contenedor esté saludable antes de enrutar tráfico hacia �
 
 ### Versiones Estables
 
+#### Imágenes JVM (Recomendadas)
+- `ghcr.io/carcheky/janitorr:latest` - Última imagen JVM estable (alias de jvm-stable)
 - `ghcr.io/carcheky/janitorr:jvm-stable` - Última imagen JVM estable (recomendada)
-- `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Versión JVM específica
+- `ghcr.io/carcheky/janitorr:v1.x.x` - Versión específica (ej., v1.9.0)
+- `ghcr.io/carcheky/janitorr:jvm-v1.x.x` - Versión JVM específica con prefijo
+
+#### Imágenes Nativas (Obsoletas)
+- `ghcr.io/carcheky/janitorr:native-latest` - Última imagen nativa estable (obsoleta)
 - `ghcr.io/carcheky/janitorr:native-stable` - Última imagen nativa estable (obsoleta)
 - `ghcr.io/carcheky/janitorr:native-v1.x.x` - Versión nativa específica
 
 ### Compilaciones de Desarrollo
 
-- `ghcr.io/carcheky/janitorr:jvm-develop` - Última compilación de desarrollo (JVM)
+- `ghcr.io/carcheky/janitorr:main` - Última compilación de la rama main (JVM)
+- `ghcr.io/carcheky/janitorr:jvm-main` - Última compilación de la rama main (JVM, con prefijo)
+- `ghcr.io/carcheky/janitorr:develop` - Última compilación de desarrollo (JVM)
+- `ghcr.io/carcheky/janitorr:jvm-develop` - Última compilación de desarrollo (JVM, con prefijo)
+- `ghcr.io/carcheky/janitorr:native-main` - Última compilación de la rama main (nativa)
 - `ghcr.io/carcheky/janitorr:native-develop` - Última compilación de desarrollo (nativa)
 
 > **Advertencia:** Las compilaciones de desarrollo pueden ser inestables. Usa solo para pruebas.
@@ -390,7 +400,7 @@ services:
 
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     user: 1000:1000
     mem_limit: 256M
     mem_swappiness: 0
@@ -474,7 +484,7 @@ Si todavía experimentas errores 404, probablemente estés usando una imagen des
 **Solución:**
 1. Actualiza a la imagen más reciente:
    ```yaml
-   image: ghcr.io/carcheky/janitorr:jvm-stable
+   image: ghcr.io/carcheky/janitorr:latest
    ```
 2. Descarga la última imagen:
    ```bash

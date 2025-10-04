@@ -277,6 +277,11 @@ https://github.com/carcheky/janitorr/pkgs/container/janitorr
 3. Revisa que los tests pasen
 4. Verifica que Java 25 está configurado correctamente
 
+**Si ves errores sobre "runner no encontrado" / "runner not found":**
+- El workflow usa QEMU emulation para builds ARM64, no requiere runners ARM64 específicos
+- Todos los builds se ejecutan en `ubuntu-latest` (AMD64 runners estándar de GitHub)
+- QEMU permite compilar imágenes ARM64 en runners AMD64
+
 ### Las imágenes no aparecen en GHCR / Images don't appear in GHCR
 
 1. Verifica que el workflow completó exitosamente

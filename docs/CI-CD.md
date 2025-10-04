@@ -28,9 +28,11 @@ The main workflow that runs on every push and pull request to `main` and `develo
 Builds multi-platform JVM Docker images for x86_64 and ARM64 architectures.
 
 **Jobs:**
-- **build-jvm-x86**: Builds JVM image for x86_64
-- **build-jvm-aarch64**: Builds JVM image for ARM64
+- **build-jvm-x86**: Builds JVM image for x86_64 (native build on AMD64 runner)
+- **build-jvm-aarch64**: Builds JVM image for ARM64 (using QEMU emulation on AMD64 runner)
 - **combine-images**: Creates multi-arch manifest
+
+**Note:** ARM64 images are built using QEMU emulation on standard GitHub-hosted runners, which allows cross-platform builds without requiring ARM64 hardware.
 
 **Output Images:**
 - `ghcr.io/carcheky/janitorr:jvm-main` and `ghcr.io/carcheky/janitorr:main` (main branch)
@@ -42,9 +44,11 @@ Builds multi-platform JVM Docker images for x86_64 and ARM64 architectures.
 Builds multi-platform GraalVM native Docker images for x86_64 and ARM64 architectures.
 
 **Jobs:**
-- **build-native-x86**: Builds native image for x86_64
-- **build-native-aarch64**: Builds native image for ARM64
+- **build-native-x86**: Builds native image for x86_64 (native build on AMD64 runner)
+- **build-native-aarch64**: Builds native image for ARM64 (using QEMU emulation on AMD64 runner)
 - **combine-images**: Creates multi-arch manifest
+
+**Note:** ARM64 images are built using QEMU emulation on standard GitHub-hosted runners, which allows cross-platform builds without requiring ARM64 hardware.
 
 **Output Images:**
 - `ghcr.io/carcheky/janitorr:native-main` (main branch)

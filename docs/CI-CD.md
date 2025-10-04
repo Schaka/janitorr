@@ -28,28 +28,32 @@ The main workflow that runs on every push and pull request to `main` and `develo
 Builds multi-platform JVM Docker images for x86_64 and ARM64 architectures.
 
 **Jobs:**
-- **build-jvm-x86**: Builds JVM image for x86_64
-- **build-jvm-aarch64**: Builds JVM image for ARM64
+- **build-jvm-x86**: Builds JVM image for x86_64 (native build on AMD64 runner)
+- **build-jvm-aarch64**: Builds JVM image for ARM64 (using QEMU emulation on AMD64 runner)
 - **combine-images**: Creates multi-arch manifest
 
+**Note:** ARM64 images are built using QEMU emulation on standard GitHub-hosted runners, which allows cross-platform builds without requiring ARM64 hardware.
+
 **Output Images:**
-- `ghcr.io/carcheky/janitorr:jvm-main` and `ghcr.io/carcheky/janitorr:main` (main branch)
-- `ghcr.io/carcheky/janitorr:jvm-develop` and `ghcr.io/carcheky/janitorr:develop` (develop branch)
-- `ghcr.io/carcheky/janitorr:jvm-stable`, `ghcr.io/carcheky/janitorr:latest`, `ghcr.io/carcheky/janitorr:jvm-v1.x.x`, and `ghcr.io/carcheky/janitorr:v1.x.x` (tagged releases)
+- `ghcr.io/carcheky/janitorr:jvm-main` (main branch)
+- `ghcr.io/carcheky/janitorr:jvm-develop` (develop branch)
+- `ghcr.io/carcheky/janitorr:latest`, `ghcr.io/carcheky/janitorr:1.x.x` (tagged releases)
 
 ### 3. Native Image Build (`native-image.yml`)
 
 Builds multi-platform GraalVM native Docker images for x86_64 and ARM64 architectures.
 
 **Jobs:**
-- **build-native-x86**: Builds native image for x86_64
-- **build-native-aarch64**: Builds native image for ARM64
+- **build-native-x86**: Builds native image for x86_64 (native build on AMD64 runner)
+- **build-native-aarch64**: Builds native image for ARM64 (using QEMU emulation on AMD64 runner)
 - **combine-images**: Creates multi-arch manifest
+
+**Note:** ARM64 images are built using QEMU emulation on standard GitHub-hosted runners, which allows cross-platform builds without requiring ARM64 hardware.
 
 **Output Images:**
 - `ghcr.io/carcheky/janitorr:native-main` (main branch)
 - `ghcr.io/carcheky/janitorr:native-develop` (develop branch)
-- `ghcr.io/carcheky/janitorr:native-stable`, `ghcr.io/carcheky/janitorr:native-latest`, and `ghcr.io/carcheky/janitorr:native-v1.x.x` (tagged releases)
+- `ghcr.io/carcheky/janitorr:native-latest`, `ghcr.io/carcheky/janitorr:native-1.x.x` (tagged releases)
 
 ## Semantic Release
 
@@ -86,8 +90,12 @@ All commit messages must follow the [Conventional Commits](https://www.conventio
 ### Format
 
 ```
-<type>(<scope>): <subject>
+<type>[(<scope>)]: <subject>
 ```
+
+**Note:** Scope (the part in parentheses) is optional. You can use either:
+- `feat: add new feature` (without scope)
+- `feat(media): add new feature` (with scope)
 
 ### Valid Types
 
@@ -106,13 +114,19 @@ All commit messages must follow the [Conventional Commits](https://www.conventio
 ### Examples
 
 ```bash
-# Feature
+# Feature (with scope)
 git commit -m "feat(media): add support for Plex"
 
-# Bug fix
+# Feature (without scope)
+git commit -m "feat: add support for user profiles"
+
+# Bug fix (with scope)
 git commit -m "fix(cleanup): resolve symlink deletion issue"
 
-# Documentation
+# Bug fix (without scope)
+git commit -m "fix: resolve memory leak"
+
+# Documentation (without scope)
 git commit -m "docs: update Docker setup guide"
 
 # Breaking change
@@ -151,23 +165,24 @@ Docker images are automatically built and published to GitHub Container Registry
 
 | Branch/Tag | JVM Image | Native Image |
 |------------|-----------|--------------|
-| `main` | `jvm-main`, `main` | `native-main` |
-| `develop` | `jvm-develop`, `develop` | `native-develop` |
-| `v1.0.0` tag | `jvm-stable`, `latest`, `jvm-v1.0.0`, `v1.0.0` | `native-stable`, `native-latest`, `native-v1.0.0` |
+| `main` | `jvm-main` | `native-main` |
+| `develop` | `jvm-develop` | `native-develop` |
+| `v1.0.0` tag | `latest`, `1.0.0` | `native-latest`, `native-1.0.0` |
 
 ### Using Images
 
 ```yaml
 # Latest stable JVM image (recommended)
 image: ghcr.io/carcheky/janitorr:latest
-# Or explicitly:
-image: ghcr.io/carcheky/janitorr:jvm-stable
+
+# Specific version JVM image
+image: ghcr.io/carcheky/janitorr:1.0.0
 
 # Latest main branch (JVM)
-image: ghcr.io/carcheky/janitorr:main
+image: ghcr.io/carcheky/janitorr:jvm-main
 
 # Development JVM image
-image: ghcr.io/carcheky/janitorr:develop
+image: ghcr.io/carcheky/janitorr:jvm-develop
 
 # Latest stable native image (deprecated)
 image: ghcr.io/carcheky/janitorr:native-latest

@@ -3,12 +3,14 @@
 ## Commit Message Format
 
 ```
-<type>(<scope>): <subject>
+<type>[(<scope>)]: <subject>
 
 [optional body]
 
 [optional footer]
 ```
+
+**Note:** Scope is optional. Both `feat: add feature` and `feat(api): add feature` are valid.
 
 ## Common Types
 
@@ -28,14 +30,23 @@
 ## Quick Examples
 
 ```bash
-# New feature
+# New feature (with scope)
 git commit -m "feat(media): add Plex integration"
 
-# Bug fix
+# New feature (without scope)
+git commit -m "feat: add new authentication system"
+
+# Bug fix (with scope)
 git commit -m "fix(cleanup): resolve deletion of symlinks"
 
-# Documentation
+# Bug fix (without scope)
+git commit -m "fix: resolve null pointer exception"
+
+# Documentation (without scope - recommended for docs)
 git commit -m "docs: update Docker setup guide"
+
+# Chore (without scope)
+git commit -m "chore: update dependencies"
 
 # Breaking change (Method 1: with !)
 git commit -m "feat(api)!: change response format"

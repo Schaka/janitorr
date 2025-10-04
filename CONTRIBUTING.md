@@ -9,12 +9,14 @@ This project follows the [Conventional Commits](https://www.conventionalcommits.
 ### Format
 
 ```
-<type>(<scope>): <subject>
+<type>[(<scope>)]: <subject>
 
-<body>
+[body]
 
-<footer>
+[footer]
 ```
+
+**Note:** Only `<type>` and `<subject>` are required. Scope, body, and footer are all optional.
 
 ### Types
 
@@ -55,6 +57,12 @@ Fixes #456
 docs: update Docker Compose examples
 
 Add examples for different deployment scenarios
+```
+
+```
+feat: add email notification support
+
+Notify users when cleanup occurs.
 ```
 
 ### Breaking Changes

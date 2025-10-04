@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.WebClientRequestException
 import org.springframework.web.reactive.function.client.WebClientResponseException
 import java.net.URI
 
@@ -78,6 +79,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Sonarr connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Sonarr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -113,6 +117,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Radarr connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Radarr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -141,6 +148,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ Unexpected response from Jellyfin: ${response?.statusCode}")
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Jellyfin connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Jellyfin connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -169,6 +179,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ Unexpected response from Emby: ${response?.statusCode}")
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Emby connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Emby connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -204,6 +217,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Jellyseerr connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Jellyseerr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -239,6 +255,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Jellystat connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Jellystat connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -274,6 +293,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Streamystats connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Streamystats connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())
@@ -309,6 +331,9 @@ class ConnectionTestService {
             } else {
                 ConnectionTestResult(false, "❌ HTTP error: ${e.statusCode} - ${e.statusText}", e.message)
             }
+        } catch (e: WebClientRequestException) {
+            log.error("Network error testing Bazarr connection", e)
+            ConnectionTestResult(false, "❌ Connection error: ${e.message}. Check URL and network connectivity.", e.stackTraceToString())
         } catch (e: Exception) {
             log.error("Error testing Bazarr connection", e)
             ConnectionTestResult(false, "❌ Error: ${e.message}", e.stackTraceToString())

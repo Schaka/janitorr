@@ -72,7 +72,11 @@ class WebhookNotificationChannel(
                 lastException = e
                 log.warn("Error sending webhook notification on attempt ${attempt + 1}", e)
                 if (attempt < properties.retryCount - 1) {
+<<<<<<< HEAD
+                    Thread.sleep(1000L * (attempt + 1)) // Exponential backoff
+=======
                     runBlocking { delay(1000L * (attempt + 1)) } // Exponential backoff
+>>>>>>> main
                 }
             }
         }

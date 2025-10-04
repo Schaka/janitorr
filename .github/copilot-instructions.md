@@ -1,5 +1,25 @@
 # GitHub Copilot Instructions for Janitorr
 
+## Quick Reference
+
+**Common Commands:**
+```bash
+./gradlew build              # Build project
+./gradlew test               # Run tests
+./gradlew bootRun            # Run locally
+./gradlew bootBuildImage     # Build Docker image
+```
+
+**Key Directories:**
+- Code: `src/main/kotlin/com/github/schaka/janitorr/`
+- Tests: `src/test/kotlin/com/github/schaka/janitorr/`
+- Docs EN: `docs/wiki/en/`
+- Docs ES: `docs/wiki/es/`
+
+**Commit Format:** `<type>(<scope>): <subject>` (See [Commit Conventions](#commit-message-conventions))
+
+---
+
 ## Project Overview
 
 Janitorr is a media library cleanup automation tool for Jellyfin and Emby media servers. It integrates with Sonarr/Radarr (*arr services) and Jellyseerr to automatically manage and clean up unwatched or old media based on configurable rules.
@@ -152,6 +172,57 @@ When updating documentation:
 4. **Memory constraints** - JVM image needs minimum 200MB, recommended 256MB
 5. **Bilingual docs** - Never update only one language version
 
+## Debugging and Troubleshooting
+
+### Running in Debug Mode
+```bash
+# Run with debug logging
+./gradlew bootRun --args='--logging.level.com.github.schaka.janitorr=DEBUG'
+
+# Run tests with detailed output
+./gradlew test --info
+```
+
+### Common Build Issues
+**Issue**: "Dependency requires at least JVM runtime version 24"
+- **Solution**: Ensure you're using JDK 25 (Temurin/Adoptium distribution)
+- **Check**: `java -version` should show version 25+
+
+**Issue**: Tests fail in MockK
+- **Solution**: Ensure you're using MockK (not Mockito) for Kotlin tests
+- **Example**: `mockk<ServiceClass>()` instead of `mock(ServiceClass::class.java)`
+
+**Issue**: Native image build fails
+- **Solution**: As of v1.9.0, native images are deprecated. Use JVM image instead
+- **Note**: Some Spring Boot features (like Management UI) don't work in native builds
+
+### Debugging Cleanup Logic
+```kotlin
+// Enable dry-run to see what would be deleted
+cleanup.dryRun = true
+
+// Check logs for deletion candidates
+log.info("Would delete: ${media.title} (${media.id})")
+
+// Verify rules are applied correctly
+log.debug("Expiration rule: $percentWatched% -> $daysOld days")
+```
+
+### Container Debugging
+```bash
+# Check container logs
+docker logs janitorr
+
+# Execute shell in running container
+docker exec -it janitorr /bin/sh
+
+# Verify configuration is loaded
+docker exec janitorr cat /config/application.yml
+
+# Check disk space calculations
+docker exec janitorr df -h
+```
+
 ## Management UI
 
 - Web-based UI at `http://<host>:<port>/`
@@ -217,6 +288,140 @@ janitorr/
 - **GitHub Discussions**: For community support
 - **Docker Images**: `ghcr.io/carcheky/janitorr`
 
+## Commit Message Conventions
+
+This project follows [Conventional Commits](https://www.conventionalcommits.org/) specification. All commits MUST follow this format:
+
+```
+<type>(<scope>): <subject>
+
+[optional body]
+
+[optional footer]
+```
+
+### Valid Types
+- `feat`: New feature (triggers minor version bump)
+- `fix`: Bug fix (triggers patch version bump)
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, etc.)
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Test additions or updates
+- `build`: Build system changes
+- `ci`: CI/CD changes
+- `chore`: Other maintenance tasks
+- `revert`: Revert previous commit
+
+### Breaking Changes
+Use `!` after type/scope or add `BREAKING CHANGE:` in footer (triggers major version bump)
+
+### Examples
+```bash
+feat(media): add Plex support
+fix(cleanup): resolve symlink deletion issue
+docs: update Docker setup guide
+feat(api)!: change response format
+
+BREAKING CHANGE: API structure has changed
+```
+
+**Important**: All commits are validated in CI. See [CONTRIBUTING.md](/CONTRIBUTING.md) for details.
+
+## Common Development Tasks
+
+### Adding a New Feature
+```bash
+# 1. Create feature branch
+git checkout -b feat/my-feature
+
+# 2. Make changes following project structure
+# - Add code in src/main/kotlin/com/github/schaka/janitorr/<feature>/
+# - Add tests in src/test/kotlin/com/github/schaka/janitorr/<feature>/
+# - Update documentation in both docs/wiki/en/ and docs/wiki/es/
+
+# 3. Build and test
+./gradlew build
+./gradlew test
+
+# 4. Commit with conventional format
+git commit -m "feat(feature): add new feature description"
+
+# 5. Push and create PR
+git push origin feat/my-feature
+```
+
+### Fixing a Bug
+```bash
+# 1. Create fix branch
+git checkout -b fix/bug-description
+
+# 2. Fix the issue and add regression test
+# 3. Verify fix doesn't break existing tests
+./gradlew test
+
+# 4. Commit with conventional format
+git commit -m "fix(component): resolve specific issue
+
+Fixes #issue-number"
+```
+
+### Updating Documentation
+```bash
+# Update BOTH language versions
+# 1. Update docs/wiki/en/File-Name.md
+# 2. Update docs/wiki/es/Archivo-Nombre.md
+# 3. Verify all links work
+# 4. Commit
+git commit -m "docs: update documentation topic"
+```
+
+### Testing Docker Image Changes
+```bash
+# Build JVM image
+IMAGE_TYPE=jvm ./gradlew bootBuildImage
+
+# Test the image
+docker run -p 8080:8080 -v ./application.yml:/config/application.yml \
+  ghcr.io/carcheky/janitorr:jvm-latest
+
+# Check logs
+docker logs <container-id>
+```
+
+## CI/CD Integration
+
+### Automated Workflows
+The project uses GitHub Actions for automation:
+
+1. **Commit Validation** (`commit-lint.yml`)
+   - Validates all PR commits against conventional commit format
+   - Runs on every PR
+   - Must pass before merge
+
+2. **Build and Test** (`gradle.yml`)
+   - Runs on push and PR
+   - Executes `./gradlew build` and `./gradlew test`
+   - Tests against JDK 25
+
+3. **Semantic Release** (`.releaserc.json`)
+   - Automatically creates releases on main/develop
+   - Generates changelog from commit messages
+   - Publishes Docker images to GHCR
+   - Version determined by commit types
+
+### Release Strategy
+- **main branch**: Production releases (v1.0.0, v1.1.0)
+- **develop branch**: Pre-releases (v1.1.0-develop.1)
+- **Feature branches**: No releases, PR validation only
+
+### Docker Image Tags
+After successful release:
+- `jvm-stable`: Latest stable JVM image
+- `jvm-latest`: Latest build (may be pre-release)
+- `jvm-v1.2.3`: Specific version tag
+- Native images deprecated as of v1.9.0
+
 ## When Unsure
 
 1. Check existing code patterns in the same area
@@ -224,3 +429,5 @@ janitorr/
 3. Consider the impact on Docker deployment
 4. Test with both dry-run enabled and disabled
 5. Verify documentation is updated in both languages
+6. Ensure commit messages follow conventional format
+7. Check if changes affect both JVM and native image builds

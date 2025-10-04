@@ -552,7 +552,7 @@ Si todavía ves errores 404 en la Interfaz de Gestión:
    
 2. **Verifica la etiqueta de imagen:**
    ```yaml
-   image: ghcr.io/carcheky/janitorr:jvm-stable  # Usa esta o jvm-main
+   image: ghcr.io/carcheky/janitorr:latest  # Usa esta o :main para desarrollo
    ```
 
 3. **Limpia la caché del navegador y vuelve a intentar**

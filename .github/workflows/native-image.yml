@@ -124,15 +124,22 @@ jobs:
           find: '/'
           replace: '-'
 
+      - name: Extract version without v prefix
+        id: version_number
+        run: |
+          VERSION="${{ steps.branch_name.outputs.value }}"
+          # Remove 'v' prefix if it exists
+          VERSION_NO_V="${VERSION#v}"
+          echo "value=$VERSION_NO_V" >> $GITHUB_OUTPUT
+
       - name: Combine native images into single manifest
         uses: int128/docker-manifest-create-action@v2
         with:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/janitorr:native-${{ steps.branch_name.outputs.value }}
-            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-stable', github.repository_owner)) || '' }}
             ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-latest', github.repository_owner)) || '' }}
-            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-{1}', github.repository_owner, steps.branch_name.outputs.value)) || '' }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-{1}', github.repository_owner, steps.version_number.outputs.value)) || '' }}
           sources: |
             ghcr.io/${{ github.repository_owner }}/janitorr:native-amd64-${{ steps.branch_name.outputs.value }}
             ghcr.io/${{ github.repository_owner }}/janitorr:native-arm64-${{ steps.branch_name.outputs.value }}

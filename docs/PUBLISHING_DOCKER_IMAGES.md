@@ -88,7 +88,7 @@ Docker images will be automatically created when:
 
 ### Español
 
-**Esta opción crea las imágenes `jvm-stable` y `native-stable` recomendadas para producción.**
+**Esta opción crea las imágenes `:latest` (JVM) y `:native-latest` recomendadas para producción.**
 
 ### Paso 1: Preparar la rama main
 
@@ -140,18 +140,19 @@ Una vez completados los workflows, las imágenes estarán disponibles:
 
 ```bash
 # Imagen JVM estable (recomendada)
-docker pull ghcr.io/carcheky/janitorr:jvm-stable
+docker pull ghcr.io/carcheky/janitorr:latest
 
 # Imagen JVM con versión específica
-docker pull ghcr.io/carcheky/janitorr:jvm-v1.0.0
+docker pull ghcr.io/carcheky/janitorr:1.0.0
 
 # Imagen nativa (obsoleta)
-docker pull ghcr.io/carcheky/janitorr:native-stable
+docker pull ghcr.io/carcheky/janitorr:native-latest
+docker pull ghcr.io/carcheky/janitorr:native-1.0.0
 ```
 
 ### English
 
-**This option creates the `jvm-stable` and `native-stable` images recommended for production.**
+**This option creates the `:latest` (JVM) and `:native-latest` images recommended for production.**
 
 ### Step 1: Prepare the main branch
 
@@ -203,13 +204,14 @@ Once workflows complete, images will be available:
 
 ```bash
 # Stable JVM image (recommended)
-docker pull ghcr.io/carcheky/janitorr:jvm-stable
+docker pull ghcr.io/carcheky/janitorr:latest
 
 # JVM image with specific version
-docker pull ghcr.io/carcheky/janitorr:jvm-v1.0.0
+docker pull ghcr.io/carcheky/janitorr:1.0.0
 
 # Native image (deprecated)
-docker pull ghcr.io/carcheky/janitorr:native-stable
+docker pull ghcr.io/carcheky/janitorr:native-latest
+docker pull ghcr.io/carcheky/janitorr:native-1.0.0
 ```
 
 ---
@@ -226,7 +228,7 @@ docker pull ghcr.io/carcheky/janitorr:native-stable
 
 ```bash
 # Verificar imagen JVM estable
-curl -I https://ghcr.io/v2/carcheky/janitorr/manifests/jvm-stable
+curl -I https://ghcr.io/v2/carcheky/janitorr/manifests/latest
 
 # Código 200 = imagen disponible
 # Código 401/404 = imagen no existe o requiere autenticación
@@ -262,7 +264,7 @@ https://github.com/carcheky/janitorr/pkgs/container/janitorr
 - [ ] Merge PR a main con commits convencionales / Merge PR to main with conventional commits
 - [ ] Esperar semantic-release o crear tag manualmente / Wait for semantic-release or create tag manually
 - [ ] Verificar workflows completan / Verify workflows complete
-- [ ] Probar imagen: `docker pull ghcr.io/carcheky/janitorr:jvm-stable`
+- [ ] Probar imagen: `docker pull ghcr.io/carcheky/janitorr:latest`
 - [ ] Verificar todas las características / Verify all features
 - [ ] Actualizar documentación con versión / Update documentation with version
 

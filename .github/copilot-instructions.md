@@ -16,7 +16,7 @@
 - Docs EN: `docs/wiki/en/`
 - Docs ES: `docs/wiki/es/`
 
-**Commit Format:** `<type>(<scope>): <subject>` (See [Commit Conventions](#commit-message-conventions))
+**Commit Format:** `<type>[(<scope>)]: <subject>` - **ALWAYS use conventional commits** (See [Commit Conventions](#commit-message-conventions))
 
 ---
 
@@ -290,15 +290,21 @@ janitorr/
 
 ## Commit Message Conventions
 
-This project follows [Conventional Commits](https://www.conventionalcommits.org/) specification. All commits MUST follow this format:
+**CRITICAL**: This project follows [Conventional Commits](https://www.conventionalcommits.org/) specification. 
+
+**ALL commits MUST follow this format** - including progress reports, internal commits, and any automated commits:
 
 ```
-<type>(<scope>): <subject>
+<type>[(<scope>)]: <subject>
 
 [optional body]
 
 [optional footer]
 ```
+
+**Note**: Scope (the part in parentheses) is **optional**. Both formats are valid:
+- `feat: add new feature` ✅
+- `feat(media): add new feature` ✅
 
 ### Valid Types
 - `feat`: New feature (triggers minor version bump)
@@ -318,15 +324,31 @@ Use `!` after type/scope or add `BREAKING CHANGE:` in footer (triggers major ver
 
 ### Examples
 ```bash
+# With scope
 feat(media): add Plex support
 fix(cleanup): resolve symlink deletion issue
+
+# Without scope (also valid)
+feat: add new feature
+fix: resolve bug
 docs: update Docker setup guide
+chore: update dependencies
+
+# Breaking change
 feat(api)!: change response format
 
 BREAKING CHANGE: API structure has changed
 ```
 
-**Important**: All commits are validated in CI. See [CONTRIBUTING.md](/CONTRIBUTING.md) for details.
+**CRITICAL REQUIREMENTS**:
+1. **NEVER** create commits with messages like "Initial plan", "WIP", "Update", etc.
+2. **ALWAYS** use a valid conventional commit type (`feat`, `fix`, `docs`, `chore`, etc.)
+3. **ALWAYS** include a meaningful subject after the colon
+4. All commits are validated in CI - non-compliant commits will fail the build
+5. Use `chore:` for maintenance tasks, `docs:` for documentation updates
+6. Scope is optional but recommended for clarity
+
+See [CONTRIBUTING.md](/CONTRIBUTING.md) for complete details.
 
 ## Common Development Tasks
 
@@ -429,5 +451,42 @@ After successful release:
 3. Consider the impact on Docker deployment
 4. Test with both dry-run enabled and disabled
 5. Verify documentation is updated in both languages
-6. Ensure commit messages follow conventional format
+6. **ALWAYS ensure commit messages follow conventional format** (even for progress reports)
 7. Check if changes affect both JVM and native image builds
+
+## Commit Guidelines for Copilot Agents
+
+**MANDATORY**: When using the `report_progress` tool or any other commit operation:
+
+1. **ALWAYS** use conventional commit format for the commit message
+2. **NEVER** use generic messages like "Initial plan", "Update", "WIP", "Progress", etc.
+3. Choose the appropriate type based on the work being done:
+   - `feat:` for new features
+   - `fix:` for bug fixes
+   - `docs:` for documentation changes
+   - `refactor:` for code refactoring
+   - `test:` for test additions/updates
+   - `chore:` for maintenance tasks
+   - `style:` for formatting changes
+   - `perf:` for performance improvements
+   - `ci:` for CI/CD changes
+
+4. **Examples of valid progress commit messages**:
+   ```bash
+   chore: initialize project setup
+   docs: add initial implementation plan
+   feat: implement basic authentication
+   refactor: restructure database layer
+   test: add unit tests for cleanup service
+   ```
+
+5. **Examples of INVALID commit messages** (will fail CI):
+   ```bash
+   ❌ Initial plan
+   ❌ WIP
+   ❌ Update files
+   ❌ Progress report
+   ❌ Commit changes
+   ```
+
+**Remember**: Every single commit in this repository is validated by commitlint in CI. Non-compliant commits will cause PR checks to fail.

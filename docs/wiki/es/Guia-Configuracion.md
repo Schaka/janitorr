@@ -294,10 +294,10 @@ ports:
 
 ```yaml
 # ✅ Incluye Interfaz de Gestión
-image: ghcr.io/carcheky/janitorr:jvm-stable
+image: ghcr.io/carcheky/janitorr:latest
 
 # ❌ NO incluye Interfaz de Gestión (obsoleta)
-image: ghcr.io/carcheky/janitorr:native-stable
+image: ghcr.io/carcheky/janitorr-native:latest
 ```
 
 Para documentación completa de la UI, consulta [MANAGEMENT_UI.md](../../MANAGEMENT_UI.md).

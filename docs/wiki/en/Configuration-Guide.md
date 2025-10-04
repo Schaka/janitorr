@@ -294,10 +294,10 @@ ports:
 
 ```yaml
 # ✅ Includes Management UI
-image: ghcr.io/carcheky/janitorr:jvm-stable
+image: ghcr.io/carcheky/janitorr:latest
 
 # ❌ Does NOT include Management UI (deprecated)
-image: ghcr.io/carcheky/janitorr:native-stable
+image: ghcr.io/carcheky/janitorr-native:latest
 ```
 
 For complete UI documentation, see [MANAGEMENT_UI.md](../../MANAGEMENT_UI.md).

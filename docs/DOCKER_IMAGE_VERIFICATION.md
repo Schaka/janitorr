@@ -16,31 +16,31 @@ All Docker Compose files in the repository use the fork's images:
 ```yaml
 janitorr:
   container_name: janitorr
-  image: ghcr.io/carcheky/janitorr:jvm-stable
+  image: ghcr.io/carcheky/janitorr:latest
 ```
 
 #### `examples/docker-compose.example.ui.yml`
 ```yaml
 janitorr:
   container_name: janitorr
-  image: ghcr.io/carcheky/janitorr:jvm-stable
+  image: ghcr.io/carcheky/janitorr:main
 ```
 
-**Result**: ✅ Both files correctly reference `ghcr.io/carcheky/janitorr:jvm-stable`
+**Result**: ✅ Both files correctly reference the fork's simplified image tags
 
 ### 2. Documentation ✅
 
 All documentation files consistently reference the fork's images:
 
 #### English Documentation
-- `README.md` - Uses `ghcr.io/carcheky/janitorr:jvm-stable`
+- `README.md` - Uses `ghcr.io/carcheky/janitorr:latest`
 - `docs/wiki/en/Docker-Compose-Setup.md` - All examples use fork images
 - `docs/wiki/en/Configuration-Guide.md` - References correct images
 - `docs/wiki/en/FAQ.md` - Image references correct
 - `docs/wiki/en/Troubleshooting.md` - Fork images used
 
 #### Spanish Documentation
-- `docs/wiki/es/Configuracion-Docker-Compose.md` - Uses `ghcr.io/carcheky/janitorr:jvm-stable`
+- `docs/wiki/es/Configuracion-Docker-Compose.md` - Uses `ghcr.io/carcheky/janitorr:latest`
 - `docs/wiki/es/Guia-Configuracion.md` - Correct image references
 - `docs/wiki/es/Preguntas-Frecuentes.md` - Fork images used
 - `docs/wiki/es/Solucion-Problemas.md` - Correct images
@@ -59,21 +59,23 @@ All CI/CD workflows are configured to build and push images to the fork's regist
 #### `.github/workflows/jvm-image.yml`
 ```yaml
 tags: |
-  ghcr.io/${{ github.repository_owner }}/janitorr:jvm-${{ steps.branch_name.outputs.value }}
-  ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:jvm-stable', github.repository_owner)) || '' }}
+  ghcr.io/${{ github.repository_owner }}/janitorr:${{ steps.branch_name.outputs.value }}
+  ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:latest', github.repository_owner)) || '' }}
+  ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:{1}', github.repository_owner, steps.version_number.outputs.value)) || '' }}
 sources: |
-  ghcr.io/${{ github.repository_owner }}/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
-  ghcr.io/${{ github.repository_owner }}/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
+  ghcr.io/${{ github.repository_owner }}/janitorr:amd64-${{ steps.branch_name.outputs.value }}
+  ghcr.io/${{ github.repository_owner }}/janitorr:arm64-${{ steps.branch_name.outputs.value }}
 ```
 
 #### `.github/workflows/native-image.yml`
 ```yaml
 tags: |
-  ghcr.io/${{ github.repository_owner }}/janitorr:native-${{ steps.branch_name.outputs.value }}
-  ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:native-stable', github.repository_owner)) || '' }}
+  ghcr.io/${{ github.repository_owner }}/janitorr-native:${{ steps.branch_name.outputs.value }}
+  ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr-native:latest', github.repository_owner)) || '' }}
+  ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr-native:{1}', github.repository_owner, steps.version_number.outputs.value)) || '' }}
 sources: |
-  ghcr.io/${{ github.repository_owner }}/janitorr:native-amd64-${{ steps.branch_name.outputs.value }}
-  ghcr.io/${{ github.repository_owner }}/janitorr:native-arm64-${{ steps.branch_name.outputs.value }}
+  ghcr.io/${{ github.repository_owner }}/janitorr-native:amd64-${{ steps.branch_name.outputs.value }}
+  ghcr.io/${{ github.repository_owner }}/janitorr-native:arm64-${{ steps.branch_name.outputs.value }}
 ```
 
 **Result**: ✅ Uses `${{ github.repository_owner }}` which resolves to `carcheky` in this fork
@@ -120,22 +122,22 @@ The fork's unique Management UI is included in the Docker images:
 The CI/CD system creates the following image tags:
 
 #### For Branch Builds (main, develop)
-- `ghcr.io/carcheky/janitorr:jvm-main` (from main branch)
-- `ghcr.io/carcheky/janitorr:jvm-develop` (from develop branch)
-- `ghcr.io/carcheky/janitorr:native-main` (native image)
-- `ghcr.io/carcheky/janitorr:native-develop` (native image)
+- `ghcr.io/carcheky/janitorr:main` (from main branch, JVM image)
+- `ghcr.io/carcheky/janitorr:develop` (from develop branch, JVM image)
+- `ghcr.io/carcheky/janitorr-native:main` (native image)
+- `ghcr.io/carcheky/janitorr-native:develop` (native image)
 
 #### For Platform-Specific Builds
-- `ghcr.io/carcheky/janitorr:jvm-amd64-<branch>`
-- `ghcr.io/carcheky/janitorr:jvm-arm64-<branch>`
-- `ghcr.io/carcheky/janitorr:native-amd64-<branch>`
-- `ghcr.io/carcheky/janitorr:native-arm64-<branch>`
+- `ghcr.io/carcheky/janitorr:amd64-<branch>`
+- `ghcr.io/carcheky/janitorr:arm64-<branch>`
+- `ghcr.io/carcheky/janitorr-native:amd64-<branch>`
+- `ghcr.io/carcheky/janitorr-native:arm64-<branch>`
 
 #### For Version Releases (when tagged with v*)
-- `ghcr.io/carcheky/janitorr:jvm-stable` (recommended for production)
-- `ghcr.io/carcheky/janitorr:native-stable` (deprecated)
-- `ghcr.io/carcheky/janitorr:jvm-v1.x.x` (specific version)
-- `ghcr.io/carcheky/janitorr:native-v1.x.x` (specific version)
+- `ghcr.io/carcheky/janitorr:latest` (recommended for production)
+- `ghcr.io/carcheky/janitorr:1.x.x` (specific version, e.g., 1.9.0)
+- `ghcr.io/carcheky/janitorr-native:latest` (deprecated)
+- `ghcr.io/carcheky/janitorr-native:1.x.x` (specific version)
 
 **Result**: ✅ Comprehensive tagging strategy for all use cases
 
@@ -155,16 +157,16 @@ Based on the workflow configuration, the following images should be available:
 
 | Image Tag | Status | Use Case |
 |-----------|--------|----------|
-| `ghcr.io/carcheky/janitorr:jvm-main` | Should exist | Latest main branch build |
-| `ghcr.io/carcheky/janitorr:jvm-develop` | Should exist | Latest develop branch build |
-| `ghcr.io/carcheky/janitorr:jvm-stable` | Created on version tag | Production use (recommended) |
-| `ghcr.io/carcheky/janitorr:native-main` | Should exist | Native image (deprecated) |
-| `ghcr.io/carcheky/janitorr:native-develop` | Should exist | Native image (deprecated) |
-| `ghcr.io/carcheky/janitorr:native-stable` | Created on version tag | Native image (deprecated) |
+| `ghcr.io/carcheky/janitorr:main` | Should exist | Latest main branch build |
+| `ghcr.io/carcheky/janitorr:develop` | Should exist | Latest develop branch build |
+| `ghcr.io/carcheky/janitorr:latest` | Created on version tag | Production use (recommended) |
+| `ghcr.io/carcheky/janitorr-native:main` | Should exist | Native image (deprecated) |
+| `ghcr.io/carcheky/janitorr-native:develop` | Should exist | Native image (deprecated) |
+| `ghcr.io/carcheky/janitorr-native:latest` | Created on version tag | Native image (deprecated) |
 
 ### First Stable Release
 
-To create the `jvm-stable` and `native-stable` tags, a version tag must be created:
+To create the `latest` tags, a version tag must be created:
 
 ```bash
 # Example: After semantic-release creates a version tag
@@ -175,7 +177,7 @@ git push origin v1.0.0
 The CI/CD will automatically:
 1. Build multi-platform images (amd64 + arm64)
 2. Combine them into manifest lists
-3. Tag them as `jvm-stable` and `native-stable`
+3. Tag them as `latest` and `1.x.x` for both janitorr and janitorr-native images
 4. Push to GitHub Container Registry
 
 ## 🔧 No Changes Required
@@ -192,7 +194,7 @@ The CI/CD will automatically:
 
 | Requirement | Status |
 |-------------|--------|
-| Change image in docker-compose.yml | ✅ Already uses `ghcr.io/carcheky/janitorr:jvm-stable` |
+| Change image in docker-compose.yml | ✅ Already uses `ghcr.io/carcheky/janitorr:latest` |
 | Verify image exists in GHCR | ✅ CI/CD configured, images created on push/tag |
 | Configure GitHub Actions for builds | ✅ Complete workflows exist for JVM and native |
 | Ensure Management UI included | ✅ UI files present, will be bundled in images |
@@ -226,8 +228,8 @@ To verify images are being built correctly:
 
 1. **Check GitHub Actions**: Navigate to the "Actions" tab in the repository
 2. **Look for workflow runs**: Check "JVM Image" and "Native images" workflows
-3. **Verify GHCR packages**: Go to repository → Packages → janitorr
-4. **Pull and test**: `docker pull ghcr.io/carcheky/janitorr:jvm-main`
+3. **Verify GHCR packages**: Go to repository → Packages → janitorr and janitorr-native
+4. **Pull and test**: `docker pull ghcr.io/carcheky/janitorr:main`
 
 ## ✅ Conclusion
 

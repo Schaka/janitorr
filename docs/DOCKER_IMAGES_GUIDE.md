@@ -13,7 +13,7 @@ This fork (`carcheky/janitorr`) publishes its own Docker images to GitHub Contai
 ### Imagen JVM (Recomendada) / JVM Image (Recommended)
 
 ```yaml
-image: ghcr.io/carcheky/janitorr:jvm-stable
+image: ghcr.io/carcheky/janitorr:latest
 ```
 
 **Características / Features:**
@@ -26,7 +26,7 @@ image: ghcr.io/carcheky/janitorr:jvm-stable
 ### Imagen Nativa (Obsoleta desde v1.9.0) / Native Image (Deprecated since v1.9.0)
 
 ```yaml
-image: ghcr.io/carcheky/janitorr:native-stable
+image: ghcr.io/carcheky/janitorr-native:latest
 ```
 
 **Nota / Note:** La imagen nativa está obsoleta. Se recomienda usar la imagen JVM. / The native image is deprecated. JVM image is recommended.
@@ -39,19 +39,29 @@ image: ghcr.io/carcheky/janitorr:native-stable
 
 | Etiqueta / Tag | Descripción / Description | Cuándo usar / When to use |
 |----------------|---------------------------|---------------------------|
-| `jvm-stable` | Última versión estable JVM / Latest stable JVM release | ✅ Producción / Production |
-| `jvm-v1.x.x` | Versión específica JVM / Specific JVM version | Reproducibilidad / Reproducibility |
-| `native-stable` | Última versión nativa (obsoleta) / Latest native (deprecated) | ⚠️ No recomendada / Not recommended |
-| `native-v1.x.x` | Versión nativa específica / Specific native version | ⚠️ No recomendada / Not recommended |
+| `latest` | Última versión estable JVM / Latest stable JVM release | ✅ Producción / Production |
+| `1.x.x` | Versión específica JVM / Specific JVM version | Reproducibilidad / Reproducibility |
+
+**Imagen Nativa (janitorr-native) / Native Image:**
+
+| Etiqueta / Tag | Imagen / Image | Cuándo usar / When to use |
+|----------------|----------------|---------------------------|
+| `latest` | `ghcr.io/carcheky/janitorr-native:latest` | ⚠️ No recomendada / Not recommended |
+| `1.x.x` | `ghcr.io/carcheky/janitorr-native:1.x.x` | ⚠️ No recomendada / Not recommended |
 
 ### Desarrollo / Development
 
 | Etiqueta / Tag | Descripción / Description | Cuándo usar / When to use |
 |----------------|---------------------------|---------------------------|
-| `jvm-main` | Última construcción desde main / Latest build from main | Características recientes / Recent features |
-| `jvm-develop` | Última construcción de desarrollo / Latest development build | ⚠️ Pruebas únicamente / Testing only |
-| `native-main` | Imagen nativa desde main / Native image from main | ⚠️ No recomendada / Not recommended |
-| `native-develop` | Imagen nativa de desarrollo / Development native image | ⚠️ No recomendada / Not recommended |
+| `main` | Última construcción desde main / Latest build from main | Características recientes / Recent features |
+| `develop` | Última construcción de desarrollo / Latest development build | ⚠️ Pruebas únicamente / Testing only |
+
+**Imagen Nativa (janitorr-native) / Native Image:**
+
+| Etiqueta / Tag | Imagen / Image | Cuándo usar / When to use |
+|----------------|----------------|---------------------------|
+| `main` | `ghcr.io/carcheky/janitorr-native:main` | ⚠️ No recomendada / Not recommended |
+| `develop` | `ghcr.io/carcheky/janitorr-native:develop` | ⚠️ No recomendada / Not recommended |
 
 ---
 
@@ -92,7 +102,7 @@ version: "3"
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     user: 1000:1000  # Tu ID de usuario / Your user ID
     mem_limit: 256M
     mem_swappiness: 0

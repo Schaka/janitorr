@@ -226,13 +226,13 @@ Yes, configure multiple *arr instances in your application.yml. Janitorr will ma
 
 ### What's the difference between JVM and native images?
 
-- **JVM Image** (`jvm-stable`): 
+- **JVM Image** (`ghcr.io/carcheky/janitorr:latest`): 
   - Recommended
   - Better supported
   - Slightly higher memory usage (~256MB)
   - Better long-term performance due to JIT optimization
 
-- **Native Image** (`native-stable`):
+- **Native Image** (`ghcr.io/carcheky/janitorr-native:latest`):
   - Deprecated as of v1.9.0
   - Lower initial memory footprint
   - Faster startup

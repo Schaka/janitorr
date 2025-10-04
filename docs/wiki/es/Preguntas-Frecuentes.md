@@ -226,13 +226,13 @@ Sí, configura múltiples instancias *arr en tu application.yml. Janitorr gestio
 
 ### ¿Cuál es la diferencia entre imágenes JVM y nativas?
 
-- **Imagen JVM** (`jvm-stable`):
+- **Imagen JVM** (`ghcr.io/carcheky/janitorr:latest`):
   - Recomendada
   - Mejor soportada
   - Uso de memoria ligeramente superior (~256MB)
   - Mejor rendimiento a largo plazo debido a optimización JIT
 
-- **Imagen Nativa** (`native-stable`):
+- **Imagen Nativa** (`ghcr.io/carcheky/janitorr-native:latest`):
   - Obsoleta desde v1.9.0
   - Menor huella inicial de memoria
   - Inicio más rápido

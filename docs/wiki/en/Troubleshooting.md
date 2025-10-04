@@ -552,7 +552,7 @@ If you're seeing 404 errors on the Management UI:
    
 2. **Verify the image tag:**
    ```yaml
-   image: ghcr.io/carcheky/janitorr:jvm-stable  # Use this or jvm-main
+   image: ghcr.io/carcheky/janitorr:latest  # Use this or :main for development
    ```
 
 3. **Clear browser cache and retry**

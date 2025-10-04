@@ -217,7 +217,7 @@ An example of a `docker-compose.yml` may look like this:
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     user: 1000:1000 # Replace with your user who should own your application.yml file
     mem_limit: 256M # is used to dynamically calculate heap size, can go as low as 200MB, but 256 is recommended - higher for very large libraries
     mem_swappiness: 0
@@ -243,14 +243,14 @@ I had originally implemented it due to fast runtimes and lower memory footprint,
 Please see release notes for 1.9.0 for a thorough explanation.
 
 A native image is also published for every build. It keeps a lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
-That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
+That image is always tagged with the `janitorr-native` name: `:latest` for stable releases. To get a specific version, use `:1.x.x`.
 **While I do publish an arm64 version of this image, it is mostly untested.**
 
 ```yml
 services:
   janitorr:
     container_name: janitorr
-    image: ghcr.io/carcheky/janitorr:native-stable
+    image: ghcr.io/carcheky/janitorr-native:latest
     user: 1000:1000 # Replace with your user who should own your application.yml file
     volumes:
       - /appdata/janitorr/config/application.yml:/config/config.yml
@@ -268,8 +268,8 @@ services:
       retries: 3
 ```
 
-To get the latest build as found in the development branch, grab the following image: `ghcr.io/carcheky/janitorr:jvm-develop`.
-The development version of the native image is available as `ghcr.io/carcheky/janitorr:native-develop`.
+To get the latest build as found in the development branch, grab the following image: `ghcr.io/carcheky/janitorr:develop`.
+The development version of the native image is available as `ghcr.io/carcheky/janitorr-native:develop`.
 
 ## Contributing
 

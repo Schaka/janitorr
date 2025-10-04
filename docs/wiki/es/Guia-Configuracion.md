@@ -254,6 +254,54 @@ logging:
 - `DEBUG` - Información detallada de depuración
 - `TRACE` - Información de rastreo muy detallada
 
+## Configuración de la Interfaz de Gestión
+
+La Interfaz de Gestión está habilitada por defecto al usar la imagen JVM.
+
+### Configuración de Puerto
+
+La UI usa el mismo puerto que la aplicación principal:
+
+```yaml
+server:
+  port: 8978  # Cambia para usar un puerto diferente
+```
+
+### Accediendo a la UI
+
+Una vez que Janitorr esté ejecutándose:
+```
+http://<ip-de-tu-servidor>:8978/
+```
+
+### Mapeo de Puerto en Docker
+
+Mapea el puerto en docker-compose.yml:
+```yaml
+ports:
+  - "8978:8978"  # host:contenedor
+```
+
+Para usar un puerto de host diferente:
+```yaml
+ports:
+  - "9000:8978"  # Acceder en http://localhost:9000/
+```
+
+### Requisitos de Imagen
+
+⚠️ **Importante:** La Interfaz de Gestión solo está disponible en la imagen JVM.
+
+```yaml
+# ✅ Incluye Interfaz de Gestión
+image: ghcr.io/carcheky/janitorr:jvm-stable
+
+# ❌ NO incluye Interfaz de Gestión (obsoleta)
+image: ghcr.io/carcheky/janitorr:native-stable
+```
+
+Para documentación completa de la UI, consulta [MANAGEMENT_UI.md](../../MANAGEMENT_UI.md).
+
 ## Configuración de Rutas
 
 ### Entendiendo el Mapeo de Rutas
@@ -379,6 +427,43 @@ Si expones la Interfaz de Gestión:
 - Considera usar HTTPS
 - Restringe el acceso por IP si es posible
 
+### Acceso a la Interfaz de Gestión
+
+La Interfaz de Gestión no tiene autenticación integrada. Para asegurarla:
+
+**Opción 1: Sin acceso externo (recomendado para la mayoría)**
+```yaml
+# docker-compose.yml
+ports:
+  # Elimina o comenta la sección de puertos
+  # - "8978:8978"  # No exponer al host
+```
+Accede a la UI solo desde otros contenedores en la misma red Docker.
+
+**Opción 2: Proxy inverso con autenticación**
+
+Usa Nginx, Traefik o similar con autenticación básica:
+
+```nginx
+# Ejemplo Nginx
+location / {
+    auth_basic "Janitorr Admin";
+    auth_basic_user_file /etc/nginx/.htpasswd;
+    proxy_pass http://janitorr:8978;
+}
+```
+
+**Opción 3: Restricción por IP**
+
+Restringe el acceso a IPs específicas:
+```nginx
+location / {
+    allow 192.168.1.0/24;  # Tu red local
+    deny all;
+    proxy_pass http://janitorr:8978;
+}
+```
+
 ## Ejemplo de Configuración Completa
 
 Consulta [Configuración con Docker Compose](Configuracion-Docker-Compose.md#ejemplo-de-stack-completo) para un ejemplo completo con todos los servicios configurados.
@@ -459,6 +544,7 @@ dry-run: true
 - [Configuración con Docker Compose](Configuracion-Docker-Compose.md) - Guía completa de implementación
 - [Preguntas Frecuentes](Preguntas-Frecuentes.md) - Preguntas comunes
 - [Solución de Problemas](Solucion-Problemas.md) - Resolución detallada de problemas
+- [Guía de Interfaz de Gestión](../../MANAGEMENT_UI.md) - Documentación de la interfaz web
 
 ---
 

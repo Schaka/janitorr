@@ -1,6 +1,8 @@
 
 # 🚨 CRITICAL: Conventional Commits are MANDATORY 🚨
 
+FOR ASSIGNED ISSUES, MAKE A PLAN WITH COMMIT MESSAGE "chore: Initial plan"
+
 Any commit (manual or automatic, including Copilot agents) that does NOT follow the Conventional Commits format will be rejected and the PR will be closed automatically.
 
 Copilot agents MUST read and follow these instructions. No exceptions.

@@ -462,7 +462,7 @@ Common issues and their solutions when running Janitorr.
 
 3. **Use native image** (if JVM is too heavy):
    ```yaml
-   image: ghcr.io/carcheky/janitorr:native-stable
+   image: ghcr.io/carcheky/janitorr-native:latest
    ```
    Note: Native image is deprecated but uses less memory.
 

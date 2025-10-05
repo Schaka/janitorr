@@ -91,7 +91,7 @@ INFO - Management UI is DISABLED by configuration (management.ui.enabled=false)
 ```yaml
 services:
   janitorr:
-    image: ghcr.io/carcheky/janitorr:jvm-stable  # Also works: jvm-main for latest
+    image: ghcr.io/carcheky/janitorr:latest  # Also works: :main for development
     environment:
       - JANITORR_UI_ENABLED=true  # UI enabled by default
     ports:
@@ -108,7 +108,7 @@ services:
 ```yaml
 services:
   janitorr:
-    image: ghcr.io/carcheky/janitorr:jvm-stable
+    image: ghcr.io/carcheky/janitorr:latest
     environment:
       - JANITORR_UI_ENABLED=false
     # No need to expose port 8080 if UI is disabled
@@ -343,7 +343,7 @@ If you cannot access the Management UI:
    - Verify `SERVER_PORT` environment variable if you changed it
 
 3. **Check the Docker image:**
-   - Use `ghcr.io/carcheky/janitorr:jvm-stable` or `jvm-main`
+   - Use `ghcr.io/carcheky/janitorr:latest` or `:main`
    - Ensure you're not using an old image version
    
 4. **Verify you can access the container:**
@@ -361,7 +361,7 @@ The following issues have been **fixed in current releases**:
 - ✅ **Static resources not loading** - FIXED: CSS, JS, and HTML properly served
 
 **If you're experiencing these issues:**
-1. Update to the latest image: `ghcr.io/carcheky/janitorr:jvm-stable`
+1. Update to the latest image: `ghcr.io/carcheky/janitorr:latest`
 2. Restart your container: `docker-compose restart janitorr`
 3. Clear browser cache and reload
 

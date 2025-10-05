@@ -52,6 +52,9 @@ jobs:
         with:
           gradle-version: 9.1.0
 
+      - name: Create logs directory
+        run: mkdir -p logs
+
       - name: Build with Gradle
         run: ./gradlew build -x bootBuildImage
         env:

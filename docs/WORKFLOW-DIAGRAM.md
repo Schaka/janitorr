@@ -61,7 +61,7 @@
 ```
 main (production)
   │
-  ├── v1.0.0 ────> GitHub Release + Docker Images (jvm-stable, native-stable)
+  ├── v1.0.0 ────> GitHub Release + Docker Images (latest, janitorr-native:latest)
   │
   ├── v1.1.0 ────> GitHub Release + Docker Images
   │
@@ -70,7 +70,7 @@ main (production)
 
 develop (pre-release)
   │
-  ├── v1.1.0-develop.1 ────> Pre-release + Docker Images (jvm-develop, native-develop)
+  ├── v1.1.0-develop.1 ────> Pre-release + Docker Images (develop, janitorr-native:develop)
   │
   ├── v1.1.0-develop.2 ────> Pre-release + Docker Images
   │

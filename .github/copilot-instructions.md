@@ -122,8 +122,8 @@ When updating documentation:
 ## Docker and Deployment
 
 ### Image Types
-- **JVM Image** (recommended): `ghcr.io/carcheky/janitorr:jvm-stable`
-- **Native Image** (deprecated v1.9.0+): `ghcr.io/carcheky/janitorr:native-stable`
+- **JVM Image** (recommended): `ghcr.io/carcheky/janitorr:latest`
+- **Native Image** (deprecated v1.9.0+): `ghcr.io/carcheky/janitorr-native:latest`
 
 ### Configuration
 - Application configuration: `application.yml`
@@ -422,7 +422,7 @@ IMAGE_TYPE=jvm ./gradlew bootBuildImage
 
 # Test the image
 docker run -p 8080:8080 -v ./application.yml:/config/application.yml \
-  ghcr.io/carcheky/janitorr:jvm-latest
+  ghcr.io/carcheky/janitorr:latest
 
 # Check logs
 docker logs <container-id>
@@ -456,10 +456,11 @@ The project uses GitHub Actions for automation:
 
 ### Docker Image Tags
 After successful release:
-- `jvm-stable`: Latest stable JVM image
-- `jvm-latest`: Latest build (may be pre-release)
-- `jvm-v1.2.3`: Specific version tag
-- Native images deprecated as of v1.9.0
+- `latest`: Latest stable JVM image
+- `main`: Latest build from main branch
+- `develop`: Development build (may be pre-release)
+- `1.x.x`: Specific version tag (e.g., `1.0.0`)
+- `janitorr-native:*`: Native images deprecated as of v1.9.0
 
 ## When Unsure
 

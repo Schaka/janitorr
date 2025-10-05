@@ -52,8 +52,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 9.1.0
 
       - name: Build Native OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/amd64
@@ -92,8 +90,6 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 9.1.0
 
       - name: Build Native ARM64 OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64

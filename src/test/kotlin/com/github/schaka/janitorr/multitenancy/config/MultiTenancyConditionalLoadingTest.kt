@@ -21,8 +21,7 @@ class MultiTenancyConditionalLoadingTest {
      * Test that multitenancy beans are NOT loaded when disabled (default)
      */
     @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        classes = [MultiTenancyConfiguration::class, MultiTenancyProperties::class]
+        webEnvironment = SpringBootTest.WebEnvironment.NONE
     )
     @TestPropertySource(
         properties = [
@@ -59,8 +58,7 @@ class MultiTenancyConditionalLoadingTest {
      * Test that multitenancy beans ARE loaded when enabled
      */
     @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.NONE,
-        classes = [MultiTenancyConfiguration::class, MultiTenancyProperties::class]
+        webEnvironment = SpringBootTest.WebEnvironment.NONE
     )
     @TestPropertySource(
         properties = [

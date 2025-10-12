@@ -2,7 +2,6 @@
 
 [![CI/CD Pipeline](https://github.com/carcheky/janitorr/workflows/CI%2FCD%20Pipeline/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/ci-cd.yml)
 [![JVM Image](https://github.com/carcheky/janitorr/workflows/JVM%20Image/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/jvm-image.yml)
-[![Native Image](https://github.com/carcheky/janitorr/workflows/Native%20images/badge.svg)](https://github.com/carcheky/janitorr/actions/workflows/native-image.yml)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 [![Management UI](https://img.shields.io/badge/Management%20UI-✅%20Working-brightgreen.svg)](#management-ui)
@@ -236,40 +235,7 @@ services:
       retries: 3
 ```
 
-**The native image is now deprecated as of 1.9.0. Please switch to the JVM image.**
-[Oracle has announced](https://blogs.oracle.com/java/post/detaching-graalvm-from-the-java-ecosystem-train) that the GraalVM will be "detached" from the ecosystem.
-Despite employees [chiming in on Reddit](https://www.reddit.com/r/java/comments/1niamuc/comment/nehsqww) saying it won't be going anywhere, its future is a bit uncertain.
-I had originally implemented it due to fast runtimes and lower memory footprint, but it requires a lot of workarounds and upkeep to save barely 100MB of RAM.
-Please see release notes for 1.9.0 for a thorough explanation.
-
-A native image is also published for every build. It keeps a lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
-That image is always tagged with the `janitorr-native` name: `:latest` for stable releases. To get a specific version, use `:1.x.x`.
-**While I do publish an arm64 version of this image, it is mostly untested.**
-
-```yml
-services:
-  janitorr:
-    container_name: janitorr
-    image: ghcr.io/carcheky/janitorr-native:latest
-    user: 1000:1000 # Replace with your user who should own your application.yml file
-    volumes:
-      - /appdata/janitorr/config/application.yml:/config/config.yml
-      - /appdata/janitorr/logs:/logs
-      - /share_media:/data
-    environment:
-      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
-      - THC_PATH=/health
-      - THC_PORT=8081
-      - SPRING_CONFIG_ADDITIONAL_LOCATION=/config/application.yml
-    healthcheck:
-      test: [ "CMD", "/workspace/health-check" ]
-      start_period: 30s
-      interval: 5s
-      retries: 3
-```
-
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/carcheky/janitorr:develop`.
-The development version of the native image is available as `ghcr.io/carcheky/janitorr-native:develop`.
 
 ## Contributing
 

@@ -10,20 +10,15 @@
     },
     "filesystem": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem"]
-    },
-    "shell": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-shell"]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."]
     },
     "fetch": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-fetch"]
+      "args": ["-y", "fetch-mcp"]
     },
-    "openapi": {
+    "shell": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-openapi"],
-      "disabled": true
+      "args": ["-y", "@mako10k/mcp-shell-server"]
     }
   }
 }

@@ -31,6 +31,8 @@ jobs:
 
       - name: Validate PR commits
         uses: wagoid/commitlint-github-action@v6
+        with:
+          configFile: ./.commitlintrc.js
 
   # Build and test
   build:

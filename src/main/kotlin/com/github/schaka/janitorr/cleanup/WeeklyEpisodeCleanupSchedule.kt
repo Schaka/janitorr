@@ -21,11 +21,10 @@ import java.time.LocalDateTime
 /**
  * Data class to track cleanup operation results
  */
-data class CleanupResult(
-    val episodesDeleted: Int = 0,
-    val spaceFreedBytes: Long = 0L,
-    val errors: MutableList<String> = mutableListOf()
-)
+    data class CleanupResult(
+        var episodesDeleted: Int = 0,
+        var spaceFreedBytes: Long = 0L
+    )
 
 /**
  * This class works differently than the other schedules because it covers one special use case.

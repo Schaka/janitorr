@@ -10,50 +10,59 @@ Janitorr uses GitHub Actions for automated building, testing, and releasing. The
 
 ### 1. CI/CD Pipeline (`ci-cd.yml`)
 
-The main workflow that runs on every push and pull request to `main` and `develop` branches.
+The main workflow that handles continuous integration and deployment automation.
+
+**Purpose:**
+
+- Validates code quality and commit standards
+- Runs comprehensive build and test suite
+- Automates semantic versioning and releases
 
 **Jobs:**
 
 - **commitlint**: Validates commit messages against conventional commit standards (PRs only)
-- **build**: Builds the application using Gradle and runs tests
+- **build**: Builds the application using Gradle and runs complete test suite (excludes Docker image building)
 - **release**: Creates automated releases using semantic-release (main/develop branches only)
 
 **Triggers:**
+
 - Push to `main` or `develop` branches
 - Pull requests targeting `main` or `develop` branches
 - Manual dispatch via `workflow_dispatch`
 
+**Note:** This workflow focuses purely on CI/CD and does not build Docker images for efficiency.
+
 ### 2. JVM Image Build (`jvm-image.yml`)
 
-Builds multi-platform JVM Docker images for x86_64 and ARM64 architectures.
+Dedicated workflow for building and publishing multi-platform JVM Docker images.
+
+**Purpose:**
+
+- Builds production-ready Docker images
+- Supports multi-architecture (AMD64/ARM64)
+- Handles proper image tagging and publishing
 
 **Jobs:**
+
 - **build-jvm-x86**: Builds JVM image for x86_64 (native build on AMD64 runner)
 - **build-jvm-aarch64**: Builds JVM image for ARM64 (using QEMU emulation on AMD64 runner)
 - **combine-images**: Creates multi-arch manifest
 
+**Triggers:**
+
+- Push to `main` or `develop` branches (only when source code changes)
+- Pull requests with relevant file changes (fork-safe with permission checks)
+- New release publications (via semantic-release)
+- Manual dispatch via `workflow_dispatch`
+- Git tags (for version-specific builds)
+
 **Note:** ARM64 images are built using QEMU emulation on standard GitHub-hosted runners, which allows cross-platform builds without requiring ARM64 hardware.
 
 **Output Images:**
+
 - `ghcr.io/carcheky/janitorr:main` (main branch)
 - `ghcr.io/carcheky/janitorr:develop` (develop branch)
 - `ghcr.io/carcheky/janitorr:latest`, `ghcr.io/carcheky/janitorr:1.x.x` (tagged releases)
-
-### 3. Native Image Build (`native-image.yml`)
-
-Builds multi-platform GraalVM native Docker images for x86_64 and ARM64 architectures.
-
-**Jobs:**
-- **build-native-x86**: Builds native image for x86_64 (native build on AMD64 runner)
-- **build-native-aarch64**: Builds native image for ARM64 (using QEMU emulation on AMD64 runner)
-- **combine-images**: Creates multi-arch manifest
-
-**Note:** ARM64 images are built using QEMU emulation on standard GitHub-hosted runners, which allows cross-platform builds without requiring ARM64 hardware.
-
-**Output Images:**
-- `ghcr.io/carcheky/janitorr-native:main` (main branch)
-- `ghcr.io/carcheky/janitorr-native:develop` (develop branch)
-- `ghcr.io/carcheky/janitorr-native:latest`, `ghcr.io/carcheky/janitorr-native:1.x.x` (tagged releases)
 
 ## Semantic Release
 
@@ -89,11 +98,12 @@ All commit messages must follow the [Conventional Commits](https://www.conventio
 
 ### Format
 
-```
+```text
 <type>[(<scope>)]: <subject>
 ```
 
 **Note:** Scope (the part in parentheses) is optional. You can use either:
+
 - `feat: add new feature` (without scope)
 - `feat(media): add new feature` (with scope)
 

@@ -1,11 +1,17 @@
-name: JVM Image
+name: JVM Docker Images
+
+# This workflow builds and publishes multi-platform JVM Docker images:
+# - Triggered by code changes that affect the application
+# - Builds for AMD64 and ARM64 architectures
+# - Publishes to GitHub Container Registry (GHCR)
+# - Handles proper image tagging for branches and releases
 
 on:
   push:
     paths:
       - src/**
       - buildSrc/**
-      - .github/**
+      - .github/workflows/jvm-image.yml
       - build.gradle.kts
       - settings.gradle.kts
       - gradle.properties
@@ -19,13 +25,18 @@ on:
     paths:
       - src/**
       - buildSrc/**
-      - .github/**
+      - .github/workflows/jvm-image.yml
       - build.gradle.kts
       - settings.gradle.kts
     branches:
       - '**'
 
+  # Allow manual triggering for testing and deployment
   workflow_dispatch:
+
+  # Build images when new releases are published by semantic-release
+  release:
+    types: [published]
 
 # Cancel previous runs when a new one is triggered on the same branch/PR
 concurrency:
@@ -35,6 +46,8 @@ concurrency:
 jobs:
   build-jvm-x86:
     runs-on: ubuntu-latest
+    # Skip image builds on PRs from forks to avoid permission issues
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
       - name: Checkout repository
@@ -70,6 +83,8 @@ jobs:
 
   build-jvm-aarch64:
     runs-on: ubuntu-latest
+    # Skip image builds on PRs from forks to avoid permission issues
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
 
     steps:
       - name: Checkout repository
@@ -111,6 +126,8 @@ jobs:
   combine-images:
     runs-on: ubuntu-latest
     needs: [build-jvm-x86, build-jvm-aarch64]
+    # Only combine images if both builds completed successfully
+    if: success() && (github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository)
     steps:
 
       - name: Log into GitHub Container Registry

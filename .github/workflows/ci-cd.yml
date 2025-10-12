@@ -1,5 +1,11 @@
 name: CI/CD Pipeline
 
+# This workflow handles Continuous Integration and Deployment:
+# - Validates commit messages (PRs only)
+# - Builds and tests the application (no Docker images)
+# - Creates semantic releases (main/develop branches only)
+# Docker image building is handled by separate jvm-image.yml workflow
+
 on:
   push:
     branches:
@@ -39,7 +45,7 @@ jobs:
         with:
           configFile: ./commitlint.config.mjs
 
-  # Build and test
+  # Build and test (CI only - no Docker images)
   build:
     name: Build and Test
     runs-on: ubuntu-latest
@@ -62,13 +68,8 @@ jobs:
         with:
           gradle-version: 9.1.0
 
-      - name: Build with Gradle
-        run: ./gradlew build -x bootBuildImage
-        env:
-          LC_ALL: "en_US.UTF-8"
-
-      - name: Run tests
-        run: ./gradlew test
+      - name: Build and Test with Gradle
+        run: ./gradlew build test -x bootBuildImage
         env:
           LC_ALL: "en_US.UTF-8"
 

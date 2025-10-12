@@ -1,27 +1,30 @@
 package com.github.schaka.janitorr.api
 
+package com.github.schaka.janitorr.api
+
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.context.annotation.Import
-import org.springframework.test.context.ActiveProfiles
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import kotlin.test.assertEquals
 
-@WebMvcTest
-@ActiveProfiles("test")
-@Import(RootController::class)
 class RootControllerTest {
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
 
     @Test
     fun `root path should forward to index html`() {
+        val controller = RootController()
+        val mockMvc = MockMvcBuilders.standaloneSetup(controller).build()
+
         mockMvc.perform(get("/"))
             .andExpect(status().isOk)
             .andExpect(forwardedUrl("/index.html"))
+    }
+
+    @Test
+    fun `controller index method returns correct forward path`() {
+        val controller = RootController()
+        val result = controller.index()
+        assertEquals("forward:/index.html", result)
     }
 }

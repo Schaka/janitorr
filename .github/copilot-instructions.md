@@ -20,11 +20,45 @@
 
 ### 🔧 Herramientas MCP Disponibles
 
-Cuando necesites estas capacidades, úsalas:
-- `@activate_filesystem_management_tools` - Para operaciones con archivos
-- `@activate_mcp_shell_tools` - Para comandos de terminal
-- `@mcp_upstash_conte_get-library-docs` - Para documentación de librerías
-- `@activate_knowledge_graph_tools` - Para gestión de memoria y contexto
+**Para operaciones con archivos:**
+- `@activate_filesystem_management_tools` - Crear/leer/editar/mover archivos y directorios
+  - Cuándo usar: Manipular archivos de código, configuración, documentación
+  - Ejemplos: Crear nuevos archivos Kotlin, editar configuraciones YAML, reorganizar estructura
+
+**Para comandos de terminal:**
+- `@activate_mcp_shell_tools` - Ejecutar comandos shell, gestionar procesos
+  - Cuándo usar: Builds, tests, git operations, instalación dependencias
+  - Ejemplos: `gradle build`, `git commit`, `docker run`, gestión de procesos
+
+**Para documentación externa:**
+- `@mcp_upstash_conte_get-library-docs` - Obtener docs actualizadas de librerías
+  - Cuándo usar: Necesitas referencia API/sintaxis de Spring Boot, Kotlin, etc.
+  - Ejemplos: Configuración Spring Security, nuevas features Kotlin, APIs de testing
+
+**Para gestión de contexto:**
+- `@activate_knowledge_graph_tools` - Memoria persistente entre sesiones
+  - Cuándo usar: Recordar decisiones arquitecturales, patrones utilizados, issues resueltos
+  - Ejemplos: Guardar soluciones a problemas complejos, patrones de integración exitosos
+
+**Para análisis web:**
+- `@mcp_fetch_fetch_url` - Obtener contenido de páginas web y APIs
+  - Cuándo usar: Analizar documentación externa, APIs REST, verificar endpoints
+  - Ejemplos: Verificar docs Spring Boot, analizar APIs de Jellyfin/Sonarr
+
+**Para automatización web:**
+- `@activate_browser_interaction_tools` - Control de navegador con Playwright
+  - Cuándo usar: Testing de UI web, automatización de tareas web, capturas
+  - Ejemplos: Testing del Management UI, validación de interfaces web
+
+**Para pensamiento estructurado:**
+- `@mcp_sequential-th_sequentialthinking` - Análisis paso a paso de problemas complejos
+  - Cuándo usar: Debugging complejo, análisis arquitectural, resolución de issues
+  - Ejemplos: Diagnosticar fallos de integración, planificar refactorizaciones
+
+**Para gestión GitHub:**
+- `@activate_github_tools_issue_management` - Gestión completa de issues y PRs
+  - Cuándo usar: Crear/actualizar issues, gestionar PRs, reviews automatizadas
+  - Ejemplos: Crear issues por bugs encontrados, gestionar workflow de desarrollo
 
 ### 🐳 Uso de Docker para Herramientas
 

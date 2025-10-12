@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -23,7 +24,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 )
 @EnableConfigurationProperties(MultiTenancyProperties::class)
 class MultiTenancyConfig(
-    private val basicAuthInterceptor: BasicAuthInterceptor
+    @Lazy private val basicAuthInterceptor: BasicAuthInterceptor
 ) : WebMvcConfigurer {
     
     /**

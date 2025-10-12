@@ -24,6 +24,12 @@
     "shell": {
       "command": "npx",
       "args": ["-y", "@mako10k/mcp-shell-server"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest"
+      ]
     }
   }
 }

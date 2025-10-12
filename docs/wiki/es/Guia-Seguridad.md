@@ -108,7 +108,7 @@ Edita tu `application.yml`:
 security:
   enabled: true
   username: admin           # ¡Cámbialo!
-  password: contraseña-super-secreta  # ¡Cámbialo!
+  password: super-secret-password  # ¡Cámbialo!
 ```
 
 **IMPORTANTE:** 

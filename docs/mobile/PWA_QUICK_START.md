@@ -627,8 +627,9 @@ async function subscribeUserToPush() {
             // Replace 'YOUR_PUBLIC_VAPID_KEY_HERE' with your actual public VAPID key.
             // To generate VAPID keys, use the 'web-push' npm package:
             //   npx web-push generate-vapid-keys
-            // The public key goes here, and the private key is used on your server.
-            // See: https://web-push-book.gauntface.com/chapter-04/01-generating-vapid-keys/
+            // Copy the generated public key here, and configure the private key on your Janitorr backend.
+            // For detailed Janitorr setup instructions, see: docs/wiki/en/mobile/push-notifications.md (and the ES version).
+            // Additional reference: https://web-push-book.gauntface.com/chapter-04/01-generating-vapid-keys/
             applicationServerKey: urlBase64ToUint8Array('YOUR_PUBLIC_VAPID_KEY_HERE')
         });
         
@@ -681,7 +682,7 @@ icons/
 
 ### Using ImageMagick (CLI)
 ```bash
-# Convert your logo to different sizes
+# Replace 'path/to/your/logo.png' with the correct path to your Janitorr logo file (e.g., ./logo.png or provide the actual location in your project)
 # Replace 'path/to/your/logo.png' with the actual path to your logo file (e.g., ../images/logos/janitorr_icon.png)
 convert path/to/your/logo.png -resize 16x16 favicon-16x16.png
 convert path/to/your/logo.png -resize 32x32 favicon-32x32.png

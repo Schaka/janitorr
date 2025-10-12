@@ -42,7 +42,7 @@ rule-engine:
 Navigate to the Management UI and click **🧩 Rule Builder** or go directly to:
 
 ```
-http://your-janitorr-host:8080/rule-builder.html
+http://your-janitorr-host:8978/rule-builder.html
 ```
 
 ### 3. Create Your First Rule

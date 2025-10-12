@@ -11,7 +11,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.forward
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest(RootController::class)
-@ActiveProfiles("test", "!leyden")
+@ActiveProfiles("test")
 class RootControllerTest {
 
     @Autowired

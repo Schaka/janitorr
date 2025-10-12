@@ -132,6 +132,7 @@ class WeeklyEpisodeCleanupSchedule(
         
         // Record metrics for deleted episodes
         if (totalEpisodesDeleted > 0) {
+            // TODO: Space freed tracking is not available for episodes; passing 0L intentionally.
             metricsService.recordCleanup("episodes", totalEpisodesDeleted, 0L)
         }
 

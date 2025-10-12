@@ -27,6 +27,11 @@ on:
 
   workflow_dispatch:
 
+# Cancel previous runs when a new one is triggered on the same branch/PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-jvm-x86:
     runs-on: ubuntu-latest

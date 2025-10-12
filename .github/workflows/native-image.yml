@@ -1,31 +1,16 @@
-name: Native images
+name: Native images (Deprecated since v1.9.0)
+
+# DEPRECATED: Native images are deprecated as of v1.9.0
+# This workflow is kept for legacy support and only runs on version tags
+# For new deployments, use the JVM image instead: ghcr.io/carcheky/janitorr:latest
 
 on:
+  # Only run on tags for legacy support - native images are deprecated
   push:
-    paths:
-      - src/**
-      - buildSrc/**
-      - .github/**
-      - build.gradle.kts
-      - settings.gradle.kts
-      - gradle.properties
     tags:
-      - '**'
-    branches:
-      - 'develop'
-      - 'main'
-
-  pull_request:
-    paths:
-      - src/**
-      - buildSrc/**
-      - .github/**
-      - build.gradle.kts
-      - settings.gradle.kts
-      - gradle.properties
-    branches:
-      - '**'
-
+      - 'v*'
+  
+  # Manual trigger only for testing/debugging
   workflow_dispatch:
 
 jobs:

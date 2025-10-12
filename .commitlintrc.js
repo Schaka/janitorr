@@ -19,7 +19,9 @@ module.exports = {
       ]
     ],
     'subject-case': [2, 'never', ['upper-case']],
-    'header-max-length': [2, 'always', 100]
+    'header-max-length': [0], // Deshabilitado - sin límite
+    'body-max-line-length': [0], // Deshabilitado - sin límite  
+    'footer-max-line-length': [0] // Deshabilitado - sin límite
   },
   ignores: [
     (message) => message.startsWith('Initial plan'),

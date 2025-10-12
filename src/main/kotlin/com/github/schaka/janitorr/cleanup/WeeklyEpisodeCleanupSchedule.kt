@@ -19,6 +19,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
+ * Data class to track cleanup operation results
+ */
+data class CleanupResult(
+    var episodesDeleted: Int = 0,
+    var spaceFreedBytes: Long = 0L,
+    val errors: MutableList<String> = mutableListOf()
+)
+
+/**
  * This class works differently than the other schedules because it covers one special use case.
  * TV shows only (mostly daily episodes), regarding only the latest season or x amount of latest episodes.
  * 
@@ -62,9 +71,7 @@ class WeeklyEpisodeCleanupSchedule(
 
         val today = LocalDateTime.now()
         val series = sonarrClient.getAllSeries().filter { it.tags.contains(episodeTag.id) }
-        var totalEpisodesDeleted = 0
-        var totalSpaceFreedBytes = 0L
-        val errors = mutableListOf<String>()
+        val cleanupResult = CleanupResult()
 
         try {
             for (show in series) {
@@ -96,7 +103,7 @@ class WeeklyEpisodeCleanupSchedule(
                                 }
                                 // Track space freed from deleted episode
                                 val episodeSize = episode.episodeFile?.size ?: 0L
-                                totalSpaceFreedBytes += episodeSize
+                                cleanupResult.spaceFreedBytes += episodeSize
                                 episodesDeletedForShow++
                             }
                         }
@@ -116,30 +123,30 @@ class WeeklyEpisodeCleanupSchedule(
                                 }
                                 // Track space freed from deleted episode
                                 val episodeSize = episode.episodeFile?.size ?: 0L
-                                totalSpaceFreedBytes += episodeSize
+                                cleanupResult.spaceFreedBytes += episodeSize
                                 episodesDeletedForShow++
                             }
                         }
                     }
                     
-                    totalEpisodesDeleted += episodesDeletedForShow
+                    cleanupResult.episodesDeleted += episodesDeletedForShow
                 } catch (e: Exception) {
                     log.error("Error cleaning up episodes for show: ${show.title}", e)
-                    errors.add("Error cleaning up ${show.title}: ${e.message}")
+                    cleanupResult.errors.add("Error cleaning up ${show.title}: ${e.message}")
                 }
             }
             
             // Send notification about cleanup completion
-            sendCleanupNotification(totalEpisodesDeleted, errors, totalSpaceFreedBytes)
+            sendCleanupNotification(cleanupResult.episodesDeleted, cleanupResult.errors, cleanupResult.spaceFreedBytes)
         } catch (e: Exception) {
             log.error("Error during episode cleanup", e)
-            errors.add("Episode cleanup error: ${e.message}")
-            sendCleanupNotification(totalEpisodesDeleted, errors, totalSpaceFreedBytes)
+            cleanupResult.errors.add("Episode cleanup error: ${e.message}")
+            sendCleanupNotification(cleanupResult.episodesDeleted, cleanupResult.errors, cleanupResult.spaceFreedBytes)
         }
         
         // Record metrics for deleted episodes with actual space freed
-        if (totalEpisodesDeleted > 0) {
-            metricsService.recordCleanup("episodes", totalEpisodesDeleted, totalSpaceFreedBytes)
+        if (cleanupResult.episodesDeleted > 0) {
+            metricsService.recordCleanup("episodes", cleanupResult.episodesDeleted, cleanupResult.spaceFreedBytes)
         }
 
         runOnce.hasWeeklyEpisodeCleanupRun = true

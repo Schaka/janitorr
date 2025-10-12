@@ -2,11 +2,11 @@ package com.github.schaka.janitorr.multitenancy.config
 
 import com.github.schaka.janitorr.multitenancy.repository.*
 import com.github.schaka.janitorr.multitenancy.security.BasicAuthInterceptor
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.context.annotation.Bean
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Lazy
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -23,10 +23,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
     matchIfMissing = false
 )
 @EnableConfigurationProperties(MultiTenancyProperties::class)
-class MultiTenancyConfig : WebMvcConfigurer {
-    
-    @Autowired
-    private lateinit var basicAuthInterceptor: BasicAuthInterceptor
+class MultiTenancyConfig(
+    @Lazy private val basicAuthInterceptor: BasicAuthInterceptor
+) : WebMvcConfigurer {
     
     /**
      * Register authentication interceptor for multi-tenancy endpoints

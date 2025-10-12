@@ -36,3 +36,4 @@ package-lock.json
 .npmrc
 appdata
 janitor.log
+*.log

@@ -123,7 +123,6 @@ class ManagementController(
         )
     }
     
-    
     @PostMapping("/notifications/test/{channel}")
     fun testNotification(@org.springframework.web.bind.annotation.PathVariable channel: String): Map<String, Any> {
         log.info("Testing notification channel: $channel")

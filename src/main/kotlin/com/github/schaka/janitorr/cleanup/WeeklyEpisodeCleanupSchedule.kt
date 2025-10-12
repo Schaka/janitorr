@@ -23,7 +23,8 @@ import java.time.LocalDateTime
  */
     data class CleanupResult(
         var episodesDeleted: Int = 0,
-        var spaceFreedBytes: Long = 0L
+        var spaceFreedBytes: Long = 0L,
+        var errors: MutableList<String> = mutableListOf()
     )
 
 /**

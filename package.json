@@ -9,15 +9,16 @@
   "license": "SEE LICENSE IN LICENSE.txt",
   "private": true,
   "scripts": {
-    "prepare": "husky install || true"
+    "prepare": "husky install || true",
+    "commitlint": "commitlint --edit"
   },
   "devDependencies": {
     "@commitlint/cli": "^18.4.3",
     "@commitlint/config-conventional": "^18.4.3",
-    "husky": "^8.0.3",
-    "semantic-release": "^22.0.12",
     "@semantic-release/changelog": "^6.0.3",
-    "@semantic-release/git": "^10.0.1"
+    "@semantic-release/git": "^10.0.1",
+    "husky": "^8.0.3",
+    "semantic-release": "^22.0.12"
   },
   "release": {
     "branches": [

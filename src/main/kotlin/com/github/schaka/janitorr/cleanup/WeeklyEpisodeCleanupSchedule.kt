@@ -19,6 +19,15 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
+ * Data class to track cleanup operation results
+ */
+    data class CleanupResult(
+        var episodesDeleted: Int = 0,
+        var spaceFreedBytes: Long = 0L,
+        var errors: MutableList<String> = mutableListOf()
+    )
+
+/**
  * This class works differently than the other schedules because it covers one special use case.
  * TV shows only (mostly daily episodes), regarding only the latest season or x amount of latest episodes.
  * 
@@ -62,41 +71,7 @@ class WeeklyEpisodeCleanupSchedule(
 
         val today = LocalDateTime.now()
         val series = sonarrClient.getAllSeries().filter { it.tags.contains(episodeTag.id) }
-<<<<<<< HEAD
-        
-        var totalEpisodesDeleted = 0
-        var totalSpaceFreed = 0L
-
-        for (show in series) {
-            val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
-            val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
-                .filter { it.airDate != null }
-                .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
-                .toMutableList()
-
-            val episodesHistory = sonarrClient.getHistory(show.id, latestSeason.seasonNumber)
-                    .sortedBy { parseDate(it.date)}
-                    .distinctBy { it.episodeId }
-
-            log.info("Deleting single episodes of ${show.title}")
-
-            // Delete by age
-            for (episodeHistory in episodesHistory) {
-                val episode = episodes.first{ it.seriesId == episodeHistory.seriesId && it.id == episodeHistory.episodeId }
-                val grabDate = parseDate(episodeHistory.date)
-                if (grabDate + applicationProperties.episodeDeletion.maxAge <= today) {
-                    log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because of its age")
-
-                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
-                        if (!applicationProperties.dryRun) {
-                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
-                            episodes.remove(episode)
-                            totalEpisodesDeleted++
-                            // Track file size if available
-                            episode.episodeFile?.size?.let { totalSpaceFreed += it }
-=======
-        var totalEpisodesDeleted = 0
-        val errors = mutableListOf<String>()
+        val cleanupResult = CleanupResult()
 
         try {
             for (show in series) {
@@ -126,9 +101,11 @@ class WeeklyEpisodeCleanupSchedule(
                                     sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                                     episodes.remove(episode)
                                 }
+                                // Track space freed from deleted episode
+                                val episodeSize = episode.episodeFile?.size ?: 0L
+                                cleanupResult.spaceFreedBytes += episodeSize
                                 episodesDeletedForShow++
                             }
->>>>>>> main
                         }
                     }
 
@@ -140,53 +117,48 @@ class WeeklyEpisodeCleanupSchedule(
                         for (episode in episodes) {
                             log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because there are too many episodes")
 
-<<<<<<< HEAD
-                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
-                        if (!applicationProperties.dryRun) {
-                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
-                            totalEpisodesDeleted++
-                            // Track file size if available
-                            episode.episodeFile?.size?.let { totalSpaceFreed += it }
-=======
                             if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                                 if (!applicationProperties.dryRun) {
                                     sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                                 }
+                                // Track space freed from deleted episode
+                                val episodeSize = episode.episodeFile?.size ?: 0L
+                                cleanupResult.spaceFreedBytes += episodeSize
                                 episodesDeletedForShow++
                             }
->>>>>>> main
                         }
                     }
                     
-                    totalEpisodesDeleted += episodesDeletedForShow
+                    cleanupResult.episodesDeleted += episodesDeletedForShow
                 } catch (e: Exception) {
                     log.error("Error cleaning up episodes for show: ${show.title}", e)
-                    errors.add("Error cleaning up ${show.title}: ${e.message}")
+                    cleanupResult.errors.add("Error cleaning up ${show.title}: ${e.message}")
                 }
             }
             
             // Send notification about cleanup completion
-            sendCleanupNotification(totalEpisodesDeleted, errors)
+            sendCleanupNotification(cleanupResult.episodesDeleted, cleanupResult.errors, cleanupResult.spaceFreedBytes)
         } catch (e: Exception) {
             log.error("Error during episode cleanup", e)
-            errors.add("Episode cleanup error: ${e.message}")
-            sendCleanupNotification(totalEpisodesDeleted, errors)
+            cleanupResult.errors.add("Episode cleanup error: ${e.message}")
+            sendCleanupNotification(cleanupResult.episodesDeleted, cleanupResult.errors, cleanupResult.spaceFreedBytes)
         }
         
-        // Record metrics for deleted episodes
-        if (totalEpisodesDeleted > 0) {
-            metricsService.recordCleanup("episodes", totalEpisodesDeleted, totalSpaceFreed)
+        // Record metrics for deleted episodes with actual space freed
+        if (cleanupResult.episodesDeleted > 0) {
+            metricsService.recordCleanup("episodes", cleanupResult.episodesDeleted, cleanupResult.spaceFreedBytes)
         }
 
         runOnce.hasWeeklyEpisodeCleanupRun = true
     }
     
-    private fun sendCleanupNotification(filesDeleted: Int, errors: List<String>) {
+    private fun sendCleanupNotification(filesDeleted: Int, errors: List<String>, spaceFreedBytes: Long = 0L) {
         try {
+            val spaceFreeGB = spaceFreedBytes / (1024.0 * 1024.0 * 1024.0) // Convert bytes to GB
             val stats = com.github.schaka.janitorr.notifications.CleanupStats(
                 cleanupType = "EPISODE",
                 filesDeleted = filesDeleted,
-                spaceFreeGB = 0.0, // Episodes don't track space saved
+                spaceFreeGB = spaceFreeGB,
                 dryRun = applicationProperties.dryRun,
                 errors = errors
             )

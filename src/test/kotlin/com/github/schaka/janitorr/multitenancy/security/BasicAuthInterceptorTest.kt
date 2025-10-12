@@ -33,9 +33,9 @@ class BasicAuthInterceptorTest {
     
     @BeforeEach
     fun setup() {
-        userService = mockk()
-        request = mockk()
-        response = mockk()
+        userService = mockk(relaxed = true)
+        request = mockk(relaxed = true)
+        response = mockk(relaxed = true)
         responseWriter = StringWriter()
         
         every { response.writer } returns PrintWriter(responseWriter)

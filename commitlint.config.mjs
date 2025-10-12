@@ -19,9 +19,9 @@ export default {
       ]
     ],
     'subject-case': [2, 'never', ['upper-case']],
-    'header-max-length': [0], // Deshabilitado - sin límite
-    'body-max-line-length': [0], // Deshabilitado - sin límite  
-    'footer-max-line-length': [0] // Deshabilitado - sin límite
+    'header-max-length': [0], // Disabled - no limit
+    'body-max-line-length': [0], // Disabled - no limit  
+    'footer-max-line-length': [0] // Disabled - no limit
   },
   ignores: [
     (message) => message.startsWith('Initial plan'),

@@ -22,8 +22,8 @@ import java.time.LocalDateTime
  * Data class to track cleanup operation results
  */
 data class CleanupResult(
-    var episodesDeleted: Int = 0,
-    var spaceFreedBytes: Long = 0L,
+    val episodesDeleted: Int = 0,
+    val spaceFreedBytes: Long = 0L,
     val errors: MutableList<String> = mutableListOf()
 )
 

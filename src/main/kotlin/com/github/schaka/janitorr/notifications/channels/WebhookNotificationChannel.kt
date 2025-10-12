@@ -27,7 +27,7 @@ class WebhookNotificationChannel(
         private val objectMapper = ObjectMapper()
     }
     
-    override fun send(event: NotificationEvent): Boolean {
+    suspend fun sendAsync(event: NotificationEvent): Boolean {
         if (properties.url.isBlank()) {
             log.warn("Webhook URL not configured")
             return false
@@ -72,13 +72,17 @@ class WebhookNotificationChannel(
                 lastException = e
                 log.warn("Error sending webhook notification on attempt ${attempt + 1}", e)
                 if (attempt < properties.retryCount - 1) {
-                    runBlocking { delay(1000L * (attempt + 1)) } // Exponential backoff
+                    delay(1000L * (attempt + 1)) // Exponential backoff using suspend delay
                 }
             }
         }
         
         log.error("Failed to send webhook notification after ${properties.retryCount} attempts", lastException)
         return false
+    }
+    
+    override fun send(event: NotificationEvent): Boolean {
+        return runBlocking { sendAsync(event) }
     }
     
     override fun test(): Boolean {

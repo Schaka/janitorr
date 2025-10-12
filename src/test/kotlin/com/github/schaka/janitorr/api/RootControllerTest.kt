@@ -1,7 +1,5 @@
 package com.github.schaka.janitorr.api
 
-package com.github.schaka.janitorr.api
-
 import org.junit.jupiter.api.Test
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.forwardedUrl

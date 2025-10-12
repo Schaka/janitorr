@@ -31,6 +31,7 @@ on:
 jobs:
   build-native-x86:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -66,6 +67,7 @@ jobs:
 
   build-native-aarch64:
     runs-on: ubuntu-latest
+    timeout-minutes: 20
 
     steps:
       - name: Checkout repository
@@ -106,6 +108,7 @@ jobs:
 
   combine-images:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [build-native-x86, build-native-aarch64]
     steps:
 

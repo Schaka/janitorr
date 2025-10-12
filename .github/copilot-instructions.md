@@ -50,6 +50,16 @@
   - When to use: Web UI testing, web task automation, screenshots
   - Examples: Management UI testing, web interface validation
 
+**For additional MCP capabilities:**
+- Native MCP servers configured in `.vscode/mcp.json` provide enhanced capabilities:
+  - **GitHub MCP**: Advanced repository management beyond basic git
+  - **Context7**: Real-time library documentation (Spring Boot, Kotlin, etc.)
+  - **Memory**: Persistent knowledge graph for session continuity
+  - **Filesystem**: Enhanced file operations with security controls
+  - **Fetch**: Web content and API integration
+  - **Shell**: Advanced command execution and process management
+  - **Playwright**: Browser automation for testing and interaction
+
 **For structured thinking:**
 - `@mcp_sequential-th_sequentialthinking` - Step-by-step analysis of complex problems
   - When to use: Complex debugging, architectural analysis, issue resolution

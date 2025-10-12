@@ -1,22 +1,241 @@
-# 📋 Instrucciones para GitHub Copilot - Proyecto Janitorr
+# 📋 GitHub Copilot Instructions - Janitorr Project
 
-## 🚨 REGLAS CRÍTICAS - LECTURA OBLIGATORIA
+## 🚨 CRITICAL RULES - MANDATORY READING
 
-### ✅ Conventional Commits - SIN EXCEPCIONES
+### ✅ Conventional Commits - NO EXCEPTIONS
 
-**TODOS los commits DEBEN seguir este formato:**
+**ALL commits MUST follow this format:**
 ```
 <type>[(<scope>)]: <subject>
 ```
 
-**Tipos válidos:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
+**Valid types:** `feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`, `revert`
 
-**Ejemplos correctos:**
-- `feat: agregar nueva funcionalidad`
-- `fix(cleanup): resolver error de sintaxis`
-- `docs: actualizar documentación`
+**Correct examples:**
+- `feat: add new functionality`
+- `fix(cleanup): resolve syntax error`
+- `docs: update documentation`
 
-**JAMÁS uses:** "Update", "WIP", "Initial plan", "Merge" - Estos commits serán rechazados automáticamente.
+**NEVER use:** "Update", "WIP", "Initial plan", "Merge" - These commits will be automatically rejected.
+
+### 🔧 Available MCP Tools
+
+**For file operations:**
+- `@activate_filesystem_management_tools` - Create/read/edit/move files and directories
+  - When to use: Manipulate code files, configuration, documentation
+  - Examples: Create new Kotlin files, edit YAML configurations, reorganize structure
+
+**For terminal commands:**
+- `@activate_mcp_shell_tools` - Execute shell commands, manage processes
+  - When to use: Builds, tests, git operations, dependency installation
+  - Examples: `gradle build`, `git commit`, `docker run`, process management
+
+**For external documentation:**
+- `@mcp_upstash_conte_get-library-docs` - Get updated library documentation
+  - When to use: Need API/syntax reference for Spring Boot, Kotlin, etc.
+  - Examples: Spring Security configuration, new Kotlin features, testing APIs
+
+**For context management:**
+- `@activate_knowledge_graph_tools` - Persistent memory between sessions
+  - When to use: Remember architectural decisions, used patterns, resolved issues
+  - Examples: Save solutions to complex problems, successful integration patterns
+
+**For web analysis:**
+- `@mcp_fetch_fetch_url` - Get content from web pages and APIs
+  - When to use: Analyze external documentation, REST APIs, verify endpoints
+  - Examples: Verify Spring Boot docs, analyze Jellyfin/Sonarr APIs
+
+**For web automation:**
+- `@activate_browser_interaction_tools` - Browser control with Playwright
+  - When to use: Web UI testing, web task automation, screenshots
+  - Examples: Management UI testing, web interface validation
+
+**For structured thinking:**
+- `@mcp_sequential-th_sequentialthinking` - Step-by-step analysis of complex problems
+  - When to use: Complex debugging, architectural analysis, issue resolution
+  - Examples: Diagnose integration failures, plan refactorings
+
+**For GitHub management:**
+- `@activate_github_tools_issue_management` - Complete issues and PRs management
+  - When to use: Create/update issues, manage PRs, automated reviews
+  - Examples: Create issues for found bugs, manage development workflow
+
+### 🐳 Docker Usage for Tools
+
+**ALWAYS use Docker for:**
+- Java/Gradle executions (JDK 25)
+- Application builds
+- Unit and integration tests
+- Any project-specific tools
+
+**Recommended image:** `gradle:8-jdk25`
+
+---
+
+## 📁 PROJECT CONTEXT
+
+### What is Janitorr
+Automation tool for media cleanup on Jellyfin/Emby servers. Integrates with Sonarr/Radarr (*arr) and Jellyseerr to automatically remove unwatched or old content according to configurable rules.
+
+### Technology Stack
+- **Language:** Kotlin 2.2.20
+- **Framework:** Spring Boot 3.5.6  
+- **Build:** Gradle 8.x with Kotlin DSL
+- **Java:** JDK 25 (Adoptium)
+- **Testing:** JUnit 5 + MockK (NO Mockito)
+- **Docker:** JVM images (native deprecated since v1.9.0)
+
+### Code Structure
+```
+src/main/kotlin/com/github/schaka/janitorr/
+├── mediaserver/     # Media server integration
+├── servarr/         # *arr integration (Sonarr/Radarr)  
+├── cleanup/         # Main cleanup logic
+├── jellyseerr/      # Jellyseerr integration
+├── notifications/   # Notification system
+├── multitenancy/    # Multi-tenant support
+└── config/          # Configurations
+```
+
+---
+
+## 💻 CODE RULES
+
+### Kotlin Style
+- Use data classes for DTOs
+- Constructor injection preferred over field injection
+- Use `@ConfigurationProperties` for configurations
+- Avoid `@Autowired` in fields, use constructor injection
+- If there are circular dependencies, use `@Lazy` in constructor
+
+### Testing
+- **ALWAYS** use MockK, NEVER Mockito for Kotlin code
+- Test names in backticks: `` `should do something when condition` ``
+- One test per behavior, not per method
+
+### Spring Boot
+- Use `@Component`, `@Service`, `@RestController` appropriately
+- Prefer `@ConfigurationProperties` over `@Value`
+- Use profiles to separate build (`leyden`) vs runtime configurations
+
+---
+
+## 🐳 DOCKER CONFIGURATION
+
+### Image Types
+- **JVM** (recommended): `ghcr.io/carcheky/janitorr:latest`
+- **Native** (deprecated v1.9.0+): Don't use for new developments
+
+### Important Environment Variables
+- `THC_PATH=/health` - Health check path
+- `THC_PORT=8081` - Health check port  
+- `SPRING_CONFIG_ADDITIONAL_LOCATION` - Additional config location
+
+---
+
+## 📚 DOCUMENTATION
+
+### Bilingual Rule
+**ALWAYS update both languages simultaneously:**
+- `docs/wiki/en/` - English version
+- `docs/wiki/es/` - Spanish version
+
+Maintain the same file structure and links between both versions.
+
+---
+
+## ⚙️ KEY CONCEPTS
+
+### Dry-Run Mode
+- **ENABLED by default**
+- Only shows what it would do, doesn't execute deletions
+- ALWAYS test in dry-run before disabling
+- Code must respect this flag in all destructive operations
+
+### Path Mapping
+**CRITICAL:** Paths must be identical between:
+- Janitorr
+- Media server (Jellyfin/Emby)  
+- *arr services (Sonarr/Radarr)
+
+If Jellyfin sees `/library/movies`, Janitorr MUST see exactly `/library/movies`.
+
+### Cleanup Flow
+1. Analyze media according to retention rules
+2. Mark elements for deletion  
+3. If NOT dry-run, execute deletion
+4. Send result notifications
+5. Update metrics and statistics
+
+---
+
+## 🚧 LOCAL DEVELOPMENT
+
+### Build Commands
+```bash
+# USE DOCKER for Java/Gradle executions
+docker run --rm -v $(pwd):/workspace -w /workspace gradle:8-jdk25 gradle build # Build
+docker run --rm -v $(pwd):/workspace -w /workspace gradle:8-jdk25 gradle test # Tests
+docker run --rm -v $(pwd):/workspace -w /workspace gradle:8-jdk25 gradle bootRun # Run local
+docker run --rm -v $(pwd):/workspace -w /workspace gradle:8-jdk25 gradle bootBuildImage # Docker image
+```
+
+### Troubleshooting
+- **"JVM runtime version 24"**: Use `docker run` with JDK 25 (Temurin)
+- **MockK tests fail**: Verify you're NOT using Mockito
+- **Native build fails**: Use JVM, native is deprecated
+- **Missing Java/Gradle**: ALWAYS use `docker run` for consistency
+
+---
+
+## 🎯 WHEN DEVELOPING
+
+### New Features
+- Create branch `feat/short-description`
+- Add tests for new functionality
+- Update EN and ES documentation if necessary
+- Respect dry-run mode in destructive operations
+- Use conventional commits
+
+### Bug Fixes  
+- Create branch `fix/bug-description`
+- Include regression test
+- Verify you don't break existing tests
+- Document the fix in commit message
+
+### Documentation Changes
+- Update BOTH versions (EN/ES) simultaneously
+- Verify internal links work
+- Maintain consistent structure between languages
+
+---
+
+## ❌ NEVER DO THIS
+
+- ❌ Commits that don't follow conventional format
+- ❌ Use Mockito instead of MockK  
+- ❌ Break dry-run functionality
+- ❌ Update only one documentation version
+- ❌ Assume different paths between services
+- ❌ Field injection with `@Autowired` without `@Lazy`
+- ❌ Ignore failing tests
+
+---
+
+## ✅ ALWAYS DO THIS
+
+- ✅ Conventional commits in ALL commits
+- ✅ Tests with MockK for Kotlin code
+- ✅ Constructor injection in Spring classes
+- ✅ Respect dry-run mode in destructive operations
+- ✅ Consistent paths between all services
+- ✅ Updated bilingual documentation
+- ✅ Verify tests pass before commit
+
+---
+
+*📅 Last updated: October 12, 2025*
+*🤖 These instructions are MANDATORY for GitHub Copilot agents. Read them completely before any changes.*
 
 ### 🔧 Herramientas MCP Disponibles
 

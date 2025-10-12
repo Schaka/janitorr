@@ -10,7 +10,7 @@
     <img src="images/logos/janitorr_icon.png" width=384>
 </p>
 
-> **Note**: This is a community-maintained fork of [schaka/janitorr](https://github.com/schaka/janitorr) with additional features including a Management Web UI and comprehensive multi-language documentation. See [FORK_CHANGES.md](FORK_CHANGES.md) for details.
+> **Note**: This is a community-maintained fork of [schaka/janitorr](https://github.com/schaka/janitorr) with additional features including a Management Web UI, comprehensive multi-language documentation, and enhanced CI/CD workflows.
 
 ### Inspiration
 
@@ -63,16 +63,15 @@ Comprehensive documentation is available in multiple languages:
   - [Preguntas Frecuentes](docs/wiki/es/Preguntas-Frecuentes.md)
   - [Solución de Problemas](docs/wiki/es/Solucion-Problemas.md)
 
-### Fork-Specific Documentation
+### Additional Documentation
 
-This fork includes additional documentation:
+This fork includes comprehensive documentation:
 
-- **[FORK_CHANGES.md](FORK_CHANGES.md)** - Complete list of features added in this fork
-- **[MANAGEMENT_UI.md](MANAGEMENT_UI.md)** - Documentation for the web-based management interface
-- **[Docker Images Guide](docs/DOCKER_IMAGES_GUIDE.md)** - Bilingual guide to available Docker images (EN/ES)
-- **[Docker Image Verification](docs/DOCKER_IMAGE_VERIFICATION.md)** - Verification report for Docker image configuration
-- **[UPSTREAM_SYNC_STATUS.md](UPSTREAM_SYNC_STATUS.md)** - Sync status with upstream repository
-- **[FORK_MAINTENANCE.md](FORK_MAINTENANCE.md)** - Quick reference guide for fork maintenance
+- **[Management UI Documentation](docs/MANAGEMENT_UI.md)** - Complete guide for the web-based management interface
+- **[Web Configuration Quick Reference](docs/WEB_CONFIG_QUICK_REFERENCE.md)** - Quick reference for web-based configuration
+- **[Docker Images Guide](docs/docker/DOCKER_IMAGES_GUIDE.md)** - Bilingual guide to available Docker images (EN/ES)
+- **[Architecture Diagram](docs/ARCHITECTURE_DIAGRAM.md)** - System architecture overview
+- **[Development Documentation](docs/development/)** - CI/CD, workflows, and development guides
 
 ## Features
 
@@ -128,7 +127,7 @@ The management UI allows you to:
 
 **Available at:** `http://<your-server-ip>:8978/`
 
-For detailed documentation, see [MANAGEMENT_UI.md](MANAGEMENT_UI.md).
+For detailed documentation, see [Management UI Documentation](docs/MANAGEMENT_UI.md).
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.

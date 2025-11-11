@@ -95,13 +95,25 @@ abstract class AbstractMediaServerService {
     }
 
     fun removePath(source: Path, toRemove: Path): Path {
-        val newPath = source.subtract(toRemove).reduce(this::combinePaths)
+        val sourceSegments = source.iterator().asSequence().map { it.fileName.toString() }.toList()
+        val toRemoveSegments = toRemove.iterator().asSequence().map { it.fileName.toString() }.toList()
+        val kept = sourceSegments.removeSubsequence(toRemoveSegments)
+        return kept.fold(source.root) { acc, seg -> acc.resolve(seg) }
+    }
 
-        if (newPath.root != source.root) {
-            return source.root.resolve(newPath)
+    private fun List<String>.removeSubsequence(sub: List<String>): List<String> {
+        if (sub.isEmpty()) return this
+        val out = ArrayList<String>(size)
+        var i = 0
+        while (i < size) {
+            if (i + sub.size <= size && sub.indices.all { this[i + it] == sub[it] }) {
+                i += sub.size
+            } else {
+                out += this[i]
+                i++
+            }
         }
-
-        return newPath
+        return out
     }
 
     fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {

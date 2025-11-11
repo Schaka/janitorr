@@ -142,6 +142,31 @@ internal class MediaRestServiceTest {
     }
 
     @Test
+    fun testTvMediaStructure() {
+        val episode = LibraryItem(
+            1,
+            LocalDateTime.now().minusDays(14),
+            "/data/torrents/tv/tv-show-folder-season 01/ep01.mkv",
+            "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
+
+            "/data/media/tv/tv-show [imdb-812543]",
+            "/data/media/tv",
+            "/data/media/tv/tv-show [imdb-812543]/season 01/ep01.mkv",
+
+            "812543"
+
+        )
+
+        val path = Path.of(fileSystemProperties.leavingSoonDir, "tv", "media")
+        val structure = jellyfinRestService.pathStructure(episode, path)
+
+        assertEquals(Path.of("/data/media/tv/tv-show [imdb-812543]"), structure.sourceFolder)
+        assertEquals(Path.of("/data/media/tv/tv-show [imdb-812543]/season 01"), structure.sourceFile)
+        assertEquals(Path.of("/data/media/leaving-soon/tv/media/tv-show [imdb-812543]"), structure.targetFolder)
+        assertEquals(Path.of("/data/media/leaving-soon/tv/media/tv-show [imdb-812543]/season 01"), structure.targetFile)
+    }
+
+    @Test
     fun testMetadataParsing() {
         assertEquals(4513, jellyfinRestService.parseMetadataId("4513-30-days-of-night"))
         assertEquals(4513, jellyfinRestService.parseMetadataId("4513"))

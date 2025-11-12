@@ -1,6 +1,7 @@
 package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.cleanup.CleanupType
+import com.github.schaka.janitorr.extensions.removeSubsequence
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -99,21 +100,6 @@ abstract class AbstractMediaServerService {
         val toRemoveSegments = toRemove.iterator().asSequence().map { it.fileName.toString() }.toList()
         val kept = sourceSegments.removeSubsequence(toRemoveSegments)
         return kept.fold(source.root) { acc, seg -> acc.resolve(seg) }
-    }
-
-    private fun List<String>.removeSubsequence(sub: List<String>): List<String> {
-        if (sub.isEmpty()) return this
-        val out = ArrayList<String>(size)
-        var i = 0
-        while (i < size) {
-            if (i + sub.size <= size && sub.indices.all { this[i + it] == sub[it] }) {
-                i += sub.size
-            } else {
-                out += this[i]
-                i++
-            }
-        }
-        return out
     }
 
     fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {

@@ -86,6 +86,7 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
+    exclude-favorited: false # When enabled, items favorited by any Jellyfin user will be excluded from deletion and won't appear in Leaving Soon
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
     leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE
@@ -99,6 +100,7 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
+    exclude-favorited: false # When enabled, items favorited by any Emby user will be excluded from deletion and won't appear in Leaving Soon
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
     leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE

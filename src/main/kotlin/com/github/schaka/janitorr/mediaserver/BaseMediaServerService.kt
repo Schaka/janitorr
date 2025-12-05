@@ -301,4 +301,32 @@ abstract class BaseMediaServerService(
         }
     }
 
+    override fun getAllFavoritedItemIds(): Set<String> {
+        if (!mediaServerProperties.excludeFavorited || !mediaServerProperties.enabled) {
+            return emptySet()
+        }
+
+        return try {
+            val users = mediaServerClient.listUsers()
+            users.flatMap { user ->
+                try {
+                    mediaServerClient.getUserFavorites(user.Id).Items.map { it.Id }
+                } catch (e: Exception) {
+                    log.warn("Failed to fetch favorites for user {}", user.Name, e)
+                    emptyList()
+                }
+            }.toSet()
+        } catch (e: Exception) {
+            log.warn("Failed to fetch favorited items", e)
+            emptySet()
+        }
+    }
+
+    override fun isItemFavorited(item: LibraryItem, favoritedIds: Set<String>): Boolean {
+        if (favoritedIds.isEmpty() || item.mediaServerIds.isEmpty()) {
+            return false
+        }
+        return item.mediaServerIds.any { favoritedIds.contains(it) }
+    }
+
 }

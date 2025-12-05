@@ -7,6 +7,7 @@ interface MediaServerProperties {
     val username: String
     val password: String
     val delete: Boolean
+    val excludeFavorited: Boolean
     val leavingSoonTv: String
     val leavingSoonMovies: String
     val leavingSoonType: LeavingSoonType

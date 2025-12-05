@@ -32,4 +32,12 @@ class MediaServerNoOpService : AbstractMediaServerService() {
     override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {
         log.info("Media Server not implemented. No 'Leaving Soon' library created.")
     }
+
+    override fun getAllFavoritedItemIds(): Set<String> {
+        return emptySet()
+    }
+
+    override fun isItemFavorited(item: LibraryItem, favoritedIds: Set<String>): Boolean {
+        return false
+    }
 }

@@ -3,18 +3,17 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
-import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.stats.StatsService
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.Period
 
 abstract class AbstractCleanupSchedule(
     protected val cleanupType: CleanupType,
@@ -71,6 +70,7 @@ abstract class AbstractCleanupSchedule(
         val expirationDays = expiration.toDays()
 
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
+        mediaServerService.populateMediaServerIds(servarrEntries, libraryType,!applicationProperties.wholeTvShow)
         jellystatService.populateWatchHistory(servarrEntries, libraryType)
 
         val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }

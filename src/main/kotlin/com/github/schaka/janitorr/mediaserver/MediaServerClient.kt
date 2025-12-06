@@ -1,6 +1,6 @@
 package com.github.schaka.janitorr.mediaserver
 
-import com.github.schaka.janitorr.mediaserver.api.User
+import com.github.schaka.janitorr.mediaserver.api.MediaServerUser
 import com.github.schaka.janitorr.mediaserver.library.*
 import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
 import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
@@ -10,7 +10,7 @@ import feign.RequestLine
 interface MediaServerClient {
 
     @RequestLine("GET /Users")
-    fun listUsers(): List<User>
+    fun listUsers(): List<MediaServerUser>
 
     @RequestLine("GET /Library/VirtualFolders")
     fun listLibraries(): List<VirtualFolderResponse>

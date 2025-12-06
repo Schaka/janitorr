@@ -4,7 +4,6 @@ import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
-import com.github.schaka.janitorr.stats.StatsClientProperties
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
@@ -29,7 +28,7 @@ abstract class AbstractMediaServerService {
 
     abstract fun cleanupMovies(items: List<LibraryItem>)
 
-    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, config: StatsClientProperties)
+    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean)
 
     abstract fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 

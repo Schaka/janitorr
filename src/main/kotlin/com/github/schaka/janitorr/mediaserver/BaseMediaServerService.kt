@@ -3,7 +3,6 @@ package com.github.schaka.janitorr.mediaserver
 import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.stats.jellystat.JellystatProperties
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -12,7 +11,6 @@ import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.bazarr.BazarrPayload
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
-import com.github.schaka.janitorr.stats.StatsClientProperties
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.io.IOException
@@ -45,10 +43,11 @@ abstract class BaseMediaServerService(
     /**
      * Populates the library items with Jellyfin/Emby IDs if available.
      * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
+     * Population happens per movie, TV show or season - but never per episode.
      */
-    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, config: StatsClientProperties) {
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {
         when (type) {
-            TV_SHOWS -> populateTvShowIds(items, !config.wholeTvShow)
+            TV_SHOWS -> populateTvShowIds(items, bySeason)
             MOVIES -> populateMovieIds(items)
         }
     }
@@ -88,7 +87,7 @@ abstract class BaseMediaServerService(
 
     private fun populateTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true) {
 
-        // Application wide season handling + Jellystat's separate property
+        // Do we need to aggregate by season or give every episode/season the entire TV show ID?
         val useSeason = !applicationProperties.wholeTvShow && bySeason
 
         val mediaServerShows = getTvLibrary(useSeason)

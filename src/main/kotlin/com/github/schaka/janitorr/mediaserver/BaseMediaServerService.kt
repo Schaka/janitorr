@@ -322,7 +322,7 @@ abstract class BaseMediaServerService(
                     log.warn("Failed to fetch favorites for user {}", user.Name, e)
                     emptyList()
                 }
-            }
+            }.distinctBy { it.jellyfinId }
         } catch (e: Exception) {
             log.warn("Failed to fetch favorited items", e)
             emptyList()

@@ -64,6 +64,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
           LC_ALL: "en_US.UTF-8"
           IMAGE_TYPE: "jvm"
           TARGET_PLATFORM: "amd64"
@@ -94,6 +95,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
           LC_ALL: "en_US.UTF-8"
           IMAGE_TYPE: "jvm"
           TARGET_PLATFORM: "arm64"
@@ -123,9 +125,9 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/schaka/janitorr:jvm-${{ steps.branch_name.outputs.value }}
-            ${{ (startsWith(github.ref, 'refs/tags/v') && 'ghcr.io/schaka/janitorr:jvm-stable') || '' }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:jvm-${{ steps.branch_name.outputs.value }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:jvm-stable', github.repository_owner)) || '' }}
           sources: |
-            ghcr.io/schaka/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
-            ghcr.io/schaka/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
           

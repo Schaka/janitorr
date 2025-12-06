@@ -29,11 +29,12 @@ class JellystatRestService(
         // if WatchHistory settings require a different way of aggregating MediaServerIds, request them again
         // TODO: if at all possible, we shouldn't populate the list of media server ids differently, but recognize a season and treat show as a whole as per application properties
         // example: grab show id for season id, get WatchHistory based on show instead of season
+        var libraryItems = items
         if (applicationProperties.wholeTvShow != jellystatProperties.wholeTvShow) {
-            mediaServerService.populateMediaServerIds(items, type, !jellystatProperties.wholeTvShow)
+            libraryItems = mediaServerService.populateMediaServerIds(libraryItems, type, !jellystatProperties.wholeTvShow)
         }
 
-        for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
+        for (item in libraryItems.filter { it.mediaServerIds.isNotEmpty() }) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
             val watchHistory = item.mediaServerIds
                 .asSequence()
@@ -52,7 +53,7 @@ class JellystatRestService(
         }
 
         if (log.isTraceEnabled) {
-            for (item in items.filter { it.mediaServerIds.isEmpty() }) {
+            for (item in libraryItems.filter { it.mediaServerIds.isEmpty() }) {
                 log.trace("Could not find any matching media server id for ${item.filePath} IMDB: ${item.imdbId} TMDB: ${item.tmdbId} TVDB: ${item.tvdbId} Season: ${item.season}")
             }
         }

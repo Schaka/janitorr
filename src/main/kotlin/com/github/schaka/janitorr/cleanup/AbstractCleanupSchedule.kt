@@ -19,7 +19,7 @@ abstract class AbstractCleanupSchedule(
     protected val cleanupType: CleanupType,
     protected val mediaServerService: AbstractMediaServerService,
     protected val jellyseerrService: JellyseerrService,
-    protected val jellystatService: StatsService,
+    protected val statsService: StatsService,
     protected val fileSystemProperties: FileSystemProperties,
     protected val applicationProperties: ApplicationProperties,
     protected val runOnce: RunOnce,
@@ -69,9 +69,9 @@ abstract class AbstractCleanupSchedule(
         val leavingSoonExpiration = applicationProperties.leavingSoon.toDays()
         val expirationDays = expiration.toDays()
 
-        val servarrEntries = servarrService.getEntries().filter(entryFilter)
-        mediaServerService.populateMediaServerIds(servarrEntries, libraryType,!applicationProperties.wholeTvShow)
-        jellystatService.populateWatchHistory(servarrEntries, libraryType)
+        var servarrEntries = servarrService.getEntries().filter(entryFilter)
+        servarrEntries = mediaServerService.populateMediaServerIds(servarrEntries, libraryType,!applicationProperties.wholeTvShow)
+        statsService.populateWatchHistory(servarrEntries, libraryType)
 
         val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
         mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)

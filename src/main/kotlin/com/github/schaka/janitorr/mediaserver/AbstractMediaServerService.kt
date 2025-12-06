@@ -28,7 +28,7 @@ abstract class AbstractMediaServerService {
 
     abstract fun cleanupMovies(items: List<LibraryItem>)
 
-    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean)
+    abstract fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean): List<LibraryItem>
 
     abstract fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 

@@ -27,8 +27,9 @@ class MediaServerNoOpService : AbstractMediaServerService() {
         items: List<LibraryItem>,
         type: LibraryType,
         bySeason: Boolean
-    ) {
+    ): List<LibraryItem> {
         log.info("Media Server not implemented. No server IDs populated.")
+        return items
     }
 
     override fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean) {

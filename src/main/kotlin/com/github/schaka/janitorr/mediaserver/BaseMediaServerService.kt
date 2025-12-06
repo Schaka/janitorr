@@ -45,8 +45,8 @@ abstract class BaseMediaServerService(
      * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
      * Population happens per movie, TV show or season - but never per episode.
      */
-    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {
-        when (type) {
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean): List<LibraryItem> {
+        return when (type) {
             TV_SHOWS -> populateTvShowIds(items, bySeason)
             MOVIES -> populateMovieIds(items)
         }
@@ -85,18 +85,18 @@ abstract class BaseMediaServerService(
         // TODO: Remove TV shows if all seasons gone - only if wholeShow is turned off
     }
 
-    private fun populateTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true) {
+    private fun populateTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true): List<LibraryItem> {
 
         // Do we need to aggregate by season or give every episode/season the entire TV show ID?
         val useSeason = !applicationProperties.wholeTvShow && bySeason
 
         val mediaServerShows = getTvLibrary(useSeason)
-        for (show: LibraryItem in items) {
-            mediaServerShows
+        return items.map { show ->
+            val mediaServerIds = mediaServerShows
                 .filter { tvShowMatches(show, it, useSeason) }
-                .forEach { mediaServerContent ->
-                    show.mediaServerIds += mediaServerContent.Id
-                }
+                .map { mediaServerContent -> mediaServerContent.Id }
+                .toList()
+            show.copy( mediaServerIds = mediaServerIds)
         }
     }
 
@@ -119,15 +119,15 @@ abstract class BaseMediaServerService(
         return mediaServerShows
     }
 
-    private fun populateMovieIds(items: List<LibraryItem>) {
+    private fun populateMovieIds(items: List<LibraryItem>): List<LibraryItem> {
         val mediaServerMovies = getMovieLibrary()
 
-        for (movie: LibraryItem in items) {
-            mediaServerMovies
+        return items.map { movie ->
+             val mediaServerIds = mediaServerMovies
                 .filter { mediaMatches(MOVIES, movie, it) }
-                .forEach { mediaServerContent ->
-                    movie.mediaServerIds += mediaServerContent.Id
-                }
+                .map { mediaServerContent -> mediaServerContent.Id }
+                .toList()
+            movie.copy( mediaServerIds = mediaServerIds)
         }
     }
 

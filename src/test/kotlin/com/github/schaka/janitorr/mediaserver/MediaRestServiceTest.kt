@@ -6,6 +6,7 @@ import com.github.schaka.janitorr.mediaserver.api.User
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinProperties
 import com.github.schaka.janitorr.mediaserver.jellyfin.JellyfinRestService
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
+import com.github.schaka.janitorr.mediaserver.library.ProviderIds
 import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
@@ -161,7 +162,7 @@ internal class MediaRestServiceTest {
     }
 
     @Test
-    fun testIsItemFavorited_whenItemInFavorites_returnsTrue() {
+    fun testIsItemFavorited_whenItemMatchesByImdb_returnsTrue() {
         val item = LibraryItem(
             1,
             LocalDateTime.now(),
@@ -170,11 +171,56 @@ internal class MediaRestServiceTest {
             "/path/parent",
             "/path/root",
             "/path/file",
-            mediaServerIds = mutableListOf("jellyfin-id-123", "jellyfin-id-456")
+            imdbId = "tt0115963"
         )
-        val favoritedIds = setOf("jellyfin-id-123", "jellyfin-id-789")
+        val favoritedItems = listOf(
+            FavoriteItem("jellyfin-id-123", "tt0115963", 9100, null),
+            FavoriteItem("jellyfin-id-456", "tt1234567", 5678, null)
+        )
 
-        val result = jellyfinRestService.isItemFavorited(item, favoritedIds)
+        val result = jellyfinRestService.isItemFavorited(item, favoritedItems)
+
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun testIsItemFavorited_whenItemMatchesByTmdb_returnsTrue() {
+        val item = LibraryItem(
+            1,
+            LocalDateTime.now(),
+            "/path/original",
+            "/path/library",
+            "/path/parent",
+            "/path/root",
+            "/path/file",
+            tmdbId = 9100
+        )
+        val favoritedItems = listOf(
+            FavoriteItem("jellyfin-id-123", "tt0115963", 9100, null)
+        )
+
+        val result = jellyfinRestService.isItemFavorited(item, favoritedItems)
+
+        assertEquals(true, result)
+    }
+
+    @Test
+    fun testIsItemFavorited_whenItemMatchesByTvdb_returnsTrue() {
+        val item = LibraryItem(
+            1,
+            LocalDateTime.now(),
+            "/path/original",
+            "/path/library",
+            "/path/parent",
+            "/path/root",
+            "/path/file",
+            tvdbId = 376459
+        )
+        val favoritedItems = listOf(
+            FavoriteItem("jellyfin-id-123", "tt11704040", 99353, 376459)
+        )
+
+        val result = jellyfinRestService.isItemFavorited(item, favoritedItems)
 
         assertEquals(true, result)
     }
@@ -189,17 +235,20 @@ internal class MediaRestServiceTest {
             "/path/parent",
             "/path/root",
             "/path/file",
-            mediaServerIds = mutableListOf("jellyfin-id-999", "jellyfin-id-888")
+            imdbId = "tt9999999",
+            tmdbId = 999999
         )
-        val favoritedIds = setOf("jellyfin-id-123", "jellyfin-id-789")
+        val favoritedItems = listOf(
+            FavoriteItem("jellyfin-id-123", "tt0115963", 9100, null)
+        )
 
-        val result = jellyfinRestService.isItemFavorited(item, favoritedIds)
+        val result = jellyfinRestService.isItemFavorited(item, favoritedItems)
 
         assertEquals(false, result)
     }
 
     @Test
-    fun testIsItemFavorited_whenItemHasNoMediaServerIds_returnsFalse() {
+    fun testIsItemFavorited_whenItemHasNoProviderIds_returnsFalse() {
         val item = LibraryItem(
             1,
             LocalDateTime.now(),
@@ -207,28 +256,29 @@ internal class MediaRestServiceTest {
             "/path/library",
             "/path/parent",
             "/path/root",
-            "/path/file",
-            mediaServerIds = mutableListOf()
+            "/path/file"
         )
-        val favoritedIds = setOf("jellyfin-id-123", "jellyfin-id-789")
+        val favoritedItems = listOf(
+            FavoriteItem("jellyfin-id-123", "tt0115963", 9100, null)
+        )
 
-        val result = jellyfinRestService.isItemFavorited(item, favoritedIds)
+        val result = jellyfinRestService.isItemFavorited(item, favoritedItems)
 
         assertEquals(false, result)
     }
 
     @Test
-    fun testGetAllFavoritedItemIds_whenMediaServerDisabled_returnsEmptySet() {
+    fun testGetAllFavoritedItems_whenMediaServerDisabled_returnsEmptyList() {
         every { jellyfinProperties.enabled } returns false
         every { jellyfinProperties.excludeFavorited } returns true
 
-        val result = jellyfinRestService.getAllFavoritedItemIds()
+        val result = jellyfinRestService.getAllFavoritedItems()
 
         assertTrue(result.isEmpty())
     }
 
     @Test
-    fun testGetAllFavoritedItemIds_withMultipleUsers_aggregatesAllFavorites() {
+    fun testGetAllFavoritedItems_withMultipleUsers_aggregatesAllFavorites() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
 
@@ -236,23 +286,36 @@ internal class MediaRestServiceTest {
         val user2 = User("User2", "user-id-2")
         every { mediaServerClient.listUsers() } returns listOf(user1, user2)
 
-        val movie1 = mockk<LibraryContent>(relaxed = true) { every { Id } returns "movie-123" }
-        val movie2 = mockk<LibraryContent>(relaxed = true) { every { Id } returns "movie-456" }
-        val movie3 = mockk<LibraryContent>(relaxed = true) { every { Id } returns "movie-789" }
+        val providerIds1 = ProviderIds("12345", "tt0115963", "9100")
+        val providerIds2 = ProviderIds(null, "tt1234567", "5678")
+        val providerIds3 = ProviderIds("54321", "tt7654321", "8765")
+
+        val movie1 = mockk<LibraryContent>(relaxed = true) {
+            every { Id } returns "movie-123"
+            every { ProviderIds } returns providerIds1
+        }
+        val movie2 = mockk<LibraryContent>(relaxed = true) {
+            every { Id } returns "movie-456"
+            every { ProviderIds } returns providerIds2
+        }
+        val movie3 = mockk<LibraryContent>(relaxed = true) {
+            every { Id } returns "movie-789"
+            every { ProviderIds } returns providerIds3
+        }
 
         every { mediaServerClient.getUserFavorites("user-id-1") } returns ItemPage(listOf(movie1, movie2), 0, 2)
         every { mediaServerClient.getUserFavorites("user-id-2") } returns ItemPage(listOf(movie3), 0, 1)
 
-        val result = jellyfinRestService.getAllFavoritedItemIds()
+        val result = jellyfinRestService.getAllFavoritedItems()
 
         assertEquals(3, result.size)
-        assertTrue(result.contains("movie-123"))
-        assertTrue(result.contains("movie-456"))
-        assertTrue(result.contains("movie-789"))
+        assertEquals("tt0115963", result[0].imdbId)
+        assertEquals(9100, result[0].tmdbId)
+        assertEquals(12345, result[0].tvdbId)
     }
 
     @Test
-    fun testGetAllFavoritedItemIds_whenUserApiFails_continuesWithOtherUsers() {
+    fun testGetAllFavoritedItems_whenUserApiFails_continuesWithOtherUsers() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
 
@@ -262,43 +325,28 @@ internal class MediaRestServiceTest {
 
         every { mediaServerClient.getUserFavorites("user-id-1") } throws RuntimeException("API Error")
 
-        val movie3 = mockk<LibraryContent>(relaxed = true) { every { Id } returns "movie-789" }
+        val providerIds3 = ProviderIds("54321", "tt7654321", "8765")
+        val movie3 = mockk<LibraryContent>(relaxed = true) {
+            every { Id } returns "movie-789"
+            every { ProviderIds } returns providerIds3
+        }
         every { mediaServerClient.getUserFavorites("user-id-2") } returns ItemPage(listOf(movie3), 0, 1)
 
-        val result = jellyfinRestService.getAllFavoritedItemIds()
+        val result = jellyfinRestService.getAllFavoritedItems()
 
         assertEquals(1, result.size)
-        assertTrue(result.contains("movie-789"))
+        assertEquals("movie-789", result[0].jellyfinId)
     }
 
     @Test
-    fun testGetAllFavoritedItemIds_whenNoUsers_returnsEmptySet() {
+    fun testGetAllFavoritedItems_whenNoUsers_returnsEmptyList() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
         every { mediaServerClient.listUsers() } returns emptyList()
 
-        val result = jellyfinRestService.getAllFavoritedItemIds()
+        val result = jellyfinRestService.getAllFavoritedItems()
 
         assertTrue(result.isEmpty())
-    }
-
-    @Test
-    fun testIsItemFavorited_withMultipleMediaServerIds_checksAll() {
-        val item = LibraryItem(
-            1,
-            LocalDateTime.now(),
-            "/path/original",
-            "/path/library",
-            "/path/parent",
-            "/path/root",
-            "/path/file",
-            mediaServerIds = mutableListOf("jellyfin-id-111", "jellyfin-id-222", "jellyfin-id-333")
-        )
-        val favoritedIds = setOf("jellyfin-id-222", "jellyfin-id-999")
-
-        val result = jellyfinRestService.isItemFavorited(item, favoritedIds)
-
-        assertEquals(true, result)
     }
 
 }

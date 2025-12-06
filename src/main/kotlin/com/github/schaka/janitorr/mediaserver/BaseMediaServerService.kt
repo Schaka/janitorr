@@ -301,32 +301,62 @@ abstract class BaseMediaServerService(
         }
     }
 
-    override fun getAllFavoritedItemIds(): Set<String> {
+    override fun getAllFavoritedItems(): List<FavoriteItem> {
         if (!mediaServerProperties.excludeFavorited || !mediaServerProperties.enabled) {
-            return emptySet()
+            return emptyList()
         }
 
         return try {
             val users = mediaServerClient.listUsers()
             users.flatMap { user ->
                 try {
-                    mediaServerClient.getUserFavorites(user.Id).Items.map { it.Id }
+                    mediaServerClient.getUserFavorites(user.Id).Items.map { item ->
+                        FavoriteItem(
+                            jellyfinId = item.Id,
+                            imdbId = item.ProviderIds?.Imdb,
+                            tmdbId = parseMetadataId(item.ProviderIds?.Tmdb),
+                            tvdbId = parseMetadataId(item.ProviderIds?.Tvdb)
+                        )
+                    }
                 } catch (e: Exception) {
                     log.warn("Failed to fetch favorites for user {}", user.Name, e)
                     emptyList()
                 }
-            }.toSet()
+            }
         } catch (e: Exception) {
             log.warn("Failed to fetch favorited items", e)
-            emptySet()
+            emptyList()
         }
     }
 
-    override fun isItemFavorited(item: LibraryItem, favoritedIds: Set<String>): Boolean {
-        if (favoritedIds.isEmpty() || item.mediaServerIds.isEmpty()) {
+    override fun isItemFavorited(item: LibraryItem, favoritedItems: List<FavoriteItem>): Boolean {
+        if (favoritedItems.isEmpty()) {
             return false
         }
-        return item.mediaServerIds.any { favoritedIds.contains(it) }
+
+        // Match by provider IDs (IMDB, TMDB, or TVDB)
+        return favoritedItems.any { favorite ->
+            (favorite.imdbId != null && favorite.imdbId == item.imdbId) ||
+            (favorite.tmdbId != null && item.tmdbId != null && favorite.tmdbId == item.tmdbId) ||
+            (favorite.tvdbId != null && item.tvdbId != null && favorite.tvdbId == item.tvdbId)
+        }
+    }
+
+    override fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem> {
+        val favoritedItems = getAllFavoritedItems()
+
+        if (favoritedItems.isEmpty()) {
+            return items
+        }
+
+        return items.filterNot { item ->
+            val isFavorited = isItemFavorited(item, favoritedItems)
+            if (isFavorited) {
+                log.debug("Excluding favorited item from deletion: {} (IMDB: {}, TMDB: {}, TVDB: {})",
+                    item.libraryPath, item.imdbId, item.tmdbId, item.tvdbId)
+            }
+            isFavorited
+        }
     }
 
 }

@@ -70,13 +70,17 @@ abstract class AbstractCleanupSchedule(
         val expirationDays = expiration.toDays()
 
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
-        mediaServerService.populateMediaServerIds(servarrEntries, libraryType,!applicationProperties.wholeTvShow)
-        statsService.populateWatchHistory(servarrEntries, libraryType)
+        // prefilter, so expensive operations like mediaServerId and watchHistory population don't have to run on the entire library
+        // this includes all entries that are already past their deletion window and the upcoming ones necessary for Leaving Soon
+        val deletionCandidates = servarrEntries.filter { it.importedDate.plusDays(expirationDays - leavingSoonExpiration) < today }
 
-        val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
+        mediaServerService.populateMediaServerIds(deletionCandidates, libraryType,!applicationProperties.wholeTvShow)
+        statsService.populateWatchHistory(deletionCandidates, libraryType)
+
+        val leavingSoon = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) >= today }
         mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)
 
-        val toDeleteMedia = servarrEntries.filter { it.historyAge.plusDays(expirationDays) < today }
+        val toDeleteMedia = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) < today }
         deleteTask(toDeleteMedia)
 
         if (log.isTraceEnabled) {

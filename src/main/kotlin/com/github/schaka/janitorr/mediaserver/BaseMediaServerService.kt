@@ -45,10 +45,23 @@ abstract class BaseMediaServerService(
      * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
      * Population happens per movie, TV show or season - but never per episode.
      */
-    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean): List<LibraryItem> {
+    override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {
+
+        // TODO: only populate if necessary - i.e. needed for excluding favorites
+        if (true == false) {
+            val mappings = when (type) {
+                TV_SHOWS -> getMediaServerIdsForTvShowIds(items, bySeason)
+                MOVIES -> getMediaServerIdsForMovieIds(items)
+            }
+
+            items.forEach { item -> item.mediaServerIds.addAll(mappings.getOrDefault(item.id, listOf())) }
+        }
+    }
+
+    override fun getMediaServerIdsForLibrary(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean): Map<Int, List<String>> {
         return when (type) {
-            TV_SHOWS -> populateTvShowIds(items, bySeason)
-            MOVIES -> populateMovieIds(items)
+            TV_SHOWS -> getMediaServerIdsForTvShowIds(items, bySeason)
+            MOVIES -> getMediaServerIdsForMovieIds(items)
         }
     }
 
@@ -85,19 +98,21 @@ abstract class BaseMediaServerService(
         // TODO: Remove TV shows if all seasons gone - only if wholeShow is turned off
     }
 
-    private fun populateTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true): List<LibraryItem> {
+    private fun getMediaServerIdsForTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true): Map<Int, List<String>> {
 
         // Do we need to aggregate by season or give every episode/season the entire TV show ID?
         val useSeason = !applicationProperties.wholeTvShow && bySeason
 
         val mediaServerShows = getTvLibrary(useSeason)
-        return items.map { show ->
-            val mediaServerIds = mediaServerShows
-                .filter { tvShowMatches(show, it, useSeason) }
-                .map { mediaServerContent -> mediaServerContent.Id }
-                .toList()
-            show.copy( mediaServerIds = mediaServerIds)
-        }
+        return items
+            .groupingBy { show -> show.id }
+            .fold(mutableListOf()) { accumulator, show ->
+                val matchingIds = mediaServerShows
+                    .filter { tvShowMatches(show, it, useSeason) }
+                    .map { mediaServerContent -> mediaServerContent.Id }
+
+                accumulator.apply { addAll(matchingIds) }
+            }
     }
 
     private fun getTvLibrary(bySeason: Boolean = true): List<LibraryContent> {
@@ -119,16 +134,18 @@ abstract class BaseMediaServerService(
         return mediaServerShows
     }
 
-    private fun populateMovieIds(items: List<LibraryItem>): List<LibraryItem> {
+    private fun getMediaServerIdsForMovieIds(items: List<LibraryItem>): Map<Int, List<String>> {
         val mediaServerMovies = getMovieLibrary()
 
-        return items.map { movie ->
-             val mediaServerIds = mediaServerMovies
-                .filter { mediaMatches(MOVIES, movie, it) }
-                .map { mediaServerContent -> mediaServerContent.Id }
-                .toList()
-            movie.copy( mediaServerIds = mediaServerIds)
-        }
+        return items
+            .groupingBy { movie -> movie.id }
+            .fold(mutableListOf()) { accumulator, movie ->
+                val matchingIds = mediaServerMovies
+                    .filter { mediaMatches(MOVIES, movie, it) }
+                    .map { mediaServerContent -> mediaServerContent.Id }
+
+                accumulator.apply { addAll(matchingIds) }
+            }
     }
 
     override fun cleanupMovies(items: List<LibraryItem>) {

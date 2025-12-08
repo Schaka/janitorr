@@ -69,8 +69,8 @@ abstract class AbstractCleanupSchedule(
         val leavingSoonExpiration = applicationProperties.leavingSoon.toDays()
         val expirationDays = expiration.toDays()
 
-        var servarrEntries = servarrService.getEntries().filter(entryFilter)
-        servarrEntries = mediaServerService.populateMediaServerIds(servarrEntries, libraryType,!applicationProperties.wholeTvShow)
+        val servarrEntries = servarrService.getEntries().filter(entryFilter)
+        mediaServerService.populateMediaServerIds(servarrEntries, libraryType,!applicationProperties.wholeTvShow)
         statsService.populateWatchHistory(servarrEntries, libraryType)
 
         val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }

@@ -27,7 +27,7 @@ class MediaServerNoOpService : AbstractMediaServerService() {
         items: List<LibraryItem>,
         type: LibraryType,
         bySeason: Boolean
-    ): List<LibraryItem> {
+    ) {
         log.info("Media Server not implemented. No server IDs populated.")
         return items
     }

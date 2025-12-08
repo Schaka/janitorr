@@ -20,7 +20,7 @@ data class LibraryItem(
         val season: Int? = null,
 
         // references the id (usually some uuid) inside Jellyfin/Emby - can refer to a movie, tv show, season or episode
-        var mediaServerIds: List<String> = listOf(),
+        var mediaServerIds: MutableList<String> = mutableListOf(),
         var seeding: Boolean = false,
         var lastSeen: LocalDateTime? = null,
 

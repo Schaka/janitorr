@@ -11,9 +11,6 @@ import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME
 
-/**
- * Does nothing. Used in case the user does not supply Jellyfin configuration.
- */
 class StreamystatsRestService(
     val streamystatsClient: StreamystatsClient,
     val streamystatsProperties: StreamystatsProperties,
@@ -29,14 +26,12 @@ class StreamystatsRestService(
         // if WatchHistory settings require a different way of aggregating MediaServerIds, request them again
         // TODO: if at all possible, we shouldn't populate the list of media server ids differently, but recognize a season and treat show as a whole as per application properties
         // example: grab show id for season id, get WatchHistory based on show instead of season
-        var libraryItems = items
-        if (applicationProperties.wholeTvShow != streamystatsProperties.wholeTvShow) {
-            libraryItems = mediaServerService.populateMediaServerIds(libraryItems, type, !streamystatsProperties.wholeTvShow)
-        }
+        val libraryMappings = mediaServerService.getMediaServerIdsForLibrary(items, type, !streamystatsProperties.wholeTvShow)
 
-        for (item in libraryItems.filter { it.mediaServerIds.isNotEmpty() }) {
+        for (item in items) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val response = item.mediaServerIds.map(::gracefulQuery)
+            val response = libraryMappings.getOrDefault(item.id, listOf())
+                .map(::gracefulQuery)
 
             val watchHistory = response
                 .filter { it != null && it.lastWatched != null }
@@ -48,13 +43,6 @@ class StreamystatsRestService(
             if (watchHistory != null) {
                 item.lastSeen = toDate(watchHistory.watchDate)
                 logWatchInfo(item, watchHistory, response[0])
-            }
-
-        }
-
-        if (log.isTraceEnabled) {
-            for (item in libraryItems.filter { it.mediaServerIds.isEmpty() }) {
-                log.trace("Could not find any matching media server id for ${item.filePath} IMDB: ${item.imdbId} TMDB: ${item.tmdbId} TVDB: ${item.tvdbId} Season: ${item.season}")
             }
         }
     }
@@ -83,7 +71,7 @@ class StreamystatsRestService(
 
     private fun toDate(date: String): LocalDateTime {
         // 2025-04-16T05:27:15Z
-        return LocalDateTime.parse(date.substring(0, date.length - 1), ISO_LOCAL_DATE_TIME)
+        return LocalDateTime.parse(date.dropLast(1), ISO_LOCAL_DATE_TIME)
     }
 
 }

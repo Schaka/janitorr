@@ -1,18 +1,15 @@
 package com.github.schaka.janitorr.stats.jellystat
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.stats.jellystat.requests.JellystatItemRequest
-import com.github.schaka.janitorr.stats.jellystat.requests.JellyStatHistoryResponse
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.stats.StatsService
+import com.github.schaka.janitorr.stats.jellystat.requests.JellyStatHistoryResponse
+import com.github.schaka.janitorr.stats.jellystat.requests.JellystatItemRequest
 import org.slf4j.LoggerFactory
 import java.time.LocalDateTime
 
-/**
- * Does nothing. Used in case the user does not supply Jellyfin configuration.
- */
 class JellystatRestService(
     val jellystatClient: JellystatClient,
     val jellystatProperties: JellystatProperties,
@@ -25,18 +22,14 @@ class JellystatRestService(
     }
 
     override fun populateWatchHistory(items: List<LibraryItem>, type: LibraryType) {
-        // populates per season, per show or per movie, depending on properties
-        // e.g. each season item can be populated with its TV show mediaserver id
-        // watch age is determined by the matched mediaserver id
-        // TODO: find a better way - passing properties to an unrelated component couples them unnecessarily
-        mediaServerService.populateMediaServerIds(items, type, jellystatProperties)
 
         // TODO: if at all possible, we shouldn't populate the list of media server ids differently, but recognize a season and treat show as a whole as per application properties
-        // example: grab show id for season id, get watchHistory based on show instead of season
+        // example: grab show id for season id, get WatchHistory based on show instead of season
+        val libraryMappings = mediaServerService.getMediaServerIdsForLibrary(items, type, !jellystatProperties.wholeTvShow)
 
-        for (item in items.filter { it.mediaServerIds.isNotEmpty() }) {
+        for (item in items) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val watchHistory = item.mediaServerIds
+            val watchHistory = libraryMappings.getOrDefault(item.id, listOf())
                 .asSequence()
                 .map(::JellystatItemRequest)
                 .map(jellystatClient::getRequests)
@@ -48,13 +41,6 @@ class JellystatRestService(
             if (watchHistory != null) {
                 item.lastSeen = toDate(watchHistory.ActivityDateInserted)
                 logWatchInfo(item, watchHistory)
-            }
-
-        }
-
-        if (log.isTraceEnabled) {
-            for (item in items.filter { it.mediaServerIds.isEmpty() }) {
-                log.trace("Could not find any matching media server id for ${item.filePath} IMDB: ${item.imdbId} TMDB: ${item.tmdbId} TVDB: ${item.tvdbId} Season: ${item.season}")
             }
         }
     }
@@ -69,7 +55,7 @@ class JellystatRestService(
     }
 
     private fun toDate(date: String): LocalDateTime {
-        return LocalDateTime.parse(date.substring(0, date.length - 1))
+        return LocalDateTime.parse(date.dropLast(1))
     }
 
 }

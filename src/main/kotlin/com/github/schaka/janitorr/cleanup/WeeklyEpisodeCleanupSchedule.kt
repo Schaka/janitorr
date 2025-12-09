@@ -6,7 +6,6 @@ import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -21,10 +20,9 @@ class WeeklyEpisodeCleanupSchedule(
         val applicationProperties: ApplicationProperties,
         val sonarrProperties: SonarrProperties,
         val sonarrClient: SonarrClient,
-        val runOnce: RunOnce,
 
         var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
-) {
+): Schedule {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -36,13 +34,10 @@ class WeeklyEpisodeCleanupSchedule(
         }
     }
 
-    // run every hour
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
-    fun runSchedule() {
+    override fun runSchedule() {
 
         if (!applicationProperties.episodeDeletion.enabled) {
             log.info("Episode based cleanup disabled, do nothing")
-            runOnce.hasWeeklyEpisodeCleanupRun = true
             return
         }
 
@@ -95,7 +90,6 @@ class WeeklyEpisodeCleanupSchedule(
             }
         }
 
-        runOnce.hasWeeklyEpisodeCleanupRun = true
     }
 
     private fun parseDate(date: String): LocalDateTime {

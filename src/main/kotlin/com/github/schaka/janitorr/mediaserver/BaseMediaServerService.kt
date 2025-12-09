@@ -105,13 +105,13 @@ abstract class BaseMediaServerService(
 
         val mediaServerShows = getTvLibrary(useSeason)
         return items
-            .groupingBy { show -> show.id }
-            .fold(mutableListOf()) { accumulator, show ->
-                val matchingIds = mediaServerShows
-                    .filter { tvShowMatches(show, it, useSeason) }
-                    .map { mediaServerContent -> mediaServerContent.Id }
-
-                accumulator.apply { addAll(matchingIds) }
+            .groupBy { show -> show.id }
+            .mapValues { (_, showsInGroup) ->
+                showsInGroup.flatMap { show ->
+                    mediaServerShows
+                        .filter { tvShowMatches(show, it) }
+                        .map { it.Id }
+                }
             }
     }
 
@@ -138,13 +138,13 @@ abstract class BaseMediaServerService(
         val mediaServerMovies = getMovieLibrary()
 
         return items
-            .groupingBy { movie -> movie.id }
-            .fold(mutableListOf()) { accumulator, movie ->
-                val matchingIds = mediaServerMovies
-                    .filter { mediaMatches(MOVIES, movie, it) }
-                    .map { mediaServerContent -> mediaServerContent.Id }
-
-                accumulator.apply { addAll(matchingIds) }
+            .groupBy { movie -> movie.id }
+            .mapValues { (_, moviesInGroup) ->
+                moviesInGroup.flatMap { movie ->
+                    mediaServerMovies
+                        .filter { mediaMatches(MOVIES, movie, it) }
+                        .map { it.Id }
+                }
             }
     }
 

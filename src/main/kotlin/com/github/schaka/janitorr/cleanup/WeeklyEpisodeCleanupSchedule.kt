@@ -1,14 +1,10 @@
 package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
-import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
 import org.slf4j.LoggerFactory
-import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -41,7 +37,6 @@ class WeeklyEpisodeCleanupSchedule(
     }
 
     // run every hour
-    @CacheEvict(cacheNames = [SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME, BazarrRestService.CACHE_NAME_TV, BazarrRestService.CACHE_NAME_MOVIES])
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedule() {
 
@@ -104,7 +99,7 @@ class WeeklyEpisodeCleanupSchedule(
     }
 
     private fun parseDate(date: String): LocalDateTime {
-        return LocalDateTime.parse(date.substring(0, date.length - 1))
+        return LocalDateTime.parse(date.dropLast(1))
     }
 
 }

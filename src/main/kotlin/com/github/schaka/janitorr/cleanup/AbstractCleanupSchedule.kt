@@ -3,24 +3,23 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
-import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.stats.StatsService
 import org.slf4j.LoggerFactory
 import java.io.File
 import java.time.Duration
 import java.time.LocalDateTime
-import java.time.Period
 
 abstract class AbstractCleanupSchedule(
     protected val cleanupType: CleanupType,
     protected val mediaServerService: AbstractMediaServerService,
     protected val jellyseerrService: JellyseerrService,
-    protected val jellystatService: StatsService,
+    protected val statsService: StatsService,
     protected val fileSystemProperties: FileSystemProperties,
     protected val applicationProperties: ApplicationProperties,
     protected val runOnce: RunOnce,
@@ -71,12 +70,17 @@ abstract class AbstractCleanupSchedule(
         val expirationDays = expiration.toDays()
 
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
-        jellystatService.populateWatchHistory(servarrEntries, libraryType)
+        // prefilter, so expensive operations like mediaServerId and watchHistory population don't have to run on the entire library
+        // this includes all entries that are already past their deletion window and the upcoming ones necessary for Leaving Soon
+        val deletionCandidates = servarrEntries.filter { it.importedDate.plusDays(expirationDays - leavingSoonExpiration) < today }
 
-        val leavingSoon = servarrEntries.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
+        mediaServerService.populateMediaServerIds(deletionCandidates, libraryType,!applicationProperties.wholeTvShow)
+        statsService.populateWatchHistory(deletionCandidates, libraryType)
+
+        val leavingSoon = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) >= today }
         mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)
 
-        val toDeleteMedia = servarrEntries.filter { it.historyAge.plusDays(expirationDays) < today }
+        val toDeleteMedia = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) < today }
         deleteTask(toDeleteMedia)
 
         if (log.isTraceEnabled) {

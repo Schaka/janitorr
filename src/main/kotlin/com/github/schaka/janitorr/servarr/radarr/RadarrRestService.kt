@@ -11,12 +11,15 @@ import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclus
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
 import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 import kotlin.io.path.Path
 import kotlin.io.path.exists
 
+@Radarr
+@ConditionalOnProperty(prefix = "clients.radarr.enabled", havingValue = "true")
 @Service
 class RadarrRestService(
 

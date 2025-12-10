@@ -8,9 +8,10 @@ import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import org.apache.http.client.utils.URIBuilder
 import org.slf4j.LoggerFactory
-import org.springframework.core.env.Environment
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.web.util.UriComponentsBuilder
 
+@ConditionalOnProperty(prefix = "clients.jellyseerr.enabled", havingValue = "true")
 class JellyseerrRestService(
 
     val jellyseerrClient: JellyseerrClient,

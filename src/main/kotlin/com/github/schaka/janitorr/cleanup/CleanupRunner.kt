@@ -1,6 +1,7 @@
 package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.ApplicationProperties
+import com.github.schaka.janitorr.mediaserver.MediaServerLibraryQueryService
 import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
 import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
@@ -22,7 +23,11 @@ class CleanupRunner(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
-    @CacheEvict(cacheNames = [SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME, BazarrRestService.CACHE_NAME_TV, BazarrRestService.CACHE_NAME_MOVIES], allEntries = true, beforeInvocation = false)
+    @CacheEvict(cacheNames = [
+        SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME,
+        MediaServerLibraryQueryService.CACHE_NAME_TV, MediaServerLibraryQueryService.CACHE_NAME_MOVIES,
+        BazarrRestService.CACHE_NAME_TV, BazarrRestService.CACHE_NAME_MOVIES],
+        allEntries = true, beforeInvocation = false)
     @Scheduled(fixedDelay = 1000 * 60 * 60)
     fun runSchedules() {
 

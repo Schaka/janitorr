@@ -1,12 +1,11 @@
 package com.github.schaka.janitorr.mediaserver.emby
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Decoder
+import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Encoder
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import feign.Feign
 import feign.RequestInterceptor
 import feign.RequestTemplate
-import feign.jackson.JacksonDecoder
-import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,6 +18,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.util.LinkedMultiValueMap
 import org.springframework.web.client.RestTemplate
+import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDateTime
 
 @Configuration(proxyBeanMethods = false)
@@ -39,10 +39,10 @@ class EmbyClientConfig {
 
     @Emby
     @Bean
-    fun embyClient(properties: EmbyProperties, mapper: ObjectMapper): EmbyMediaServerClient {
+    fun embyClient(properties: EmbyProperties, mapper: JsonMapper): EmbyMediaServerClient {
         return Feign.builder()
-                .decoder(JacksonDecoder(mapper))
-                .encoder(JacksonEncoder(mapper))
+                .decoder(Jackson3Decoder(mapper))
+                .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor {
                     headerMap.map { e ->
                         it.header(e.key, e.value)
@@ -57,10 +57,10 @@ class EmbyClientConfig {
 
     @Emby
     @Bean
-    fun embyUserClient(properties: EmbyProperties, mapper: ObjectMapper): MediaServerUserClient {
+    fun embyUserClient(properties: EmbyProperties, mapper: JsonMapper): MediaServerUserClient {
         return Feign.builder()
-                .decoder(JacksonDecoder(mapper))
-                .encoder(JacksonEncoder(mapper))
+                .decoder(Jackson3Decoder(mapper))
+                .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor(EmbyUserInterceptor(properties))
                 .target(MediaServerUserClient::class.java, "${properties.url}/emby")
     }

@@ -1,4 +1,6 @@
 spring:
+  main:
+    keep-alive: true
   cache:
     type: caffeine
     caffeine:
@@ -14,17 +16,6 @@ logging:
       max-history: 14
       max-file-size: 100MB
       clean-history-on-start: true
-
-management:
-  server:
-    port: 8081
-  endpoints:
-    web:
-      base-path: "/"
-  endpoint:
-    health:
-      probes:
-        enabled: true
 
 clients:
   default:

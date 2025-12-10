@@ -134,15 +134,6 @@ services:
       - /appdata/janitorr/config/application.yml:/config/application.yml
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
-    environment:
-      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
-      - THC_PATH=/health
-      - THC_PORT=8081
-    healthcheck:
-      test: [ "CMD", "/workspace/health-check" ]
-      start_period: 30s
-      interval: 5s
-      retries: 3
 ```
 
 In extremely memory constrained environments or if you're a seasoned developer on the JVM developed, you can supply your own `JAVA_TOOL_OPTIONS` as an environment variable for.

@@ -1,13 +1,12 @@
 package com.github.schaka.janitorr.mediaserver.jellyfin
 
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Decoder
+import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Encoder
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import feign.Feign
 import feign.RequestInterceptor
 import feign.RequestTemplate
-import feign.jackson.JacksonDecoder
-import feign.jackson.JacksonEncoder
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -19,6 +18,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.client.RestTemplate
+import tools.jackson.databind.json.JsonMapper
 import java.time.LocalDateTime
 
 @Configuration(proxyBeanMethods = false)
@@ -31,10 +31,10 @@ class JellyfinClientConfig {
 
     @Jellyfin
     @Bean
-    fun jellyfinClient(properties: JellyfinProperties, mapper: ObjectMapper): MediaServerClient {
+    fun jellyfinClient(properties: JellyfinProperties, mapper: JsonMapper): MediaServerClient {
         return Feign.builder()
-                .decoder(JacksonDecoder(mapper))
-                .encoder(JacksonEncoder(mapper))
+                .decoder(Jackson3Decoder(mapper))
+                .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor {
                     it.header(AUTHORIZATION, "MediaBrowser Token=\"${properties.apiKey}\", $janitorrClientString")
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
@@ -44,10 +44,10 @@ class JellyfinClientConfig {
 
     @Jellyfin
     @Bean
-    fun jellyfinUserClient(properties: JellyfinProperties, mapper: ObjectMapper): MediaServerUserClient {
+    fun jellyfinUserClient(properties: JellyfinProperties, mapper: JsonMapper): MediaServerUserClient {
         return Feign.builder()
-                .decoder(JacksonDecoder(mapper))
-                .encoder(JacksonEncoder(mapper))
+                .decoder(Jackson3Decoder(mapper))
+                .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor(JellyfinUserInterceptor(properties))
                 .target(MediaServerUserClient::class.java, properties.url)
     }

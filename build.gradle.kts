@@ -11,8 +11,8 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "3.5.8"
-    id("org.springframework.boot.aot") version "3.5.8"
+    id("org.springframework.boot") version "4.0.0"
+    id("org.springframework.boot.aot") version "4.0.0"
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
     id("org.graalvm.buildtools.native") version "0.11.0"
@@ -30,22 +30,23 @@ repositories {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-jackson")
+    implementation("org.springframework.boot:spring-boot-starter-kotlin-serialization")
+    implementation("org.springframework.boot:spring-boot-webmvc")
     implementation("com.github.ben-manes.caffeine:caffeine")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
     implementation("io.github.openfeign:feign-core:13.6")
     implementation("io.github.openfeign:feign-jackson:13.6")
-    implementation("io.github.openfeign:feign-httpclient:13.5")
+    implementation("io.github.openfeign:feign-httpclient:13.6")
 
     implementation("org.slf4j:jcl-over-slf4j")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.14.5")
+    testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
@@ -150,7 +151,6 @@ tasks.withType<BootBuildImage> {
         "paketobuildpacks/adoptium",
         "paketobuildpacks/java",
         "./buildpacks/aot-cache",
-        "paketobuildpacks/health-checker",
     )
     imageName = project.extra["docker.image.name"] as String
     version = project.extra["docker.image.version"] as String
@@ -161,7 +161,6 @@ tasks.withType<BootBuildImage> {
         "BP_NATIVE_IMAGE" to "false",
         "BP_JVM_CDS_ENABLED" to "false",
         "BP_SPRING_AOT_ENABLED" to "true",
-        "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_VERSION" to "25", // JDK required, because we need the executable to run our AOTCache buildpack
         "BP_JVM_TYPE" to "JDK",
         "LC_ALL" to "en_US.UTF-8",

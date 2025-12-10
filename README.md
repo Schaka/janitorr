@@ -145,6 +145,20 @@ services:
       retries: 3
 ```
 
+In extremely memory constrained environments or if you're a seasoned developer on the JVM developed, you can supply your own `JAVA_TOOL_OPTIONS` as an environment variable for.
+It is possible to lower overall memory consumption to about 150MB, but I do not recommend it because you're right at the edge of stability.
+However, if you're on an extremely old device and every few megabytes count - you may experiment with the options as follows, by adding it to your `docker-compose.yml` under `environment`.
+`- JAVA_TOOL_OPTIONS=-Xms10m -Xmx30m -XX:+UseSerialGC -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=20M -XX:ReservedCodeCacheSize=10M -Xss150K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info`
+
+My recommendations:
+- don't try to reduce the heap much more unless your library size is small - 20MB will not work
+- code cache can be reduced at the expense of more CPU cycles
+- 100K stack size worked well in my limited testing
+- MetaSpaceSize can't be dropped much lower than 20M
+
+#### Bleeding edge development image
+
+**Attention: The develop branch is experimental. Logical errors and breaking changes may happen.**
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
 
 

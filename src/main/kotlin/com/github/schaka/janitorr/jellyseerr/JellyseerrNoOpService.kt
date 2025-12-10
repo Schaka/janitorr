@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 /**
  * Does nothing. Used in case the user does not supply Jellyfin configuration.
  */
-@ConditionalOnProperty(prefix = "clients.jellyseerr.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = ["clients.jellyseerr.enabled"], havingValue = "false", matchIfMissing = true)
 @Service
 class JellyseerrNoOpService : JellyseerrService {
 

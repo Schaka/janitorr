@@ -22,7 +22,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 @Sonarr
-@ConditionalOnProperty(prefix = "clients.sonarr.enabled", havingValue = "true")
+@ConditionalOnProperty(name = ["clients.sonarr.enabled"], havingValue = "true")
 @Service
 class SonarrRestService(
 

@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.stereotype.Service
 
 @Radarr
-@ConditionalOnProperty(prefix = "clients.radarr.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = ["clients.radarr.enabled"], havingValue = "false", matchIfMissing = true)
 @Service
 class RadarrNoOpService : ServarrService {
 

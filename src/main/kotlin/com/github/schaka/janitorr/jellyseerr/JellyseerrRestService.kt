@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.web.util.UriComponentsBuilder
 
-@ConditionalOnProperty(prefix = "clients.jellyseerr.enabled", havingValue = "true")
+@ConditionalOnProperty(name = ["clients.jellyseerr.enabled"], havingValue = "true")
 class JellyseerrRestService(
 
     val jellyseerrClient: JellyseerrClient,

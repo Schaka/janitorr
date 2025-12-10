@@ -19,7 +19,7 @@ import kotlin.io.path.Path
 import kotlin.io.path.exists
 
 @Radarr
-@ConditionalOnProperty(prefix = "clients.radarr.enabled", havingValue = "true")
+@ConditionalOnProperty(name =["clients.radarr.enabled"], havingValue = "true")
 @Service
 class RadarrRestService(
 

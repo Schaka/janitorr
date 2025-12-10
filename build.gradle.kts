@@ -151,7 +151,6 @@ tasks.withType<BootBuildImage> {
         "paketobuildpacks/adoptium",
         "paketobuildpacks/java",
         "./buildpacks/aot-cache",
-        "paketobuildpacks/health-checker",
     )
     imageName = project.extra["docker.image.name"] as String
     version = project.extra["docker.image.version"] as String
@@ -162,7 +161,6 @@ tasks.withType<BootBuildImage> {
         "BP_NATIVE_IMAGE" to "false",
         "BP_JVM_CDS_ENABLED" to "false",
         "BP_SPRING_AOT_ENABLED" to "true",
-        "BP_HEALTH_CHECKER_ENABLED" to "true",
         "BP_JVM_VERSION" to "25", // JDK required, because we need the executable to run our AOTCache buildpack
         "BP_JVM_TYPE" to "JDK",
         "LC_ALL" to "en_US.UTF-8",

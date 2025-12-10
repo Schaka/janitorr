@@ -40,6 +40,9 @@ internal class MediaRestServiceTest {
     @MockK
     lateinit var bazarrService: BazarrService
 
+    @SpyK
+    var mediaServerLibraryQueryService: MediaServerLibraryQueryService = MediaServerLibraryQueryService()
+
     @MockK
     lateinit var jellyfinProperties: JellyfinProperties
 

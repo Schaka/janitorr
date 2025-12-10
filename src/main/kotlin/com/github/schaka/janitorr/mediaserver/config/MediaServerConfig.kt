@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
+import com.github.schaka.janitorr.mediaserver.MediaServerLibraryQueryService
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import com.github.schaka.janitorr.mediaserver.emby.Emby
 import com.github.schaka.janitorr.mediaserver.emby.EmbyMediaServerClient
@@ -22,6 +23,7 @@ class MediaServerConfig(
     @Jellyfin val jellyfinClient: MediaServerClient,
     @Emby val embyUserClient: MediaServerUserClient,
     @Jellyfin val jellyfinUserClient: MediaServerUserClient,
+    val mediaServerLibraryQueryService: MediaServerLibraryQueryService,
 ) {
 
     @Bean
@@ -42,9 +44,9 @@ class MediaServerConfig(
         }
 
         if (embyProperties.enabled) {
-            return EmbyRestService(embyClient, embyUserClient, bazarrService, embyProperties, applicationProperties, fileSystemProperties)
+            return EmbyRestService(embyClient, embyUserClient, bazarrService, mediaServerLibraryQueryService,embyProperties, applicationProperties, fileSystemProperties)
         }
 
-        return JellyfinRestService(jellyfinClient, jellyfinUserClient, bazarrService, jellyfinProperties, applicationProperties, fileSystemProperties)
+        return JellyfinRestService(jellyfinClient, jellyfinUserClient, bazarrService, mediaServerLibraryQueryService, jellyfinProperties, applicationProperties, fileSystemProperties)
     }
 }

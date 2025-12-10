@@ -29,6 +29,7 @@ abstract class BaseMediaServerService(
     val mediaServerClient: MediaServerClient,
     val mediaServerUserClient: MediaServerUserClient,
     val bazarrService: BazarrService,
+    val mediaServerLibraryQueryService: MediaServerLibraryQueryService,
     val mediaServerProperties: MediaServerProperties,
     val applicationProperties: ApplicationProperties,
     val fileSystemProperties: FileSystemProperties
@@ -104,47 +105,35 @@ abstract class BaseMediaServerService(
         val useSeason = !applicationProperties.wholeTvShow && bySeason
 
         val mediaServerShows = getTvLibrary(useSeason)
-        return items
-            .groupingBy { show -> show.id }
-            .fold(mutableListOf()) { accumulator, show ->
-                val matchingIds = mediaServerShows
-                    .filter { tvShowMatches(show, it, useSeason) }
-                    .map { mediaServerContent -> mediaServerContent.Id }
 
-                accumulator.apply { addAll(matchingIds) }
+        // it's not worth caching the showId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
+        return items
+            .groupBy { show -> show.id }
+            .mapValues { (_, showsInGroup) ->
+                showsInGroup.flatMap { show ->
+                    mediaServerShows
+                        .filter { tvShowMatches(show, it) }
+                        .map { it.Id }
+                }
             }
     }
 
     private fun getTvLibrary(bySeason: Boolean = true): List<LibraryContent> {
-        val parentFolders = mediaServerClient.getAllItems().Items.filter { it.Type != "ManualPlaylistsFolder" && it.Name != "Playlists" }
-
-        var mediaServerShows = parentFolders.flatMap { parent ->
-            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type.lowercase() == "series" }
-        }
-
-        // don't treat library season by season, if not necessary
-        if (bySeason) {
-            mediaServerShows = mediaServerShows.flatMap { show ->
-                val seasons = mediaServerClient.getAllSeasons(show.Id).Items
-                seasons.forEach { it.ProviderIds = show.ProviderIds } // we want metadata (IMDB, TMDB) IDs for the entire show to match, not season IDs (only available from TDVB)
-                return@flatMap seasons
-            }
-        }
-
-        return mediaServerShows
+        return mediaServerLibraryQueryService.getTvLibrary(mediaServerClient, bySeason)
     }
 
     private fun getMediaServerIdsForMovieIds(items: List<LibraryItem>): Map<Int, List<String>> {
         val mediaServerMovies = getMovieLibrary()
 
+        // it's not worth caching the movieId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items
-            .groupingBy { movie -> movie.id }
-            .fold(mutableListOf()) { accumulator, movie ->
-                val matchingIds = mediaServerMovies
-                    .filter { mediaMatches(MOVIES, movie, it) }
-                    .map { mediaServerContent -> mediaServerContent.Id }
-
-                accumulator.apply { addAll(matchingIds) }
+            .groupBy { movie -> movie.id }
+            .mapValues { (_, moviesInGroup) ->
+                moviesInGroup.flatMap { movie ->
+                    mediaServerMovies
+                        .filter { mediaMatches(MOVIES, movie, it) }
+                        .map { it.Id }
+                }
             }
     }
 
@@ -176,13 +165,7 @@ abstract class BaseMediaServerService(
     }
 
     private fun getMovieLibrary(): List<LibraryContent> {
-        val parentFolders = mediaServerClient.getAllItems().Items.filter { it.Type != "ManualPlaylistsFolder" && it.Name != "Playlists" }
-
-        val mediaServerMovies = parentFolders.flatMap {
-            mediaServerClient.getAllMovies(it.Id).Items
-        }
-
-        return mediaServerMovies
+        return mediaServerLibraryQueryService.getMovieLibrary(mediaServerClient)
     }
 
     // TODO: the right way is getting the server's localization settings and checking all of Jellyfin's location for the key NameSeasonNumber

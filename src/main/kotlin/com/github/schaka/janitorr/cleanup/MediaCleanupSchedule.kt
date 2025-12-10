@@ -8,16 +8,11 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.ServarrService
-import com.github.schaka.janitorr.servarr.bazarr.BazarrRestService
 import com.github.schaka.janitorr.servarr.radarr.Radarr
-import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
-import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
 import com.github.schaka.janitorr.stats.StatsService
 import org.slf4j.LoggerFactory
-import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.Duration
 
@@ -29,24 +24,19 @@ class MediaCleanupSchedule(
     jellystatService: StatsService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
-    runOnce: RunOnce,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService) {
+) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService), Schedule {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
 
-    // run every hour
-    @CacheEvict(cacheNames = [SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME, BazarrRestService.CACHE_NAME_TV, BazarrRestService.CACHE_NAME_MOVIES])
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
-    fun runSchedule() {
+    override fun runSchedule() {
 
         if (!applicationProperties.mediaDeletion.enabled) {
             log.info("Media based cleanup disabled, do nothing")
-            runOnce.hasMediaCleanupRun = true
             return
         }
 
@@ -58,7 +48,6 @@ class MediaCleanupSchedule(
         scheduleDelete(TV_SHOWS, seasonExpiration)
         scheduleDelete(MOVIES, movieExpiration)
 
-        runOnce.hasMediaCleanupRun = true
     }
 
     override fun needToDelete(type: LibraryType): Boolean {

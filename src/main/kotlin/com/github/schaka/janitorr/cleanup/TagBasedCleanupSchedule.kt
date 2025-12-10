@@ -4,7 +4,6 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.config.TagDeleteSchedule
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
-import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -16,10 +15,10 @@ import com.github.schaka.janitorr.servarr.radarr.Radarr
 import com.github.schaka.janitorr.servarr.radarr.RadarrRestService
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
 import com.github.schaka.janitorr.servarr.sonarr.SonarrRestService
+import com.github.schaka.janitorr.stats.StatsService
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.CacheEvict
 import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Profile("!leyden")
@@ -30,23 +29,19 @@ class TagBasedCleanupSchedule(
     jellystatService: StatsService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
-    runOnce: RunOnce,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, runOnce, sonarrService, radarrService) {
+) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService), Schedule {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
-    // run every hour
     @CacheEvict(cacheNames = [SonarrRestService.CACHE_NAME, RadarrRestService.CACHE_NAME, BazarrRestService.CACHE_NAME_TV, BazarrRestService.CACHE_NAME_MOVIES])
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
-    fun runSchedule() {
+    override fun runSchedule() {
 
         if (!applicationProperties.tagBasedDeletion.enabled) {
             log.info("Tag based cleanup disabled, do nothing")
-            runOnce.hasTagBasedCleanupRun = true
             return
         }
 
@@ -63,7 +58,6 @@ class TagBasedCleanupSchedule(
             scheduleDelete(MOVIES, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
         }
 
-        runOnce.hasTagBasedCleanupRun = true
     }
 
     private fun tagMatches(item: LibraryItem, tag: TagDeleteSchedule): Boolean {

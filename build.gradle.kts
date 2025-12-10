@@ -167,8 +167,8 @@ tasks.withType<BootBuildImage> {
         "LC_ALL" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         // these values are logged correctly during build time without BPE_ prefix but then not applied at runtime, so we set environment variables for the JVM
-        "BPE_BPL_JVM_THREAD_COUNT" to "50",
-        "BPE_BPL_JVM_HEAD_ROOM" to "5",
+        "BPE_BPL_JVM_THREAD_COUNT" to "30",
+        "BPE_BPL_JVM_HEAD_ROOM" to "3",
         "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
         "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
         "BPE_PREPEND_JAVA_TOOL_OPTIONS" to "-XX:+UseSerialGC -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:NativeMemoryTracking=summary",

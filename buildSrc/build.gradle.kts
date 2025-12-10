@@ -4,7 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "com.github.schaka.janitorr"
 
 plugins {
-    kotlin("jvm") version "2.2.20"
+    kotlin("jvm") version "2.2.21"
     `kotlin-dsl` version "6.4.1"
     `embedded-kotlin` version "6.4.1"
 }

@@ -52,6 +52,7 @@ application:
 
   episode-deletion: # This ignores Jellystat. Only grab history matters. It also doesn't clean up Jellyfin. There is NO seeding check either.
     enabled: true
+    clean-older-seasons: false # If enabled, all seasons but the latest will be entirely deleted (regardless of the number of episodes inside)
     tag: janitorr_daily # Shows tagged with this will have all episodes of their LATEST season deleted by the below thresholds
     max-episodes: 10 # maximum (latest) episodes of this season to keep
     max-age: 30d # Maximum age to keep any episode at all - even the last 10 episodes would expire after 30 days in this example

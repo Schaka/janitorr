@@ -4,6 +4,8 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
+import com.github.schaka.janitorr.servarr.sonarr.series.Season
+import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
@@ -46,6 +48,8 @@ class WeeklyEpisodeCleanupSchedule(
 
         for (show in series) {
             val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
+            deleteOlderSeasons(show, latestSeason)
+
             val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
                 .filter { it.airDate != null }
                 .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
@@ -90,6 +94,26 @@ class WeeklyEpisodeCleanupSchedule(
             }
         }
 
+    }
+
+    private fun deleteOlderSeasons(show: SeriesPayload, latestSeason: Season) {
+        if (applicationProperties.episodeDeletion.cleanOlderSeasons) {
+
+            val otherSeasons = show.seasons.filter { season -> season.seasonNumber < latestSeason.seasonNumber }
+
+            for (season in otherSeasons) {
+                val episodes = sonarrClient.getAllEpisodes(show.id, season.seasonNumber)
+                for (episode in episodes) {
+                    log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because it's part of an older season")
+                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                        if (!applicationProperties.dryRun) {
+                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     private fun parseDate(date: String): LocalDateTime {

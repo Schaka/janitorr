@@ -110,7 +110,7 @@ extra {
     project.extra["build.user"] = build.userName()
 
     val repositoryOwner = System.getenv("REPOSITORY_OWNER") ?: "schaka"
-    val containerImageName = "ghcr.io/$repositoryOwner/${project.name}"
+    val containerImageName = "ghcr.io/${repositoryOwner.lowercase()}/${project.name}"
 
     val imageType = System.getenv("IMAGE_TYPE") ?: "jvm"
     val platform = System.getenv("TARGET_PLATFORM") ?: "amd64"

@@ -141,9 +141,9 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/${{ steps.branch_name.outputs.owner_lc }}/janitorr:jvm-${{ steps.branch_name.outputs.value }}
-            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:jvm-stable', steps.branch_name.outputs.owner_lc)) || '' }}
+            ghcr.io/${{ steps.lc_owner.outputs.owner_lc }}/janitorr:jvm-${{ steps.branch_name.outputs.value }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:jvm-stable', steps.lc_owner.outputs.owner_lc)) || '' }}
           sources: |
-            ghcr.io/${{ steps.branch_name.outputs.owner_lc }}/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
-            ghcr.io/${{ steps.branch_name.outputs.owner_lc }}/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ steps.lc_owner.outputs.owner_lc }}/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ steps.lc_owner.outputs.owner_lc }}/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
           

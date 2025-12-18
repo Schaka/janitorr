@@ -27,12 +27,16 @@ on:
 jobs:
   build-jvm-x86:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Log in to Docker Hub to pull images without rate limit
+        continue-on-error: true
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
@@ -64,11 +68,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
           LC_ALL: "en_US.UTF-8"
           TARGET_PLATFORM: "amd64"
 
   build-jvm-aarch64:
     runs-on: ubuntu-24.04-arm
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -93,12 +101,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+          REPOSITORY_OWNER: ${{ github.repository_owner }}
           LC_ALL: "en_US.UTF-8"
           TARGET_PLATFORM: "arm64"
 
   combine-images:
     runs-on: ubuntu-latest
     needs: [build-jvm-x86, build-jvm-aarch64]
+    permissions:
+      contents: read
+      packages: write
     steps:
 
       - name: Log into GitHub Container Registry
@@ -121,9 +133,9 @@ jobs:
         with:
           push: true
           tags: |
-            ghcr.io/schaka/janitorr:jvm-${{ steps.branch_name.outputs.value }}
-            ${{ (startsWith(github.ref, 'refs/tags/v') && 'ghcr.io/schaka/janitorr:jvm-stable') || '' }}
-          sources: |
-            ghcr.io/schaka/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
-            ghcr.io/schaka/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:jvm-${{ steps.branch_name.outputs.value }}
+            ${{ (startsWith(github.ref, 'refs/tags/v') && format('ghcr.io/{0}/janitorr:jvm-stable', github.repository_owner)) || '' }}
+            sources: |
+            ghcr.io/${{ github.repository_owner }}/janitorr:jvm-amd64-${{ steps.branch_name.outputs.value }}
+            ghcr.io/${{ github.repository_owner }}/janitorr:jvm-arm64-${{ steps.branch_name.outputs.value }}
           

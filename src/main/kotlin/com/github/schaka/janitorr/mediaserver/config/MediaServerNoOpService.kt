@@ -2,6 +2,7 @@ package com.github.schaka.janitorr.mediaserver.config
 
 import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
+import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
@@ -42,5 +43,13 @@ class MediaServerNoOpService : AbstractMediaServerService() {
     ): Map<Int, List<String>> {
         log.info("Media Server not implemented. No mediaServerIds populated.")
         return mapOf()
+    }
+
+    override fun getAllFavoritedItems(): List<LibraryContent> {
+        return emptyList()
+    }
+
+    override fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem> {
+        return items
     }
 }

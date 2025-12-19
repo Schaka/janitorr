@@ -71,10 +71,13 @@ abstract class AbstractCleanupSchedule(
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
         // prefilter, so expensive operations like mediaServerId and watchHistory population don't have to run on the entire library
         // this includes all entries that are already past their deletion window and the upcoming ones necessary for Leaving Soon
-        val deletionCandidates = servarrEntries.filter { it.importedDate.plusDays(expirationDays - leavingSoonExpiration) < today }
+        var deletionCandidates = servarrEntries.filter { it.importedDate.plusDays(expirationDays - leavingSoonExpiration) < today }
 
         mediaServerService.populateMediaServerIds(deletionCandidates, libraryType,!applicationProperties.wholeTvShow)
         statsService.populateWatchHistory(deletionCandidates, libraryType)
+
+        // Filter out favorited items
+        deletionCandidates = mediaServerService.filterOutFavorites(deletionCandidates, libraryType)
 
         val leavingSoon = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) >= today }
         mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)

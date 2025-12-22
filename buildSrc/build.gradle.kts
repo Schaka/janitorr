@@ -5,8 +5,6 @@ group = "com.github.schaka.janitorr"
 
 plugins {
     kotlin("jvm") version "2.3.0"
-    `kotlin-dsl` version "6.5.2"
-    `embedded-kotlin` version "6.5.2"
 }
 
 repositories {

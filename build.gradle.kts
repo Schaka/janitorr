@@ -11,14 +11,13 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "4.0.0"
-    id("org.springframework.boot.aot") version "4.0.0"
+    id("org.springframework.boot") version "4.0.1"
+    id("org.springframework.boot.aot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
     id("net.nemerosa.versioning") version "3.1.0"
-    id("org.graalvm.buildtools.native") version "0.11.0"
 
-    kotlin("jvm") version "2.2.21"
-    kotlin("plugin.spring") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
+    kotlin("plugin.spring") version "2.3.0"
 
 }
 
@@ -33,7 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-jackson")
-    implementation("org.springframework.boot:spring-boot-starter-kotlin-serialization")
+    implementation("org.springframework.boot:spring-boot-starter-kotlinx-serialization-json")
     implementation("org.springframework.boot:spring-boot-webmvc")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
@@ -76,14 +75,14 @@ tasks.withType<Test> {
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_24.toString()
-    targetCompatibility = JavaVersion.VERSION_24.toString()
+    sourceCompatibility = JavaVersion.VERSION_25.toString()
+    targetCompatibility = JavaVersion.VERSION_25.toString()
 }
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict", "-Xannotation-default-target=param-property")
-        jvmTarget = JvmTarget.JVM_24
+        jvmTarget = JvmTarget.JVM_25
         javaParameters = true
     }
 }

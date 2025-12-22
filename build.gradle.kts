@@ -150,7 +150,6 @@ tasks.withType<BootBuildImage> {
         "paketobuildpacks/environment-variables",
         "paketobuildpacks/adoptium",
         "paketobuildpacks/java",
-        "./buildpacks/aot-cache",
     )
     imageName = project.extra["docker.image.name"] as String
     version = project.extra["docker.image.version"] as String
@@ -159,16 +158,16 @@ tasks.withType<BootBuildImage> {
 
     environment = mapOf(
         "BP_NATIVE_IMAGE" to "false",
-        "BP_JVM_CDS_ENABLED" to "false",
+        "BP_JVM_AOTCACHE_ENABLED" to "true",
         "BP_SPRING_AOT_ENABLED" to "true",
-        "BP_JVM_VERSION" to "25", // JDK required, because we need the executable to run our AOTCache buildpack
-        "BP_JVM_TYPE" to "JDK",
+        "BP_JVM_VERSION" to "25",
         "LC_ALL" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         // these values are logged correctly during build time without BPE_ prefix but then not applied at runtime, so we set environment variables for the JVM
-        "BPE_BPL_JVM_THREAD_COUNT" to "30",
+        "BPE_BPL_JVM_THREAD_COUNT" to "15",
         "BPE_BPL_JVM_HEAD_ROOM" to "1",
         "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
+        "TRAINING_RUN_JAVA_TOOL_OPTIONS" to "-XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -Dspring.profiles.active=leyden",
         "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
         "BPE_PREPEND_JAVA_TOOL_OPTIONS" to "-XX:+UseSerialGC -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders",
         "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",

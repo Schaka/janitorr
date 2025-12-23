@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.mediaserver
 import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.extensions.removeSubsequence
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
+import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
@@ -34,6 +35,10 @@ abstract class AbstractMediaServerService {
     abstract fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 
     abstract fun getMediaServerIdsForLibrary(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean ): Map<Int, List<String>>
+
+    abstract fun getAllFavoritedItems(): List<LibraryContent>
+
+    abstract fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem>
 
     protected fun isMediaFile(path: String) =
         filePattern.matches(path)

@@ -48,8 +48,7 @@ abstract class BaseMediaServerService(
      */
     override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {
 
-        // TODO: only populate if necessary - i.e. needed for excluding favorites
-        if (true == false) {
+        if (mediaServerProperties.excludeFavorited) {
             val mappings = when (type) {
                 TV_SHOWS -> getMediaServerIdsForTvShowIds(items, bySeason)
                 MOVIES -> getMediaServerIdsForMovieIds(items)
@@ -261,6 +260,40 @@ abstract class BaseMediaServerService(
         populateExtraFiles(libraryType, items)
         createLinks(items, path, libraryType)
         createEmptyFile(path)
+    }
+
+    override fun getAllFavoritedItems(): List<LibraryContent> {
+        if (!mediaServerProperties.excludeFavorited || !mediaServerProperties.enabled) {
+            return emptyList()
+        }
+
+        val users = mediaServerClient.listUsers()
+
+        return users.flatMap { user ->
+                try {
+                    mediaServerClient.getUserFavorites(user.Id).Items
+                } catch (e: Exception) {
+                    log.warn("Failed to fetch favorites for user {}", user.Name, e)
+                    emptyList()
+                }
+            }.distinctBy { it.Id }
+    }
+
+    override fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem> {
+        val favoritedItems = getAllFavoritedItems()
+
+        if (favoritedItems.isEmpty()) {
+            return items
+        }
+
+        return items.filterNot { item ->
+            val isFavorited = favoritedItems.any { favorite -> mediaMatches(libraryType, item, favorite)}
+            if (isFavorited) {
+                log.debug("Excluding favorited item from deletion: {} (IMDB: {}, TMDB: {}, TVDB: {})",
+                    item.libraryPath, item.imdbId, item.tmdbId, item.tvdbId)
+            }
+            return@filterNot isFavorited
+        }
     }
 
     private fun populateExtraFiles(type: LibraryType, items: List<LibraryItem>) {

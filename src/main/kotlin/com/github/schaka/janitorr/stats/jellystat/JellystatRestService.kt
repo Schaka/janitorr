@@ -30,7 +30,6 @@ class JellystatRestService(
         for (item in items) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
             val watchHistory = libraryMappings.getOrDefault(item.id, listOf())
-                .asSequence()
                 .map(::JellystatItemRequest)
                 .map(jellystatClient::getRequests)
                 .flatMap { page -> page.results }

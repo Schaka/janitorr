@@ -52,6 +52,7 @@ application:
 
   episode-deletion: # This ignores Jellystat. Only grab history matters. It also doesn't clean up Jellyfin. There is NO seeding check either.
     enabled: true
+    clean-older-seasons: false # If enabled, all seasons but the latest will be entirely deleted (regardless of the number of episodes inside)
     tag: janitorr_daily # Shows tagged with this will have all episodes of their LATEST season deleted by the below thresholds
     max-episodes: 10 # maximum (latest) episodes of this season to keep
     max-age: 30d # Maximum age to keep any episode at all - even the last 10 episodes would expire after 30 days in this example
@@ -86,6 +87,7 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
+    exclude-favorited: false # When enabled, items favorited by any Jellyfin user will be excluded from deletion and won't appear in Leaving Soon
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
     leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE
@@ -99,6 +101,7 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
+    exclude-favorited: false # When enabled, items favorited by any Jellyfin user will be excluded from deletion and won't appear in Leaving Soon
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
     leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE

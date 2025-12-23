@@ -4,9 +4,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "com.github.schaka.janitorr"
 
 plugins {
-    kotlin("jvm") version "2.2.20"
-    `kotlin-dsl` version "6.2.0"
-    `embedded-kotlin` version "6.2.0"
+    kotlin("jvm") version "2.3.0"
 }
 
 repositories {
@@ -17,13 +15,13 @@ repositories {
 }
 
 tasks.withType<JavaCompile> {
-    sourceCompatibility = JavaVersion.VERSION_24.toString()
-    targetCompatibility = JavaVersion.VERSION_24.toString()
+    sourceCompatibility = JavaVersion.VERSION_25.toString()
+    targetCompatibility = JavaVersion.VERSION_25.toString()
 }
 
 tasks.withType<KotlinCompile> {
     compilerOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
-        jvmTarget = JvmTarget.JVM_24
+        jvmTarget = JvmTarget.JVM_25
     }
 }

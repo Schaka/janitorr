@@ -1,7 +1,9 @@
 package com.github.schaka.janitorr.mediaserver
 
 import com.github.schaka.janitorr.cleanup.CleanupType
+import com.github.schaka.janitorr.extensions.removeSubsequence
 import com.github.schaka.janitorr.mediaserver.filesystem.PathStructure
+import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
 import org.slf4j.LoggerFactory
@@ -33,6 +35,10 @@ abstract class AbstractMediaServerService {
     abstract fun updateLeavingSoon(cleanupType: CleanupType, libraryType: LibraryType, items: List<LibraryItem>, onlyAddLinks: Boolean = false)
 
     abstract fun getMediaServerIdsForLibrary(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean ): Map<Int, List<String>>
+
+    abstract fun getAllFavoritedItems(): List<LibraryContent>
+
+    abstract fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem>
 
     protected fun isMediaFile(path: String) =
         filePattern.matches(path)
@@ -96,13 +102,10 @@ abstract class AbstractMediaServerService {
     }
 
     fun removePath(source: Path, toRemove: Path): Path {
-        val newPath = source.subtract(toRemove).reduce(this::combinePaths)
-
-        if (newPath.root != source.root) {
-            return source.root.resolve(newPath)
-        }
-
-        return newPath
+        val sourceSegments = source.iterator().asSequence().map { it.fileName.toString() }.toList()
+        val toRemoveSegments = toRemove.iterator().asSequence().map { it.fileName.toString() }.toList()
+        val kept = sourceSegments.removeSubsequence(toRemoveSegments)
+        return kept.fold(source.root) { acc, seg -> acc.resolve(seg) }
     }
 
     fun cleanupPath(leavingSoonDir: String, libraryType: LibraryType, cleanupType: CleanupType) {

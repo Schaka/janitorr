@@ -134,51 +134,23 @@ services:
       - /appdata/janitorr/config/application.yml:/config/application.yml
       - /appdata/janitorr/logs:/logs
       - /share_media:/data
-    environment:
-      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
-      - THC_PATH=/health
-      - THC_PORT=8081
-    healthcheck:
-      test: [ "CMD", "/workspace/health-check" ]
-      start_period: 30s
-      interval: 5s
-      retries: 3
 ```
 
-**The native image is now deprecated as of 1.9.0. Please switch to the JVM image.**
-[Oracle has announced](https://blogs.oracle.com/java/post/detaching-graalvm-from-the-java-ecosystem-train) that the GraalVM will be "detached" from the ecosystem.
-Despite employees [chiming in on Reddit](https://www.reddit.com/r/java/comments/1niamuc/comment/nehsqww) saying it won't be going anywhere, its future is a bit uncertain.
-I had originally implemented it due to fast runtimes and lower memory footprint, but it requires a lot of workarounds and upkeep to save barely 100MB of RAM.
-Please see release notes for 1.9.0 for a thorough explanation.
+In extremely memory constrained environments or if you're a seasoned developer on the JVM developed, you can supply your own `JAVA_TOOL_OPTIONS` as an environment variable for.
+It is possible to lower overall memory consumption to about 150MB, but I do not recommend it because you're right at the edge of stability.
+However, if you're on an extremely old device and every few megabytes count - you may experiment with the options as follows, by adding it to your `docker-compose.yml` under `environment`.
+`- JAVA_TOOL_OPTIONS=-Xms10m -Xmx30m -XX:+UseSerialGC -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders -XX:MaxDirectMemorySize=10M -XX:MaxMetaspaceSize=20M -XX:ReservedCodeCacheSize=10M -Xss150K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info`
 
-A native image is also published for every build. It keeps a lower memory and CPU footprint and doesn't require longer runtimes to achieve optimal performance (JIT).
-That image is always tagged `:native-stable`. To get a specific version, use `:native-v1.x.x`.
-**While I do publish an arm64 version of this image, it is mostly untested.**
+My recommendations:
+- don't try to reduce the heap much more unless your library size is small - 20MB will not work
+- code cache can be reduced at the expense of more CPU cycles
+- 100K stack size worked well in my limited testing
+- MetaSpaceSize can't be dropped much lower than 20M
 
-```yml
-services:
-  janitorr:
-    container_name: janitorr
-    image: ghcr.io/schaka/janitorr:native-stable
-    user: 1000:1000 # Replace with your user who should own your application.yml file
-    volumes:
-      - /appdata/janitorr/config/application.yml:/config/config.yml
-      - /appdata/janitorr/logs:/logs
-      - /share_media:/data
-    environment:
-      # Uses https://github.com/dmikusa/tiny-health-checker supplied by paketo buildpacks
-      - THC_PATH=/health
-      - THC_PORT=8081
-      - SPRING_CONFIG_ADDITIONAL_LOCATION=/config/application.yml
-    healthcheck:
-      test: [ "CMD", "/workspace/health-check" ]
-      start_period: 30s
-      interval: 5s
-      retries: 3
-```
+#### Bleeding edge development image
 
+**Attention: The develop branch is experimental. Logical errors and breaking changes may happen.**
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
-The development version of the native image is available as `ghcr.io/schaka/janitorr:native-develop`.
 
 
 ## JetBrains

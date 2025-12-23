@@ -2,14 +2,12 @@ package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.servarr.data_structures.Tag
-import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
-import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
+import com.github.schaka.janitorr.servarr.sonarr.series.Season
+import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import org.slf4j.LoggerFactory
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
 import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -20,15 +18,13 @@ import java.time.LocalDateTime
  */
 @Profile("!leyden")
 @Service
-@RegisterReflectionForBinding(classes = [Tag::class,HistoryResponse::class, EpisodeResponse::class])
 class WeeklyEpisodeCleanupSchedule(
         val applicationProperties: ApplicationProperties,
         val sonarrProperties: SonarrProperties,
         val sonarrClient: SonarrClient,
-        val runOnce: RunOnce,
 
         var episodeTag: Tag = Tag(Integer.MIN_VALUE, "Not_Set")
-) {
+): Schedule {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
@@ -40,13 +36,10 @@ class WeeklyEpisodeCleanupSchedule(
         }
     }
 
-    // run every hour
-    @Scheduled(fixedDelay = 1000 * 60 * 60)
-    fun runSchedule() {
+    override fun runSchedule() {
 
         if (!applicationProperties.episodeDeletion.enabled) {
             log.info("Episode based cleanup disabled, do nothing")
-            runOnce.hasWeeklyEpisodeCleanupRun = true
             return
         }
 
@@ -55,6 +48,8 @@ class WeeklyEpisodeCleanupSchedule(
 
         for (show in series) {
             val latestSeason = show.seasons.maxBy { season -> season.seasonNumber }
+            deleteOlderSeasons(show, latestSeason)
+
             val episodes = sonarrClient.getAllEpisodes(show.id, latestSeason.seasonNumber)
                 .filter { it.airDate != null }
                 .filter { LocalDate.parse(it.airDate!!) <= today.toLocalDate() }
@@ -99,7 +94,26 @@ class WeeklyEpisodeCleanupSchedule(
             }
         }
 
-        runOnce.hasWeeklyEpisodeCleanupRun = true
+    }
+
+    private fun deleteOlderSeasons(show: SeriesPayload, latestSeason: Season) {
+        if (applicationProperties.episodeDeletion.cleanOlderSeasons) {
+
+            val otherSeasons = show.seasons.filter { season -> season.seasonNumber < latestSeason.seasonNumber }
+
+            for (season in otherSeasons) {
+                val episodes = sonarrClient.getAllEpisodes(show.id, season.seasonNumber)
+                for (episode in episodes) {
+                    log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because it's part of an older season")
+                    if (episode.episodeFileId != null && episode.episodeFileId != 0) {
+                        if (!applicationProperties.dryRun) {
+                            sonarrClient.deleteEpisodeFile(episode.episodeFileId)
+                        }
+                    }
+                }
+            }
+
+        }
     }
 
     private fun parseDate(date: String): LocalDateTime {

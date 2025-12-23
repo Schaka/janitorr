@@ -1,9 +1,0 @@
-#!/bin/bash
-set -euo pipefail
-if [[ -z "${BP_NATIVE_IMAGE:-}" || "${BP_NATIVE_IMAGE}" == "true" ]]; then
-    echo "BP_NATIVE_IMAGE not explicitly set to false, not contributing AOTCache"
-    exit 0
-fi
-
-echo "BP_NATIVE_IMAGE set to false, contributing AOTCache"
-exit 0

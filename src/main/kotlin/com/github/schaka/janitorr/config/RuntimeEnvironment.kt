@@ -24,6 +24,7 @@ class RuntimeEnvironment {
         log.info("ENV JAVA_TOOL_OPTIONS {}", System.getenv("JAVA_TOOL_OPTIONS"))
         log.info("ENV LANG {}", System.getenv("LANG"))
         log.info("ENV LANGUAGE {}", System.getenv("LANGUAGE"))
+        log.info("ENV LC_CTYPE {}", System.getenv("LC_CTYPE"))
         log.info("ENV LC_ALL {}", System.getenv("LC_ALL"))
     }
 }

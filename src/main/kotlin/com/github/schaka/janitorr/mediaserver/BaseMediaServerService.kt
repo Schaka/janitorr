@@ -29,6 +29,7 @@ abstract class BaseMediaServerService(
     val mediaServerClient: MediaServerClient,
     val mediaServerUserClient: MediaServerUserClient,
     val bazarrService: BazarrService,
+    val mediaServerLibraryQueryService: MediaServerLibraryQueryService,
     val mediaServerProperties: MediaServerProperties,
     val applicationProperties: ApplicationProperties,
     val fileSystemProperties: FileSystemProperties
@@ -47,8 +48,7 @@ abstract class BaseMediaServerService(
      */
     override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {
 
-        // TODO: only populate if necessary - i.e. needed for excluding favorites
-        if (true == false) {
+        if (mediaServerProperties.excludeFavorited) {
             val mappings = when (type) {
                 TV_SHOWS -> getMediaServerIdsForTvShowIds(items, bySeason)
                 MOVIES -> getMediaServerIdsForMovieIds(items)
@@ -104,6 +104,8 @@ abstract class BaseMediaServerService(
         val useSeason = !applicationProperties.wholeTvShow && bySeason
 
         val mediaServerShows = getTvLibrary(useSeason)
+
+        // it's not worth caching the showId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items
             .groupBy { show -> show.id }
             .mapValues { (_, showsInGroup) ->
@@ -116,27 +118,13 @@ abstract class BaseMediaServerService(
     }
 
     private fun getTvLibrary(bySeason: Boolean = true): List<LibraryContent> {
-        val parentFolders = mediaServerClient.getAllItems().Items.filter { it.Type != "ManualPlaylistsFolder" && it.Name != "Playlists" }
-
-        var mediaServerShows = parentFolders.flatMap { parent ->
-            mediaServerClient.getAllTvShows(parent.Id).Items.filter { it.IsSeries || it.Type.lowercase() == "series" }
-        }
-
-        // don't treat library season by season, if not necessary
-        if (bySeason) {
-            mediaServerShows = mediaServerShows.flatMap { show ->
-                val seasons = mediaServerClient.getAllSeasons(show.Id).Items
-                seasons.forEach { it.ProviderIds = show.ProviderIds } // we want metadata (IMDB, TMDB) IDs for the entire show to match, not season IDs (only available from TDVB)
-                return@flatMap seasons
-            }
-        }
-
-        return mediaServerShows
+        return mediaServerLibraryQueryService.getTvLibrary(mediaServerClient, bySeason)
     }
 
     private fun getMediaServerIdsForMovieIds(items: List<LibraryItem>): Map<Int, List<String>> {
         val mediaServerMovies = getMovieLibrary()
 
+        // it's not worth caching the movieId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items
             .groupBy { movie -> movie.id }
             .mapValues { (_, moviesInGroup) ->
@@ -176,13 +164,7 @@ abstract class BaseMediaServerService(
     }
 
     private fun getMovieLibrary(): List<LibraryContent> {
-        val parentFolders = mediaServerClient.getAllItems().Items.filter { it.Type != "ManualPlaylistsFolder" && it.Name != "Playlists" }
-
-        val mediaServerMovies = parentFolders.flatMap {
-            mediaServerClient.getAllMovies(it.Id).Items
-        }
-
-        return mediaServerMovies
+        return mediaServerLibraryQueryService.getMovieLibrary(mediaServerClient)
     }
 
     // TODO: the right way is getting the server's localization settings and checking all of Jellyfin's location for the key NameSeasonNumber
@@ -278,6 +260,40 @@ abstract class BaseMediaServerService(
         populateExtraFiles(libraryType, items)
         createLinks(items, path, libraryType)
         createEmptyFile(path)
+    }
+
+    override fun getAllFavoritedItems(): List<LibraryContent> {
+        if (!mediaServerProperties.excludeFavorited || !mediaServerProperties.enabled) {
+            return emptyList()
+        }
+
+        val users = mediaServerClient.listUsers()
+
+        return users.flatMap { user ->
+                try {
+                    mediaServerClient.getUserFavorites(user.Id).Items
+                } catch (e: Exception) {
+                    log.warn("Failed to fetch favorites for user {}", user.Name, e)
+                    emptyList()
+                }
+            }.distinctBy { it.Id }
+    }
+
+    override fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem> {
+        val favoritedItems = getAllFavoritedItems()
+
+        if (favoritedItems.isEmpty()) {
+            return items
+        }
+
+        return items.filterNot { item ->
+            val isFavorited = favoritedItems.any { favorite -> mediaMatches(libraryType, item, favorite)}
+            if (isFavorited) {
+                log.debug("Excluding favorited item from deletion: {} (IMDB: {}, TMDB: {}, TVDB: {})",
+                    item.libraryPath, item.imdbId, item.tmdbId, item.tvdbId)
+            }
+            return@filterNot isFavorited
+        }
     }
 
     private fun populateExtraFiles(type: LibraryType, items: List<LibraryItem>) {

@@ -164,6 +164,7 @@ tasks.withType<BootBuildImage> {
         "LC_ALL" to "en_US.UTF-8",
         "BPE_LC_ALL" to "en_US.UTF-8",
         // these values are logged correctly during build time without BPE_ prefix but then not applied at runtime, so we set environment variables for the JVM
+        "BPE_BPL_JAVA_NMT_ENABLED" to "false",
         "BPE_BPL_JVM_THREAD_COUNT" to "15",
         "BPE_BPL_JVM_HEAD_ROOM" to "1",
         "BPE_BPL_JVM_LOADED_CLASS_COUNT" to "15000",
@@ -171,6 +172,6 @@ tasks.withType<BootBuildImage> {
         "BPE_SPRING_CONFIG_ADDITIONAL_LOCATION" to "optional:/config/application.yml",
         "BPE_PREPEND_JAVA_TOOL_OPTIONS" to "-XX:+UseSerialGC -XX:+UnlockExperimentalVMOptions -XX:+UseCompactObjectHeaders",
         "BPE_DELIM_JAVA_TOOL_OPTIONS" to " ",
-        "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:ReservedCodeCacheSize=30M -Xss200K -XX:AOTCache=/workspace/aot-cache/janitorr.aot -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
+        "BPE_APPEND_JAVA_TOOL_OPTIONS" to "-XX:ReservedCodeCacheSize=30M -Xss200K -Xlog:cds=info -Xlog:aot=info -Xlog:class+path=info",
     )
 }

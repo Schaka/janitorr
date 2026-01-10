@@ -8,6 +8,7 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.mediaserver.library.VirtualFolderResponse
+import com.github.schaka.janitorr.mediaserver.lookup.MediaLookup
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.bazarr.BazarrPayload
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
@@ -58,7 +59,7 @@ abstract class BaseMediaServerService(
         }
     }
 
-    override fun getMediaServerIdsForLibrary(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean): Map<Int, List<String>> {
+    override fun getMediaServerIdsForLibrary(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean): Map<MediaLookup, List<String>> {
         return when (type) {
             TV_SHOWS -> getMediaServerIdsForTvShowIds(items, bySeason)
             MOVIES -> getMediaServerIdsForMovieIds(items)
@@ -98,7 +99,7 @@ abstract class BaseMediaServerService(
         // TODO: Remove TV shows if all seasons gone - only if wholeShow is turned off
     }
 
-    private fun getMediaServerIdsForTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true): Map<Int, List<String>> {
+    private fun getMediaServerIdsForTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true): Map<MediaLookup, List<String>> {
 
         // Do we need to aggregate by season or give every episode/season the entire TV show ID?
         val useSeason = !applicationProperties.wholeTvShow && bySeason
@@ -107,11 +108,11 @@ abstract class BaseMediaServerService(
 
         // it's not worth caching the showId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items
-            .groupBy { show -> show.id }
-            .mapValues { (_, showsInGroup) ->
+            .groupBy { show -> if (bySeason) MediaLookup(show.id, show.season) else MediaLookup(show.id) }
+            .mapValues { (_, showsInGroup) -> // more realistically, these are potential seasons or a single show with that ID
                 showsInGroup.flatMap { show ->
                     mediaServerShows
-                        .filter { tvShowMatches(show, it) }
+                        .filter { tvShowMatches(show, it, bySeason) }
                         .map { it.Id }
                 }
             }
@@ -121,12 +122,12 @@ abstract class BaseMediaServerService(
         return mediaServerLibraryQueryService.getTvLibrary(mediaServerClient, bySeason)
     }
 
-    private fun getMediaServerIdsForMovieIds(items: List<LibraryItem>): Map<Int, List<String>> {
+    private fun getMediaServerIdsForMovieIds(items: List<LibraryItem>): Map<MediaLookup, List<String>> {
         val mediaServerMovies = getMovieLibrary()
 
         // it's not worth caching the movieId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items
-            .groupBy { movie -> movie.id }
+            .groupBy { movie -> MediaLookup(movie.id) }
             .mapValues { (_, moviesInGroup) ->
                 moviesInGroup.flatMap { movie ->
                     mediaServerMovies

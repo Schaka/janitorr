@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.stats.streamystats
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
+import com.github.schaka.janitorr.mediaserver.lookup.MediaLookup
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.stats.streamystats.requests.StreamystatsHistoryResponse
@@ -30,7 +31,8 @@ class StreamystatsRestService(
 
         for (item in items) {
             // every movie, show, season and episode has its own unique ID, so every request will only consider what's passed to it here
-            val response = libraryMappings.getOrDefault(item.id, listOf())
+            val lookupKey = if (type == LibraryType.TV_SHOWS && !streamystatsProperties.wholeTvShow) MediaLookup(item.id, item.season) else MediaLookup(item.id)
+            val response = libraryMappings.getOrDefault(lookupKey, listOf())
                 .map(::gracefulQuery)
 
             val watchHistory = response

@@ -9,6 +9,7 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.ProviderIds
 import com.github.schaka.janitorr.mediaserver.library.items.ItemPage
 import com.github.schaka.janitorr.mediaserver.library.items.MediaFolderItem
+import com.github.schaka.janitorr.mediaserver.lookup.MediaLookup
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.bazarr.BazarrService
 import io.mockk.every
@@ -273,9 +274,9 @@ internal class MediaRestServiceTest {
             false
         )
 
-        assertThat(populatedIds[1]?.size).isEqualTo(2)
-        assertThat(populatedIds[2]?.size).isEqualTo(1)
-        assertThat(populatedIds[3]?.size).isEqualTo(0)
+        assertThat(populatedIds[MediaLookup(1)]?.size).isEqualTo(2)
+        assertThat(populatedIds[MediaLookup(2)]?.size).isEqualTo(1)
+        assertThat(populatedIds[MediaLookup(3)]?.size).isEqualTo(0)
     }
 
 }

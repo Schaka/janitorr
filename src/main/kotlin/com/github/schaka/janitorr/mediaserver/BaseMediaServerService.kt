@@ -55,7 +55,7 @@ abstract class BaseMediaServerService(
                 MOVIES -> getMediaServerIdsForMovieIds(items)
             }
 
-            items.forEach { item -> item.mediaServerIds.addAll(mappings.getOrDefault(item.id, listOf())) }
+            items.forEach { item -> item.mediaServerIds.addAll(mappings.getOrDefault(lookup(bySeason, item), listOf())) }
         }
     }
 
@@ -108,7 +108,7 @@ abstract class BaseMediaServerService(
 
         // it's not worth caching the showId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items
-            .groupBy { show -> if (bySeason) MediaLookup(show.id, show.season) else MediaLookup(show.id) }
+            .groupBy { show -> lookup(bySeason, show) }
             .mapValues { (_, showsInGroup) -> // more realistically, these are potential seasons or a single show with that ID
                 showsInGroup.flatMap { show ->
                     mediaServerShows
@@ -288,7 +288,7 @@ abstract class BaseMediaServerService(
         }
 
         return items.filterNot { item ->
-            val isFavorited = favoritedItems.any { favorite -> mediaMatches(libraryType, item, favorite)}
+            val isFavorited = favoritedItems.any { favorite -> item.mediaServerIds.contains(favorite.Id) || mediaMatches(libraryType, item, favorite)}
             if (isFavorited) {
                 log.debug("Excluding favorited item from deletion: {} (IMDB: {}, TMDB: {}, TVDB: {})",
                     item.libraryPath, item.imdbId, item.tmdbId, item.tvdbId)
@@ -308,6 +308,8 @@ abstract class BaseMediaServerService(
             log.trace("Adding extra files to {} for *arr id {} (season {}): {}", type, item.id, item.season, extraFiles)
         }
     }
+
+    private fun lookup(bySeason: Boolean, item: LibraryItem ): MediaLookup = if (bySeason) MediaLookup(item.id, item.season) else MediaLookup(item.id)
 
     private fun gracefulRequest(id: Int, httpApiCall: (id: Int) -> List<BazarrPayload>): List<BazarrPayload> {
         try {

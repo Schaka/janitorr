@@ -79,7 +79,7 @@ abstract class AbstractCleanupSchedule(
         // Filter out favorited items
         deletionCandidates = mediaServerService.filterOutFavorites(deletionCandidates, libraryType)
 
-        val leavingSoon = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) >= today }
+        val leavingSoon = deletionCandidates.filter { it.historyAge.plusDays(expirationDays - leavingSoonExpiration) < today && it.historyAge.plusDays(expirationDays) >= today }
         mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)
 
         val toDeleteMedia = deletionCandidates.filter { it.historyAge.plusDays(expirationDays) < today }

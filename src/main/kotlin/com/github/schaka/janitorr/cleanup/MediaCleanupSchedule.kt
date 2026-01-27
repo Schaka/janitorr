@@ -60,6 +60,15 @@ class MediaCleanupSchedule(
         return determineDeletionDuration(deleteConditions) != null
     }
 
+    override fun determineLeavingSoonDuration(type: LibraryType): Duration? {
+        val deleteConditions: Map<Int, Duration> = when (type) {
+            TV_SHOWS -> applicationProperties.mediaDeletion.seasonExpiration
+            MOVIES -> applicationProperties.mediaDeletion.movieExpiration
+        }
+
+        return determineLeavingSoonDuration(deleteConditions, applicationProperties.leavingSoonThresholdOffsetPercent)
+    }
+
     private fun determineDeletionDuration(deletionConditions: Map<Int, Duration>): Duration? {
 
         // If we don't have access to the same file system as the library, we can't determine the actual space left and will just choose the longest expiration time available
@@ -70,6 +79,18 @@ class MediaCleanupSchedule(
         val freeSpacePercentage = getFreeSpacePercentage()
 
         val entry = deletionConditions.entries.filter { freeSpacePercentage < it.key }.minByOrNull { it.key }
+        return entry?.value
+    }
+
+    private fun determineLeavingSoonDuration(deletionConditions: Map<Int, Duration>, thresholdOffsetPercent: Int): Duration? {
+        if (!fileSystemProperties.access || thresholdOffsetPercent <= 0) {
+            return null
+        }
+
+        val freeSpacePercentage = getFreeSpacePercentage()
+        val entry = deletionConditions.entries
+            .filter { freeSpacePercentage < (it.key + thresholdOffsetPercent) }
+            .minByOrNull { it.key }
         return entry?.value
     }
 }

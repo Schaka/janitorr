@@ -98,6 +98,10 @@ You need to ensure links can be created from the source (in the *arrs' library) 
 The only exception is your `leaving-soon-dir`. If Jellyfin and Janitorr know this directory under different paths, you can just this.
 By default, both `media-server-leaving-soon-dir` and `leaving-soon-dir` should be identical if your volume mappings are identical.
 
+Leaving Soon timing is controlled by `application.leaving-soon` (days before deletion), and you can optionally start populating
+Leaving Soon earlier with `application.leaving-soon-threshold-offset-percent`. For disk-threshold deletion, this means Janitorr will
+start populating Leaving Soon when free disk is within N% of the next deletion threshold, but will only delete once the actual threshold is reached.
+
 
 If Janitorr's mapping looks like this:
 `/share_media/media/leaving-soon:/data/media/leaving-soon`

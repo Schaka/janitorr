@@ -41,18 +41,27 @@ class AbstractCleanupScheduleTest {
     @Test
     fun scheduleDeleteUpdatesLeavingSoonWithoutDeleting() {
         val now = LocalDateTime.now()
-        val item = LibraryItem(
+        val olderItem = LibraryItem(
             id = 1,
-            importedDate = now.minusDays(9),
+            importedDate = now.minusDays(11),
             originalPath = "/data/media/movies/Movie (2024)/Movie.mkv",
             libraryPath = "/data/media/movies/Movie (2024)/Movie.mkv",
             parentPath = "/data/media/movies/Movie (2024)",
             rootFolderPath = "/data/media/movies",
             filePath = "/data/media/movies/Movie (2024)/Movie.mkv"
         )
+        val newerItem = LibraryItem(
+            id = 2,
+            importedDate = now.minusDays(9),
+            originalPath = "/data/media/movies/Movie 2 (2024)/Movie2.mkv",
+            libraryPath = "/data/media/movies/Movie 2 (2024)/Movie2.mkv",
+            parentPath = "/data/media/movies/Movie 2 (2024)",
+            rootFolderPath = "/data/media/movies",
+            filePath = "/data/media/movies/Movie 2 (2024)/Movie2.mkv"
+        )
 
-        every { radarrService.getEntries() } returns listOf(item)
-        every { mediaServerService.filterOutFavorites(any(), any()) } returns listOf(item)
+        every { radarrService.getEntries() } returns listOf(olderItem, newerItem)
+        every { mediaServerService.filterOutFavorites(any(), any()) } returns listOf(olderItem, newerItem)
 
         val schedule = buildSchedule(
             shouldDelete = false,
@@ -66,7 +75,7 @@ class AbstractCleanupScheduleTest {
             mediaServerService.updateLeavingSoon(
                 CleanupType.MEDIA,
                 LibraryType.MOVIES,
-                match { it.size == 1 && it.first().id == item.id },
+                match { it.map { item -> item.id } == listOf(olderItem.id) },
                 false
             )
         }

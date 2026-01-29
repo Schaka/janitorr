@@ -6,7 +6,9 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.dsl.SpringBootExtension
 import org.springframework.boot.gradle.tasks.aot.ProcessAot
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
+import org.gradle.api.tasks.bundling.Jar
 
 plugins {
 
@@ -72,6 +74,14 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<BootJar> {
+    archiveClassifier.set("")
+}
+
+tasks.named<Jar>("jar") {
+    enabled = false
 }
 
 tasks.withType<JavaCompile> {

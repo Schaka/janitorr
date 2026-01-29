@@ -66,7 +66,32 @@ class MediaCleanupSchedule(
             MOVIES -> applicationProperties.mediaDeletion.movieExpiration
         }
 
-        return determineLeavingSoonDuration(deleteConditions, applicationProperties.leavingSoonThresholdOffsetPercent)
+        val offset = applicationProperties.leavingSoonThresholdOffsetPercent
+        val duration = determineLeavingSoonDuration(deleteConditions, offset)
+        if (duration != null) {
+            log.info(
+                "Updating Leaving Soon for {} older than {} days based on threshold offset ({}%)",
+                type.collectionType,
+                duration.toDays(),
+                offset
+            )
+        } else if (fileSystemProperties.access && offset > 0) {
+            val freeSpacePercentage = getFreeSpacePercentage()
+            val thresholds = deleteConditions.keys.sorted()
+            val thresholdSummary = when {
+                thresholds.isEmpty() -> "none"
+                thresholds.size <= 6 -> thresholds.joinToString(",")
+                else -> "${thresholds.first()}..${thresholds.last()}"
+            }
+            log.info(
+                "Leaving Soon threshold not matched for {}: free space {}%, offset {}%, thresholds {}",
+                type.collectionType,
+                String.format("%.2f", freeSpacePercentage),
+                offset,
+                thresholdSummary
+            )
+        }
+        return duration
     }
 
     private fun determineDeletionDuration(deletionConditions: Map<Int, Duration>): Duration? {
@@ -88,9 +113,26 @@ class MediaCleanupSchedule(
         }
 
         val freeSpacePercentage = getFreeSpacePercentage()
-        val entry = deletionConditions.entries
-            .filter { freeSpacePercentage < (it.key + thresholdOffsetPercent) }
+        val deleteEntry = deletionConditions.entries
+            .filter { freeSpacePercentage < it.key }
             .minByOrNull { it.key }
-        return entry?.value
+            ?: return null
+
+        val targetThreshold = (deleteEntry.key - thresholdOffsetPercent).coerceAtLeast(0)
+        val leavingSoonEntry = deletionConditions.entries
+            .filter { it.key <= targetThreshold }
+            .maxByOrNull { it.key }
+
+        if (leavingSoonEntry != null) {
+            log.info(
+                "Leaving Soon threshold selected: delete threshold {}%, offset {}% -> target {}% (free space {}%)",
+                deleteEntry.key,
+                thresholdOffsetPercent,
+                targetThreshold,
+                String.format("%.2f", freeSpacePercentage)
+            )
+        }
+
+        return leavingSoonEntry?.value
     }
 }

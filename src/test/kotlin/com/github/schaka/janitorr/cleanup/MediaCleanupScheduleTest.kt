@@ -50,17 +50,18 @@ class MediaCleanupScheduleTest {
         )
 
         val freeSpacePercentage = freeSpacePercent(fileSystemProperties.freeSpaceCheckDir)
-        val threshold = max(1, floor(freeSpacePercentage).toInt())
+        val deleteThreshold = max(6, floor(freeSpacePercentage).toInt() + 1)
         val offset = 5
+        val leavingSoonThreshold = deleteThreshold - offset
 
         val mediaDeletion = MediaDeletion(
             enabled = true,
             movieExpiration = mapOf(
-                threshold to Duration.ofDays(10),
-                (threshold + 10) to Duration.ofDays(20)
+                leavingSoonThreshold to Duration.ofDays(10),
+                deleteThreshold to Duration.ofDays(20)
             ),
             seasonExpiration = mapOf(
-                threshold to Duration.ofDays(10)
+                leavingSoonThreshold to Duration.ofDays(10)
             )
         )
 

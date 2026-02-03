@@ -21,6 +21,7 @@ on:
       - .github/**
       - build.gradle.kts
       - settings.gradle.kts
+      - gradle.properties
     branches:
       - '**'
 
@@ -62,6 +63,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Fix Git Branch for Versioning
+        if: github.event_name == 'pull_request_target'
+        run: git checkout -b ${{ github.event.number }}-merge
 
       - name: Log in to Docker Hub to pull images without rate limit
         continue-on-error: true
@@ -111,6 +116,10 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
+      - name: Fix Git Branch for Versioning
+        if: github.event_name == 'pull_request_target'
+        run: git checkout -b ${{ github.event.number }}-merge
+
       - name: Set up JDK 25
         uses: actions/setup-java@v5
         with:
@@ -153,7 +162,7 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "pull_request_target" ]; then
             # Tag with PR number to avoid overwriting develop/main images
-            NAME="pr-${{ github.event.number }}"
+            NAME="${{ github.event.number }}-merge"
           else
             # Tag with branch/tag name for direct pushes
             NAME="${{ github.ref_name }}"

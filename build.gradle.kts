@@ -141,7 +141,7 @@ tasks.withType<ProcessAot> {
 tasks.withType<BootBuildImage> {
 
     docker.publishRegistry.url = "ghcr.io"
-    docker.publishRegistry.username = System.getenv("USERNAME") ?: "INVALID_USER"
+    docker.publishRegistry.username = System.getenv("REPOSITORY_OWNER") ?: "INVALID_USER"
     docker.publishRegistry.password = System.getenv("GITHUB_TOKEN") ?: "INVALID_PASSWORD"
 
     // "paketobuildpacks/builder-noble-java-tiny" has issues with locale, we can work around that by patching the JDK, but I'd rather not

@@ -5,6 +5,7 @@ import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.SonarrHistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
 import com.github.schaka.janitorr.servarr.sonarr.episodes.EpisodeResponse
+import com.github.schaka.janitorr.servarr.sonarr.episodes.MonitoringRequest
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import feign.Param
 import feign.RequestLine
@@ -46,5 +47,8 @@ interface SonarrClient {
 
     @RequestLine("POST /importlistexclusion")
     fun addToImportExclusion(exclusion: SonarrImportListExclusion)
+
+    @RequestLine("PUT /episode/monitor")
+    fun changeMonitoringStatus(monitoringRequest: MonitoringRequest)
 
 }

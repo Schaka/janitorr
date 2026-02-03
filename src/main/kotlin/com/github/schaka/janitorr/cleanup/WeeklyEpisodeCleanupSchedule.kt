@@ -4,6 +4,7 @@ import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
+import com.github.schaka.janitorr.servarr.sonarr.episodes.MonitoringRequest
 import com.github.schaka.janitorr.servarr.sonarr.series.Season
 import com.github.schaka.janitorr.servarr.sonarr.series.SeriesPayload
 import org.slf4j.LoggerFactory
@@ -70,6 +71,7 @@ class WeeklyEpisodeCleanupSchedule(
 
                     if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                         if (!applicationProperties.dryRun) {
+                            sonarrClient.changeMonitoringStatus(MonitoringRequest(listOf(episode.id)))
                             sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                             episodes.remove(episode)
                         }
@@ -87,6 +89,7 @@ class WeeklyEpisodeCleanupSchedule(
 
                     if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                         if (!applicationProperties.dryRun) {
+                            sonarrClient.changeMonitoringStatus(MonitoringRequest(listOf(episode.id)))
                             sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                         }
                     }
@@ -107,6 +110,7 @@ class WeeklyEpisodeCleanupSchedule(
                     log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because it's part of an older season")
                     if (episode.episodeFileId != null && episode.episodeFileId != 0) {
                         if (!applicationProperties.dryRun) {
+                            sonarrClient.changeMonitoringStatus(MonitoringRequest(listOf(episode.id)))
                             sonarrClient.deleteEpisodeFile(episode.episodeFileId)
                         }
                     }

@@ -52,30 +52,6 @@ class Build(private val project: Project) {
     }
 
     /**
-     * @return the username to push containers to the project’s GitLab Container Registry.
-     *
-     * Only available if the Container Registry is enabled for the project.
-     *
-     * If the variable is not set, an empty string is used.
-     */
-    fun containerRegistryUser(): String {
-        return getenv("DOCKERHUB_USER") ?: ""
-    }
-
-    /**
-     * @return The password to push containers to the project’s GitLab Container Registry.
-     *
-     * Only available if the Container Registry is enabled for the project.
-     *
-     * This password value is the same as the `CI_JOB_TOKEN` and is valid only as long as the job is running.
-     *
-     * If the variable is not set, an empty string is used.
-     */
-    fun containerRegistryPassword(): String {
-        return getenv("DOCKERHUB_PASSWORD") ?: ""
-    }
-
-    /**
      * @return the container image name to be used as FROM image for the application image.
      */
     fun containerBaseImage(): String {
@@ -113,7 +89,7 @@ class Build(private val project: Project) {
      * If the variable is not set, the local user name is used.
      */
     fun userName(): String {
-        return getenv("GITLAB_USER_NAME") ?: System.getProperty("user.name")
+        return getenv("USERNAME") ?: System.getProperty("user.name")
     }
 
     /**

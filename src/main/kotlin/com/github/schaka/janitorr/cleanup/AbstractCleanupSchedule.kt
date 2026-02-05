@@ -34,8 +34,8 @@ abstract class AbstractCleanupSchedule(
 
         val shouldDelete = needToDelete(libraryType)
         val deletionExpiration = if (shouldDelete) expiration else null
-        val leavingSoonFromOffset = determineLeavingSoonDuration(libraryType)
-        val leavingSoonExpiration = leavingSoonFromOffset ?: deletionExpiration
+        val leavingSoonOffset = determineLeavingSoonDuration(libraryType)
+        val leavingSoonExpiration = if (!leavingSoonOffset.isZero) leavingSoonOffset else deletionExpiration
 
         if (!shouldDelete && leavingSoonExpiration == null) {
             log.info("Not deleting ${libraryType.collectionType} because minimum disk threshold was not reached.")
@@ -58,33 +58,38 @@ abstract class AbstractCleanupSchedule(
         }
 
         when (libraryType) {
-            TV_SHOWS -> cleanupMediaType(libraryType, sonarrService, leavingSoonExpiration, deletionExpiration, leavingSoonFromOffset != null, this::deleteTvShows, entryFilter, onlyAddLinks)
-            MOVIES -> cleanupMediaType(libraryType, radarrService, leavingSoonExpiration, deletionExpiration, leavingSoonFromOffset != null, this::deleteMovies, entryFilter, onlyAddLinks)
+            TV_SHOWS -> cleanupMediaType(libraryType, sonarrService, leavingSoonExpiration, deletionExpiration, shouldDelete, this::deleteTvShows, entryFilter, onlyAddLinks)
+            MOVIES -> cleanupMediaType(libraryType, radarrService, leavingSoonExpiration, deletionExpiration, shouldDelete, this::deleteMovies, entryFilter, onlyAddLinks)
         }
 
     }
 
     abstract fun needToDelete(type: LibraryType): Boolean
 
-    protected open fun determineLeavingSoonDuration(type: LibraryType): Duration? {
-        return null
+    protected open fun determineLeavingSoonDuration(type: LibraryType): Duration {
+        return Duration.ZERO
     }
 
     /**
      * Convert to full days and do some math.
      * This should probably work just letting the user set the duration entirely. But I think forcing full days will avoid some user errors.
      */
-    private fun cleanupMediaType(libraryType: LibraryType, servarrService: ServarrService, leavingSoonExpiration: Duration, deletionExpiration: Duration?, leavingSoonFromOffset: Boolean,
+    private fun cleanupMediaType(libraryType: LibraryType, servarrService: ServarrService, leavingSoonExpiration: Duration, deletionExpiration: Duration?, performDeletion: Boolean,
                                  deleteTask: (List<LibraryItem>) -> Unit,
                                  entryFilter: (LibraryItem) -> Boolean,
                                  onlyAddLinks: Boolean = false
                                  ) {
 
         val today = LocalDateTime.now()
-        val leavingSoonWindow = applicationProperties.leavingSoon.toDays()
+        val leavingSoonWindowDays = applicationProperties.leavingSoon.toDays()
         val leavingSoonExpirationDays = leavingSoonExpiration.toDays()
         val deletionExpirationDays = deletionExpiration?.toDays()
-        val leavingSoonStartDays = if (leavingSoonFromOffset) leavingSoonExpirationDays else leavingSoonExpirationDays - leavingSoonWindow
+        val hasLeavingSoonOffset = deletionExpirationDays == null || leavingSoonExpirationDays < deletionExpirationDays
+        val leavingSoonStartDays = if (hasLeavingSoonOffset) {
+            leavingSoonExpirationDays
+        } else {
+            leavingSoonExpirationDays - leavingSoonWindowDays
+        }
 
         val servarrEntries = servarrService.getEntries().filter(entryFilter)
         // prefilter, so expensive operations like mediaServerId and watchHistory population don't have to run on the entire library
@@ -103,12 +108,10 @@ abstract class AbstractCleanupSchedule(
         }
         mediaServerService.updateLeavingSoon(cleanupType, libraryType, leavingSoon, onlyAddLinks)
 
-        val toDeleteMedia = if (deletionExpirationDays != null) {
-            deletionCandidates.filter { it.historyAge.plusDays(deletionExpirationDays) < today }
-        } else {
-            emptyList()
-        }
-        if (deletionExpirationDays != null) {
+        if (performDeletion && deletionExpirationDays != null) {
+            val toDeleteMedia = deletionCandidates.filter {
+                it.historyAge.plusDays(deletionExpirationDays) < today
+            }
             deleteTask(toDeleteMedia)
         }
 

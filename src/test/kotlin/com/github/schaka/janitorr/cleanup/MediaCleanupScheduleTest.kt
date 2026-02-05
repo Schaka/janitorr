@@ -88,7 +88,7 @@ class MediaCleanupScheduleTest {
     }
 
     @Test
-    fun determineLeavingSoonDurationIsNullWhenOffsetIsDisabled() {
+    fun determineLeavingSoonDurationIsZeroWhenOffsetIsDisabled() {
         val fileSystemProperties = FileSystemProperties(
             access = true,
             leavingSoonDir = "/data/media/leaving-soon",
@@ -117,11 +117,11 @@ class MediaCleanupScheduleTest {
 
         val duration = schedule.exposeDetermineLeavingSoonDuration(LibraryType.MOVIES)
 
-        assertThat(duration).isNull()
+        assertThat(duration).isEqualTo(Duration.ZERO)
     }
 
     @Test
-    fun determineLeavingSoonDurationIsNullWithoutFilesystemAccess() {
+    fun determineLeavingSoonDurationIsZeroWithoutFilesystemAccess() {
         val fileSystemProperties = FileSystemProperties(
             access = false,
             leavingSoonDir = "/data/media/leaving-soon",
@@ -150,7 +150,7 @@ class MediaCleanupScheduleTest {
 
         val duration = schedule.exposeDetermineLeavingSoonDuration(LibraryType.MOVIES)
 
-        assertThat(duration).isNull()
+        assertThat(duration).isEqualTo(Duration.ZERO)
     }
 
     private fun freeSpacePercent(dir: String): Double {
@@ -175,7 +175,7 @@ class MediaCleanupScheduleTest {
         sonarrService,
         radarrService
     ) {
-        fun exposeDetermineLeavingSoonDuration(type: LibraryType): Duration? {
+        fun exposeDetermineLeavingSoonDuration(type: LibraryType): Duration {
             return determineLeavingSoonDuration(type)
         }
     }

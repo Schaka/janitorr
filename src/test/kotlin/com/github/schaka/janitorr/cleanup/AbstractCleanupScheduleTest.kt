@@ -88,7 +88,7 @@ class AbstractCleanupScheduleTest {
     fun scheduleDeleteSkipsWorkWhenNoDeletionAndNoLeavingSoon() {
         val schedule = buildSchedule(
             shouldDelete = false,
-            leavingSoonDuration = null,
+            leavingSoonDuration = Duration.ZERO,
             leavingSoonWindow = Duration.ofDays(2)
         )
 
@@ -101,7 +101,7 @@ class AbstractCleanupScheduleTest {
 
     private fun buildSchedule(
         shouldDelete: Boolean,
-        leavingSoonDuration: Duration?,
+        leavingSoonDuration: Duration,
         leavingSoonWindow: Duration
     ): TestCleanupSchedule {
         val fileSystemProperties = FileSystemProperties(
@@ -142,7 +142,7 @@ class AbstractCleanupScheduleTest {
         sonarrService: ServarrService,
         radarrService: ServarrService,
         private val shouldDelete: Boolean,
-        private val leavingSoonDuration: Duration?
+        private val leavingSoonDuration: Duration
     ) : AbstractCleanupSchedule(
         CleanupType.MEDIA,
         mediaServerService,
@@ -155,7 +155,7 @@ class AbstractCleanupScheduleTest {
     ) {
         override fun needToDelete(type: LibraryType): Boolean = shouldDelete
 
-        override fun determineLeavingSoonDuration(type: LibraryType): Duration? = leavingSoonDuration
+        override fun determineLeavingSoonDuration(type: LibraryType): Duration = leavingSoonDuration
 
         fun exposeScheduleDelete(libraryType: LibraryType, expiration: Duration?) {
             scheduleDelete(libraryType, expiration)

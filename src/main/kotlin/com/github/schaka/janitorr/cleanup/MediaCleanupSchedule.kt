@@ -60,22 +60,22 @@ class MediaCleanupSchedule(
         return determineDeletionDuration(deleteConditions) != null
     }
 
-    override fun determineLeavingSoonDuration(type: LibraryType): Duration? {
+    override fun determineLeavingSoonDuration(type: LibraryType): Duration {
         val deleteConditions: Map<Int, Duration> = when (type) {
             TV_SHOWS -> applicationProperties.mediaDeletion.seasonExpiration
             MOVIES -> applicationProperties.mediaDeletion.movieExpiration
         }
 
-        val offset = applicationProperties.leavingSoonThresholdOffsetPercent
-        val duration = determineLeavingSoonDuration(deleteConditions, offset)
+        val offsetPercent = applicationProperties.leavingSoonThresholdOffsetPercent
+        val duration = determineLeavingSoonDuration(deleteConditions, offsetPercent)
         if (duration != null) {
             log.info(
                 "Updating Leaving Soon for {} older than {} days based on threshold offset ({}%)",
                 type.collectionType,
                 duration.toDays(),
-                offset
+                offsetPercent
             )
-        } else if (fileSystemProperties.access && offset > 0) {
+        } else if (fileSystemProperties.access && offsetPercent > 0) {
             val freeSpacePercentage = getFreeSpacePercentage()
             val thresholds = deleteConditions.keys.sorted()
             val thresholdSummary = when {
@@ -83,15 +83,15 @@ class MediaCleanupSchedule(
                 thresholds.size <= 6 -> thresholds.joinToString(",")
                 else -> "${thresholds.first()}..${thresholds.last()}"
             }
-            log.info(
+            log.debug(
                 "Leaving Soon threshold not matched for {}: free space {}%, offset {}%, thresholds {}",
                 type.collectionType,
                 String.format("%.2f", freeSpacePercentage),
-                offset,
+                offsetPercent,
                 thresholdSummary
             )
         }
-        return duration
+        return duration ?: Duration.ZERO
     }
 
     private fun determineDeletionDuration(deletionConditions: Map<Int, Duration>): Duration? {
@@ -118,9 +118,9 @@ class MediaCleanupSchedule(
             .minByOrNull { it.key }
             ?: return null
 
-        val targetThreshold = (deleteEntry.key - thresholdOffsetPercent).coerceAtLeast(0)
+        val targetThresholdPercent = (deleteEntry.key - thresholdOffsetPercent).coerceAtLeast(0)
         val leavingSoonEntry = deletionConditions.entries
-            .filter { it.key <= targetThreshold }
+            .filter { it.key <= targetThresholdPercent }
             .maxByOrNull { it.key }
 
         if (leavingSoonEntry != null) {
@@ -128,7 +128,7 @@ class MediaCleanupSchedule(
                 "Leaving Soon threshold selected: delete threshold {}%, offset {}% -> target {}% (free space {}%)",
                 deleteEntry.key,
                 thresholdOffsetPercent,
-                targetThreshold,
+                targetThresholdPercent,
                 String.format("%.2f", freeSpacePercentage)
             )
         }

@@ -60,6 +60,40 @@ class MediaCleanupSchedule(
         return determineDeletionDuration(deleteConditions) != null
     }
 
+    override fun determineLeavingSoonDuration(type: LibraryType): Duration {
+        val deleteConditions: Map<Int, Duration> = when (type) {
+            TV_SHOWS -> applicationProperties.mediaDeletion.seasonExpiration
+            MOVIES -> applicationProperties.mediaDeletion.movieExpiration
+        }
+
+        val offsetPercent = applicationProperties.leavingSoonThresholdOffsetPercent
+        val duration = determineLeavingSoonDuration(deleteConditions, offsetPercent)
+        if (duration != null) {
+            log.info(
+                "Updating Leaving Soon for {} older than {} days based on threshold offset ({}%)",
+                type.collectionType,
+                duration.toDays(),
+                offsetPercent
+            )
+        } else if (fileSystemProperties.access && offsetPercent > 0) {
+            val freeSpacePercentage = getFreeSpacePercentage()
+            val thresholds = deleteConditions.keys.sorted()
+            val thresholdSummary = when {
+                thresholds.isEmpty() -> "none"
+                thresholds.size <= 6 -> thresholds.joinToString(",")
+                else -> "${thresholds.first()}..${thresholds.last()}"
+            }
+            log.debug(
+                "Leaving Soon threshold not matched for {}: free space {}%, offset {}%, thresholds {}",
+                type.collectionType,
+                String.format("%.2f", freeSpacePercentage),
+                offsetPercent,
+                thresholdSummary
+            )
+        }
+        return duration ?: Duration.ZERO
+    }
+
     private fun determineDeletionDuration(deletionConditions: Map<Int, Duration>): Duration? {
 
         // If we don't have access to the same file system as the library, we can't determine the actual space left and will just choose the longest expiration time available
@@ -71,5 +105,34 @@ class MediaCleanupSchedule(
 
         val entry = deletionConditions.entries.filter { freeSpacePercentage < it.key }.minByOrNull { it.key }
         return entry?.value
+    }
+
+    private fun determineLeavingSoonDuration(deletionConditions: Map<Int, Duration>, thresholdOffsetPercent: Int): Duration? {
+        if (!fileSystemProperties.access || thresholdOffsetPercent <= 0) {
+            return null
+        }
+
+        val freeSpacePercentage = getFreeSpacePercentage()
+        val deleteEntry = deletionConditions.entries
+            .filter { freeSpacePercentage < it.key }
+            .minByOrNull { it.key }
+            ?: return null
+
+        val targetThresholdPercent = (deleteEntry.key - thresholdOffsetPercent).coerceAtLeast(0)
+        val leavingSoonEntry = deletionConditions.entries
+            .filter { it.key <= targetThresholdPercent }
+            .maxByOrNull { it.key }
+
+        if (leavingSoonEntry != null) {
+            log.info(
+                "Leaving Soon threshold selected: delete threshold {}%, offset {}% -> target {}% (free space {}%)",
+                deleteEntry.key,
+                thresholdOffsetPercent,
+                targetThresholdPercent,
+                String.format("%.2f", freeSpacePercentage)
+            )
+        }
+
+        return leavingSoonEntry?.value
     }
 }

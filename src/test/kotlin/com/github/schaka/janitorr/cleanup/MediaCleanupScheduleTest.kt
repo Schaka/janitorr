@@ -1,10 +1,6 @@
 package com.github.schaka.janitorr.cleanup
 
-import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.config.EpisodeDeletion
-import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.config.MediaDeletion
-import com.github.schaka.janitorr.config.TagDeletion
+import com.github.schaka.janitorr.config.*
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -17,6 +13,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.io.File
 import java.time.Duration
+import java.time.temporal.ChronoUnit.FOREVER
 import kotlin.math.floor
 import kotlin.math.max
 
@@ -117,11 +114,11 @@ class MediaCleanupScheduleTest {
 
         val duration = schedule.exposeDetermineLeavingSoonDuration(LibraryType.MOVIES)
 
-        assertThat(duration).isEqualTo(Duration.ZERO)
+        assertThat(duration).isEqualTo(FOREVER.duration)
     }
 
     @Test
-    fun determineLeavingSoonDurationIsZeroWithoutFilesystemAccess() {
+    fun determineLeavingSoonDurationIsMaximumDurationWithoutFilesystemAccess() {
         val fileSystemProperties = FileSystemProperties(
             access = false,
             leavingSoonDir = "/data/media/leaving-soon",
@@ -150,7 +147,7 @@ class MediaCleanupScheduleTest {
 
         val duration = schedule.exposeDetermineLeavingSoonDuration(LibraryType.MOVIES)
 
-        assertThat(duration).isEqualTo(Duration.ZERO)
+        assertThat(duration).isEqualTo(Duration.ofDays(120))
     }
 
     private fun freeSpacePercent(dir: String): Double {
@@ -176,7 +173,15 @@ class MediaCleanupScheduleTest {
         radarrService
     ) {
         fun exposeDetermineLeavingSoonDuration(type: LibraryType): Duration {
-            return determineLeavingSoonDuration(type)
+
+            val freeSpacePercentage = getFreeSpacePercentage()
+            val leavingSoonFreeSpacePercentage = freeSpacePercentage - applicationProperties.leavingSoonThresholdOffsetPercent
+            val expirationMap = if (type == LibraryType.MOVIES) {
+                applicationProperties.mediaDeletion.movieExpiration
+            } else {
+                applicationProperties.mediaDeletion.seasonExpiration
+            }
+            return determineDeletionDuration(expirationMap, leavingSoonFreeSpacePercentage)
         }
     }
 }

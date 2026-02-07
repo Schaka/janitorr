@@ -54,8 +54,8 @@ class TagBasedCleanupSchedule(
         for (tag in applicationProperties.tagBasedDeletion.schedules) {
             log.debug("Deleting TV shows and movies with tag: {}", tag)
             // Forcefully only adding links - since we're treating all tags as one equal type of cleanup
-            scheduleDelete(TV_SHOWS, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
-            scheduleDelete(MOVIES, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
+            scheduleDelete(TV_SHOWS, tag.expiration, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
+            scheduleDelete(MOVIES, tag.expiration, tag.expiration, entryFilter = { item -> tagMatches(item, tag) }, true)
         }
 
     }

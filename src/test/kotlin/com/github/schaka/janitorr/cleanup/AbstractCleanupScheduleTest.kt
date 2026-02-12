@@ -1,10 +1,6 @@
 package com.github.schaka.janitorr.cleanup
 
-import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.config.EpisodeDeletion
-import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.config.MediaDeletion
-import com.github.schaka.janitorr.config.TagDeletion
+import com.github.schaka.janitorr.config.*
 import com.github.schaka.janitorr.jellyseerr.JellyseerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
@@ -19,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.Duration
 import java.time.LocalDateTime
+import java.time.temporal.ChronoUnit.FOREVER
 
 @ExtendWith(MockKExtension::class)
 class AbstractCleanupScheduleTest {
@@ -88,7 +85,7 @@ class AbstractCleanupScheduleTest {
     fun scheduleDeleteSkipsWorkWhenNoDeletionAndNoLeavingSoon() {
         val schedule = buildSchedule(
             shouldDelete = false,
-            leavingSoonDuration = Duration.ZERO,
+            leavingSoonDuration = FOREVER.duration,
             leavingSoonWindow = Duration.ofDays(2)
         )
 
@@ -155,10 +152,8 @@ class AbstractCleanupScheduleTest {
     ) {
         override fun needToDelete(type: LibraryType): Boolean = shouldDelete
 
-        override fun determineLeavingSoonDuration(type: LibraryType): Duration = leavingSoonDuration
-
-        fun exposeScheduleDelete(libraryType: LibraryType, expiration: Duration?) {
-            scheduleDelete(libraryType, expiration)
+        fun exposeScheduleDelete(libraryType: LibraryType, expiration: Duration) {
+            scheduleDelete(libraryType, expiration, leavingSoonDuration)
         }
     }
 }

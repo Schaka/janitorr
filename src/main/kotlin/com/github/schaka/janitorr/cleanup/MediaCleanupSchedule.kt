@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import java.time.Duration
+import java.time.temporal.ChronoUnit.FOREVER
 
 @Profile("!leyden")
 @Service
@@ -40,13 +41,20 @@ class MediaCleanupSchedule(
             return
         }
 
-        val seasonExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.seasonExpiration)
-        log.debug("Cleaning up TV shows older than ${seasonExpiration?.toDays()}")
-        val movieExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.movieExpiration)
-        log.debug("Cleaning up movies older than ${movieExpiration?.toDays()}")
+        val freeSpacePercentage = getFreeSpacePercentage()
+        val seasonExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.seasonExpiration, freeSpacePercentage)
+        log.debug("Cleaning up TV shows older than ${seasonExpiration.toDays()}")
+        val movieExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.movieExpiration, freeSpacePercentage)
+        log.debug("Cleaning up movies older than ${movieExpiration.toDays()}")
 
-        scheduleDelete(TV_SHOWS, seasonExpiration)
-        scheduleDelete(MOVIES, movieExpiration)
+        val leavingSoonFreeSpacePercentage = freeSpacePercentage - applicationProperties.leavingSoonThresholdOffsetPercent
+        val seasonLeavingSoonExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.seasonExpiration, leavingSoonFreeSpacePercentage)
+        log.debug("Creating Leaving Soon for TV shows older than ${seasonLeavingSoonExpiration.toDays()}")
+        val movieLeavingSoooExpiration = determineDeletionDuration(applicationProperties.mediaDeletion.movieExpiration, leavingSoonFreeSpacePercentage)
+        log.debug("Creating Leaving Soon for movies older than ${movieLeavingSoooExpiration.toDays()}")
+
+        scheduleDelete(TV_SHOWS, seasonExpiration, seasonLeavingSoonExpiration)
+        scheduleDelete(MOVIES, movieExpiration, movieLeavingSoooExpiration)
 
     }
 
@@ -57,19 +65,20 @@ class MediaCleanupSchedule(
             MOVIES -> applicationProperties.mediaDeletion.movieExpiration
         }
 
-        return determineDeletionDuration(deleteConditions) != null
+        val freeSpacePercentage = getFreeSpacePercentage()
+        return determineDeletionDuration(deleteConditions, freeSpacePercentage) != FOREVER.duration
     }
 
-    private fun determineDeletionDuration(deletionConditions: Map<Int, Duration>): Duration? {
+    protected fun determineDeletionDuration(deletionConditions: Map<Int, Duration>, freeSpacePercentage: Double): Duration {
 
         // If we don't have access to the same file system as the library, we can't determine the actual space left and will just choose the longest expiration time available
         if (!fileSystemProperties.access) {
-            return deletionConditions.entries.maxByOrNull { it.value.toDays() }?.value
+            log.debug("File system access is disabled - choosing longest expiration duration")
+            return deletionConditions.entries.maxByOrNull { it.value.toDays() }?.value ?: FOREVER.duration
         }
 
-        val freeSpacePercentage = getFreeSpacePercentage()
-
         val entry = deletionConditions.entries.filter { freeSpacePercentage < it.key }.minByOrNull { it.key }
-        return entry?.value
+        return entry?.value ?: FOREVER.duration
     }
+
 }

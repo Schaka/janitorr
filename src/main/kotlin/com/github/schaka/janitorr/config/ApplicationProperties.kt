@@ -18,5 +18,6 @@ data class ApplicationProperties(
         val wholeTvShow: Boolean = false,
         val wholeShowSeedingCheck: Boolean = false,
         val leavingSoon: Duration = Duration.ofDays(14),
+        val leavingSoonThresholdOffsetPercent: Int = 0,
         val exclusionTags: List<String> = listOf("janitorr_keep")
 )

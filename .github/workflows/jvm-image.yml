@@ -28,7 +28,7 @@ on:
 jobs:
 
   run-test-suite:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -43,19 +43,27 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 9.2.1
+          gradle-version: 9.3.1
 
       - name: Run tests
         run: ./gradlew test
 
   build-jvm-x86:
     needs: [ run-test-suite ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write
 
     steps:
+
+      - name: Free GitHub Runner Space & Memory
+        run: |
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /opt/ghc
+          docker system prune -af
+
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -83,7 +91,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 9.2.1
+          gradle-version: 9.3.1
 
       - name: Build JVM OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/amd64
@@ -115,7 +123,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 9.2.1
+          gradle-version: 9.3.1
 
       - name: Build JVM ARM64 OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64

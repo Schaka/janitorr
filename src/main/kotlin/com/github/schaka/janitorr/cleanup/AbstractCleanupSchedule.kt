@@ -29,7 +29,7 @@ abstract class AbstractCleanupSchedule(
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
-        private val THIRTY_YEARS: Long = 365L * 30L
+        private const val HUNDRED_YEARS: Long = 365L * 100L
     }
 
     protected fun scheduleDelete(libraryType: LibraryType, expiration: Duration, leavingSoonExpiration: Duration, entryFilter: (LibraryItem) -> Boolean = { true }, onlyAddLinks: Boolean = false) {
@@ -77,8 +77,8 @@ abstract class AbstractCleanupSchedule(
         val today = LocalDateTime.now()
         val needToDelete = deletionExpiration != FOREVER.duration
         val needLeavingSoon = leavingSoonExpiration != FOREVER.duration
-        val deletionExpirationDays = if (needToDelete) deletionExpiration.toDays() else THIRTY_YEARS
-        val leavingSoonExpirationDays = if (needLeavingSoon) leavingSoonExpiration.toDays() else THIRTY_YEARS
+        val deletionExpirationDays = if (needToDelete) deletionExpiration.toDays() else HUNDRED_YEARS
+        val leavingSoonExpirationDays = if (needLeavingSoon) leavingSoonExpiration.toDays() else HUNDRED_YEARS
 
         if (!needToDelete && !needLeavingSoon) {
             return

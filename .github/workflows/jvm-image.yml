@@ -28,7 +28,7 @@ on:
 jobs:
 
   run-test-suite:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -50,7 +50,7 @@ jobs:
 
   build-jvm-x86:
     needs: [ run-test-suite ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: read
       packages: write

@@ -1,6 +1,6 @@
 package com.github.schaka.janitorr.servarr.radarr
 
-import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
+import com.github.schaka.janitorr.servarr.data_structures.RadarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.history.HistoryResponse
 import com.github.schaka.janitorr.servarr.quality_profile.QualityProfile
@@ -38,6 +38,6 @@ interface RadarrClient {
     @RequestLine("GET /qualityprofile")
     fun getAllQualityProfiles(): List<QualityProfile>
 
-    @RequestLine("POST /importlistexclusion")
-    fun addToImportExclusion(exclusion: SonarrImportListExclusion)
+    @RequestLine("POST /exclusions")
+    fun addToImportExclusion(exclusion: RadarrImportListExclusion)
 }

@@ -7,6 +7,7 @@ import com.github.schaka.janitorr.servarr.HistorySort.MOST_RECENT
 import com.github.schaka.janitorr.servarr.HistorySort.OLDEST
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
+import com.github.schaka.janitorr.servarr.data_structures.RadarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.SonarrImportListExclusion
 import com.github.schaka.janitorr.servarr.data_structures.Tag
 import com.github.schaka.janitorr.servarr.radarr.movie.MovieFile
@@ -91,8 +92,7 @@ class RadarrRestService(
 
             if (!applicationProperties.dryRun) {
                 unmonitorMovie(movie.id)
-                deleteMovie(movie.id)
-                addToExclusionList( movie )
+                deleteMovie(movie)
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
             } else {
                 log.info("Deleting movie ({}), id: {}, imdb: {}", movie.parentPath, movie.id, movie.imdbId)
@@ -102,17 +102,23 @@ class RadarrRestService(
 
     private fun addToExclusionList(item: LibraryItem) {
         if (radarrProperties.importExclusions && item.tmdbId != null)  {
-            radarrClient.addToImportExclusion(SonarrImportListExclusion("IMDB: ${item.imdbId} by Janitorr", item.tmdbId))
+            radarrClient.addToImportExclusion(
+                RadarrImportListExclusion(
+                    "IMDB: ${item.imdbId} by Janitorr",
+                    item.tmdbId
+                )
+            )
         }
     }
 
-    private fun deleteMovie(movieId: Int) {
+    private fun deleteMovie(movie: LibraryItem) {
         if (!radarrProperties.onlyDeleteFiles) {
-            radarrClient.deleteMovie(movieId, true, radarrProperties.importExclusions)
+            radarrClient.deleteMovie(movie.id, true, radarrProperties.importExclusions)
             return
         }
 
-        radarrClient.getMovieFiles(movieId)
+        addToExclusionList( movie )
+        radarrClient.getMovieFiles(movie.id)
             .map(MovieFile::id)
             .forEach(radarrClient::deleteMovieFile)
     }

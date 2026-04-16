@@ -5,6 +5,7 @@ import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.stats.StatsNoOpService
 import com.github.schaka.janitorr.stats.StatsService
+import com.github.schaka.janitorr.stats.janitorrstats.*
 import com.github.schaka.janitorr.stats.jellystat.JellystatClient
 import com.github.schaka.janitorr.stats.jellystat.JellystatProperties
 import com.github.schaka.janitorr.stats.jellystat.JellystatRestService
@@ -27,14 +28,30 @@ class StatsConfig(
     }
 
     @Bean
+    fun janitorrStatsService(
+        janitorrStatsProperties: JanitorrStatsProperties,
+        janitorrStatsClient: JanitorrStatsClient,
+    ): JanitorrStatsService {
+        if (!janitorrStatsProperties.enabled) {
+            return JanitorrStatsNoOpService()
+        }
+        return JanitorrStatsRestService(janitorrStatsClient)
+    }
+
+    @Bean
     fun statsService(
         jellystatProperties: JellystatProperties,
         streamystatsProperties: StreamystatsProperties,
+        janitorrStatsProperties: JanitorrStatsProperties,
+        janitorrStatsService: JanitorrStatsService,
         applicationProperties: ApplicationProperties,
         fileSystemProperties: FileSystemProperties,
     ): StatsService {
 
         if (!jellystatProperties.enabled && !streamystatsProperties.enabled) {
+            if (janitorrStatsProperties.enabled) {
+                return janitorrStatsService
+            }
             return StatsNoOpService()
         }
 
@@ -43,10 +60,10 @@ class StatsConfig(
         }
 
         if (jellystatProperties.enabled) {
-            return JellystatRestService(jellystatClient, jellystatProperties, mediaServerService, applicationProperties)
+            return JellystatRestService(jellystatClient, jellystatProperties, mediaServerService, applicationProperties, janitorrStatsService)
         }
 
-        return StreamystatsRestService(streamystatsClient, streamystatsProperties, mediaServerService, applicationProperties)
+        return StreamystatsRestService(streamystatsClient, streamystatsProperties, mediaServerService, applicationProperties, janitorrStatsService)
     }
 
 }

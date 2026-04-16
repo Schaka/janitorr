@@ -88,6 +88,36 @@ services:
     depends_on:
       - jellystat-db
 
+  # janitorr-stats is the recommended stats backend for new setups (https://github.com/Schaka/janitorr-stats).
+  # It only records what is watched while it runs - it does NOT backfill old history.
+  # If Jellystat or Streamystats is also configured, Janitorr uses them first and only consults
+  # janitorr-stats when they return no result. New users without an existing stats setup should
+  # only enable janitorr-stats and skip Jellystat/Streamystats entirely.
+  janitorr-stats-db:
+    container_name: janitorr-stats-db
+    image: postgres:18
+    user: 1000:1000
+    environment:
+      POSTGRES_DB: janitorr_stats
+      POSTGRES_USER: janitorr_stats
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - /appdata/janitorr-stats/postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  janitorr-stats:
+    container_name: janitorr-stats
+    image: ghcr.io/schaka/janitorr-stats:stable
+    user: 1000:1000
+    volumes:
+      - /appdata/janitorr-stats/application.yaml:/work/config/application.yaml
+      - /appdata/janitorr-stats/data:/data
+      - /appdata/janitorr-stats/logs:/logs # optional - only needed if quarkus.log.file.enable is true
+    # No published port required - Janitorr reaches it over the internal docker network.
+    depends_on:
+      - janitorr-stats-db
+    restart: unless-stopped
+
   janitorr:
     container_name: janitorr
     image: ghcr.io/schaka/janitorr:jvm-stable

@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.stats.config
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
+import com.github.schaka.janitorr.stats.Stats
 import com.github.schaka.janitorr.stats.StatsNoOpService
 import com.github.schaka.janitorr.stats.StatsService
 import com.github.schaka.janitorr.stats.janitorrstats.*
@@ -15,6 +16,7 @@ import com.github.schaka.janitorr.stats.streamystats.StreamystatsRestService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import java.util.Optional
 
 @Configuration(proxyBeanMethods = false)
 class StatsConfig(
@@ -27,17 +29,19 @@ class StatsConfig(
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
+    @JanitorrStats
     @Bean
     fun janitorrStatsService(
         janitorrStatsProperties: JanitorrStatsProperties,
-        janitorrStatsClient: JanitorrStatsClient,
+        janitorrStatsClient: Optional<JanitorrStatsClient>,
     ): JanitorrStatsService {
         if (!janitorrStatsProperties.enabled) {
             return JanitorrStatsNoOpService()
         }
-        return JanitorrStatsRestService(janitorrStatsClient)
+        return JanitorrStatsRestService(janitorrStatsClient.get())
     }
 
+    @Stats
     @Bean
     fun statsService(
         jellystatProperties: JellystatProperties,

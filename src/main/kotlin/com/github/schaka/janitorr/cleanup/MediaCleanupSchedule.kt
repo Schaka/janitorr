@@ -10,6 +10,7 @@ import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.servarr.radarr.Radarr
 import com.github.schaka.janitorr.servarr.sonarr.Sonarr
+import com.github.schaka.janitorr.stats.Stats
 import com.github.schaka.janitorr.stats.StatsService
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
@@ -22,12 +23,12 @@ import java.time.temporal.ChronoUnit.FOREVER
 class MediaCleanupSchedule(
     mediaServerService: AbstractMediaServerService,
     jellyseerrService: JellyseerrService,
-    jellystatService: StatsService,
+    @Stats statsService: StatsService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, jellystatService, fileSystemProperties, applicationProperties, sonarrService, radarrService), Schedule {
+) : AbstractCleanupSchedule(CleanupType.MEDIA, mediaServerService, jellyseerrService, statsService, fileSystemProperties, applicationProperties, sonarrService, radarrService), Schedule {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

@@ -33,9 +33,9 @@ class JanitorrStatsRestService(
                 .maxByOrNull { it.playedAt }
         } catch (e: Exception) {
             if (log.isTraceEnabled) {
-                log.warn("janitorr-stats lookup failed for item {} (season {})", item.id, item.season, e)
+                log.warn("janitorr-stats lookup failed for item {} (season {})", item, item.season, e)
             } else {
-                log.warn("janitorr-stats lookup failed for item {} (season {})", item.id, item.season)
+                log.warn("janitorr-stats lookup failed for item {} (season {})", item, item.season)
             }
             null
         }

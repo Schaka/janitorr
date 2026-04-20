@@ -59,8 +59,8 @@ class JellystatRestService(
 
     private fun logWatchInfo(item: LibraryItem, watchHistory: JellyStatHistoryResponse?) {
         if (watchHistory?.SeasonId != null) {
-            val season = "${watchHistory.NowPlayingItemName} Season ${item.season}"
-            log.debug("Updating history - user {} watched {} at {}", watchHistory.UserName, season, watchHistory.ActivityDateInserted)
+            val season = "${watchHistory.SeriesName} Season ${item.season}"
+            log.debug("Updating history - user {} watched {} ({}) at {}", watchHistory.UserName, season, watchHistory.NowPlayingItemName, watchHistory.ActivityDateInserted)
         } else {
             log.debug("Updating history - user {} watched {} at {}", watchHistory?.UserName, watchHistory?.NowPlayingItemName, watchHistory?.ActivityDateInserted)
         }

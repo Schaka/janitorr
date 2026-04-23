@@ -1,7 +1,7 @@
-package com.github.schaka.janitorr.jellyseerr
+package com.github.schaka.janitorr.seerr
 
 import com.github.schaka.janitorr.servarr.LibraryItem
 
-interface JellyseerrService {
+interface SeerrService {
     fun cleanupRequests(items: List<LibraryItem>)
 }

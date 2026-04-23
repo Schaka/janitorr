@@ -1,8 +1,8 @@
-package com.github.schaka.janitorr.jellyseerr
+package com.github.schaka.janitorr.seerr
 
 import com.github.schaka.janitorr.config.ApplicationProperties
-import com.github.schaka.janitorr.jellyseerr.requests.RequestResponse
-import com.github.schaka.janitorr.jellyseerr.servarr.ServarrSettings
+import com.github.schaka.janitorr.seerr.requests.RequestResponse
+import com.github.schaka.janitorr.seerr.servarr.ServarrSettings
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
@@ -14,26 +14,26 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @ConditionalOnProperty(name = ["clients.jellyseerr.enabled"], havingValue = "true")
 @Service
-class JellyseerrRestService(
+class SeerrRestService(
 
-    val jellyseerrClient: JellyseerrClient,
-    val jellyseerrProperties: JellyseerrProperties,
+    val seerrClient: SeerrClient,
+    val seerrProperties: SeerrProperties,
     val sonarrProperties: SonarrProperties,
     val radarrProperties: RadarrProperties,
     val applicationProperties: ApplicationProperties,
     var sonarrServers: List<ServarrSettings> = listOf(),
     var radarrServers: List<ServarrSettings> = listOf(),
 
-) : JellyseerrService {
+) : SeerrService {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
     init {
-        if (jellyseerrProperties.enabled && !applicationProperties.trainingRun) {
-            sonarrServers = jellyseerrClient.getSonarrServers()
-            radarrServers = jellyseerrClient.getRadarrServers()
+        if (seerrProperties.enabled && !applicationProperties.trainingRun) {
+            sonarrServers = seerrClient.getSonarrServers()
+            radarrServers = seerrClient.getRadarrServers()
         }
     }
 
@@ -54,9 +54,9 @@ class JellyseerrRestService(
                 if (!applicationProperties.dryRun) {
                     try {
                         log.info("Deleting request for {} | IMDB: {} - {}", item.filePath, item.imdbId, request)
-                        jellyseerrClient.deleteRequest(request.id)
+                        seerrClient.deleteRequest(request.id)
                     } catch(e: Exception) {
-                        log.trace("Error deleting Jellyseerr request", e)
+                        log.trace("Error deleting Seerr request", e)
                     }
                 } else {
                     log.info("Found request for {} | IMDB: {} - {}", item.filePath, item.imdbId, request)
@@ -68,7 +68,7 @@ class JellyseerrRestService(
     private fun mediaMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
 
         if (!serverMatches(candidate)) {
-            log.debug("Found request in Jellyseerr but server doesn't match!")
+            log.debug("Found request in Seerr but server doesn't match!")
             return false
         }
 
@@ -77,7 +77,7 @@ class JellyseerrRestService(
             return false
         }
 
-        // Match between Radarr ID or Sonarr ID and the ID Jellyseerr stores for Radarr/Sonarr
+        // Match between Radarr ID or Sonarr ID and the ID Seerr stores for Radarr/Sonarr
         // TODO: Maybe grab the Jellyfin ID here to make deletion in Jellyfin easier down the line?
         if (item.id == candidate.media.externalServiceId) {
             return true
@@ -93,7 +93,7 @@ class JellyseerrRestService(
     private fun serverMatches(candidate: RequestResponse): Boolean {
 
         // only validate the server, if the user enabled it
-        if (!jellyseerrProperties.matchServer) {
+        if (!seerrProperties.matchServer) {
             return true
         }
 
@@ -104,7 +104,7 @@ class JellyseerrRestService(
         // find server this request is responsible for
         val serverSetting = servarrrSettings.firstOrNull { it.id == candidate.media.serviceId }
         if (serverSetting == null) {
-            log.debug("Found a Jellyseerr request [id: {}] not matching any known server: {}", candidate.id, candidate.media)
+            log.debug("Found a Seerr request [id: {}] not matching any known server: {}", candidate.id, candidate.media)
             return false
         }
 
@@ -146,7 +146,7 @@ class JellyseerrRestService(
         var pages: Int
 
         do {
-            val pageResult = jellyseerrClient.getRequests(pageSize, page * pageSize)
+            val pageResult = seerrClient.getRequests(pageSize, page * pageSize)
             pages = pageResult.pageInfo.pages
             allRequests.addAll(pageResult.results)
             page++

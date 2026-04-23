@@ -54,6 +54,8 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:testcontainers")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }

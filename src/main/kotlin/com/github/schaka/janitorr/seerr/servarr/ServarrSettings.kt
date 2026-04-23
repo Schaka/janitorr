@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.jellyseerr.servarr
+package com.github.schaka.janitorr.seerr.servarr
 
 data class ServarrSettings(
     val id: Int,

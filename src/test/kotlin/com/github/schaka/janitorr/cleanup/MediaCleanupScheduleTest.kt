@@ -1,7 +1,7 @@
 package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.*
-import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.ServarrService
@@ -24,7 +24,7 @@ class MediaCleanupScheduleTest {
     lateinit var mediaServerService: AbstractMediaServerService
 
     @MockK(relaxed = true)
-    lateinit var jellyseerrService: JellyseerrService
+    lateinit var seerrService: SeerrService
 
     @MockK(relaxed = true)
     lateinit var statsService: StatsService
@@ -71,7 +71,7 @@ class MediaCleanupScheduleTest {
 
         val schedule = TestMediaCleanupSchedule(
             mediaServerService,
-            jellyseerrService,
+            seerrService,
             statsService,
             fileSystemProperties,
             applicationProperties,
@@ -104,7 +104,7 @@ class MediaCleanupScheduleTest {
 
         val schedule = TestMediaCleanupSchedule(
             mediaServerService,
-            jellyseerrService,
+            seerrService,
             statsService,
             fileSystemProperties,
             applicationProperties,
@@ -137,7 +137,7 @@ class MediaCleanupScheduleTest {
 
         val schedule = TestMediaCleanupSchedule(
             mediaServerService,
-            jellyseerrService,
+            seerrService,
             statsService,
             fileSystemProperties,
             applicationProperties,
@@ -157,7 +157,7 @@ class MediaCleanupScheduleTest {
 
     private class TestMediaCleanupSchedule(
         mediaServerService: AbstractMediaServerService,
-        jellyseerrService: JellyseerrService,
+        seerrService: SeerrService,
         statsService: StatsService,
         fileSystemProperties: FileSystemProperties,
         applicationProperties: ApplicationProperties,
@@ -165,7 +165,7 @@ class MediaCleanupScheduleTest {
         radarrService: ServarrService
     ) : MediaCleanupSchedule(
         mediaServerService,
-        jellyseerrService,
+        seerrService,
         statsService,
         fileSystemProperties,
         applicationProperties,

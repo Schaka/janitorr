@@ -116,7 +116,7 @@ clients:
     enabled: true
     url: "http://localhost:5055"
     api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
-    match-server: false # Enable if you have several Radarr/Sonarr instances set up in Jellyseerr. Janitorr will match them by the host+port supplied in their respective config settings.
+    match-server: false # Enable if you have several Radarr/Sonarr instances set up in Seerr. Janitorr will match them by the host+port supplied in their respective config settings.
 
   jellystat: # Only one, Jellystat or Streamystats can be used
     enabled: true

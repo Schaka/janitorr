@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.jellyseerr.requests
+package com.github.schaka.janitorr.seerr.requests
 
 data class ModifiedBy(
         val avatar: String,

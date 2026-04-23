@@ -44,7 +44,7 @@ abstract class BaseMediaServerService(
 
     /**
      * Populates the library items with Jellyfin/Emby IDs if available.
-     * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
+     * This can be used for easier matching by other components like Seerr and Jellystat, which use the same IDs.
      * Population happens per movie, TV show or season - but never per episode.
      */
     override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {

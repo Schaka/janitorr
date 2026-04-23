@@ -36,7 +36,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in the *arrs - optionally via Jellystat
 - Season by season removal for TV shows, removing entire shows or only keep a minimum number of episodes for weekly shows
-- Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
+- Clear requests from Seerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
 
 <img src="images/leaving_soon_01.png" width=60%>
@@ -51,7 +51,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
 - **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
-- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
+- Jellyfin/Emby and Seerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.
@@ -112,7 +112,7 @@ Janitorr looks for can be adjusted in your config file.
 
 - follow the mapping for `application.yml` examples below
 - within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from this repository
-- adjust said copy with your own info like *arr, Jellyfin and Jellyseerr API keys and your preferred port
+- adjust said copy with your own info like *arr, Jellyfin and Seerr API keys and your preferred port
 
 If using Jellyfin with **filesystem access**, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
 Additionally, make sure the *arrs directories are mapped into your container the same way for Janitorr as well.
@@ -183,6 +183,10 @@ My recommendations:
 **Attention: The develop branch is experimental. Logical errors and breaking changes may happen.**
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
 
+
+## Local Development
+
+For instructions on running Janitorr locally with a full stack of real service containers, see [docs/local-development.md](docs/local-development.md).
 
 ## JetBrains
 Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.

@@ -3,7 +3,7 @@ package com.github.schaka.janitorr.cleanup
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
 import com.github.schaka.janitorr.config.TagDeleteSchedule
-import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -26,13 +26,13 @@ import org.springframework.stereotype.Service
 @Service
 class TagBasedCleanupSchedule(
     mediaServerService: AbstractMediaServerService,
-    jellyseerrService: JellyseerrService,
+    seerrService: SeerrService,
     @Stats statsService: StatsService,
     fileSystemProperties: FileSystemProperties,
     applicationProperties: ApplicationProperties,
     @Sonarr sonarrService: ServarrService,
     @Radarr radarrService: ServarrService,
-) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, jellyseerrService, statsService, fileSystemProperties, applicationProperties, sonarrService, radarrService), Schedule {
+) : AbstractCleanupSchedule(CleanupType.TAG, mediaServerService, seerrService, statsService, fileSystemProperties, applicationProperties, sonarrService, radarrService), Schedule {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)

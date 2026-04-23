@@ -1,4 +1,4 @@
-package com.github.schaka.janitorr.jellyseerr
+package com.github.schaka.janitorr.seerr
 
 import com.github.schaka.janitorr.config.DefaultClientProperties
 import feign.Feign
@@ -14,14 +14,14 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import tools.jackson.databind.json.JsonMapper
 
 @Configuration(proxyBeanMethods = false)
-class JellyseerrClientConfig {
+class SeerrClientConfig {
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
     }
 
     @Bean
-    fun jellyseerrClient(properties: JellyseerrProperties, defaults: DefaultClientProperties, mapper: JsonMapper): JellyseerrClient {
+    fun seerrClient(properties: SeerrProperties, defaults: DefaultClientProperties, mapper: JsonMapper): SeerrClient {
         return Feign.builder()
             .options(Request.Options(defaults.connectTimeout, defaults.readTimeout, true))
                 .logLevel(defaults.level)
@@ -32,6 +32,6 @@ class JellyseerrClientConfig {
                     it.header("X-Api-Key", properties.apiKey)
                     it.header(CONTENT_TYPE, APPLICATION_JSON_VALUE)
                 }
-                .target(JellyseerrClient::class.java, properties.url + "/api/v1")
+                .target(SeerrClient::class.java, properties.url + "/api/v1")
     }
 }

@@ -54,7 +54,7 @@ clients:
   jellyseerr:
     enabled: false
     url: "http://jellyseerr:5055"
-    api-key: "jellyseerr-key"
+    api-key: "seerr-key"
   jellystat:
     enabled: false
     url: "http://jellystat:3000"

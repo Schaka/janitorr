@@ -2,7 +2,7 @@ package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -19,7 +19,7 @@ import java.time.temporal.ChronoUnit.FOREVER
 abstract class AbstractCleanupSchedule(
     protected val cleanupType: CleanupType,
     protected val mediaServerService: AbstractMediaServerService,
-    protected val jellyseerrService: JellyseerrService,
+    protected val seerrService: SeerrService,
     protected val statsService: StatsService,
     protected val fileSystemProperties: FileSystemProperties,
     protected val applicationProperties: ApplicationProperties,
@@ -120,7 +120,7 @@ abstract class AbstractCleanupSchedule(
         val cannotDeleteMovies = toDeleteMovies.filter { it.seeding }
         val deletedMovies = toDeleteMovies.filter { !it.seeding }
 
-        jellyseerrService.cleanupRequests(deletedMovies)
+        seerrService.cleanupRequests(deletedMovies)
         mediaServerService.cleanupMovies(deletedMovies)
         mediaServerService.updateLeavingSoon(cleanupType, MOVIES, cannotDeleteMovies, true)
     }
@@ -131,7 +131,7 @@ abstract class AbstractCleanupSchedule(
         val cannotDeleteShow = toDeleteShows.filter { it.seeding }
         val deletedShows = toDeleteShows.filter { !it.seeding }
 
-        jellyseerrService.cleanupRequests(deletedShows)
+        seerrService.cleanupRequests(deletedShows)
         mediaServerService.cleanupTvShows(deletedShows)
         mediaServerService.updateLeavingSoon(cleanupType, TV_SHOWS, cannotDeleteShow, true)
     }

@@ -69,3 +69,7 @@ clients:
     whole-tv-show: false 
     url: "http://jellystat:3000"
     api-key: "jellystat-key"
+  janitorr-stats:
+    enabled: true
+    whole-tv-show: false
+    url: "http://janitorr-stats:8080"

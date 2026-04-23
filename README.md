@@ -47,6 +47,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
 - Only one of Jellyfin or Emby can be enabled at a time
 - Only one of Jellystat or Streamystats can be enabled at a time
+- [janitorr-stats](https://github.com/Schaka/janitorr-stats) can run alongside either as a fallback, or on its own
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
 - **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
@@ -77,6 +78,32 @@ If you cannot use Docker, you'll have to compile it yourself from source.
 Depending on the configuration, files will be deleted if they are older than x days. Age is determined by your grab
 history in the *arr apps. By default, it will choose the oldest file in the history.
 If Jellystat or Streamystats is set up, the most recent watch date overwrites the grab history, if it exists.
+
+### Watch history via janitorr-stats
+
+[janitorr-stats](https://github.com/Schaka/janitorr-stats) is an optional companion microservice that stores Jellyfin
+play history keyed by stable external IDs (IMDB/TMDB/TVDB). Unlike Jellystat or Streamystats, the history survives
+library rescans, file moves and server migrations that change Jellyfin's internal item IDs.
+
+Important caveats:
+- **janitorr-stats only records what is watched while it runs.** It does not backfill historical activity,
+  so on day one it knows nothing. The longer it runs, the more useful it becomes.
+- When both Jellystat/Streamystats and janitorr-stats are enabled, Janitorr queries the primary first and only
+  falls back to janitorr-stats when the primary returns no result.
+- If you are setting up Janitorr fresh and don't already have Jellystat or Streamystats running, enable
+  janitorr-stats from the start and skip the others. There is no reason to set up a stats app you're planning
+  to migrate away from.
+
+Enable it by pointing Janitorr at the janitorr-stats container:
+
+```yml
+clients:
+  janitorr-stats:
+    enabled: true
+    url: "http://janitorr-stats:8080"
+```
+
+See the [janitorr-stats README](https://github.com/Schaka/janitorr-stats) for container setup.
 
 To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
 Janitorr looks for can be adjusted in your config file.

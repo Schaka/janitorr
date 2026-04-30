@@ -60,6 +60,11 @@ application:
 
 
 clients:
+  default:
+    connect-timeout: 60s
+    read-timeout: 60s
+    level: NONE # If set to FULL, will log all data of requests Janitorr sends out
+
   sonarr:
     enabled: true
     url: "http://localhost:8989"
@@ -111,7 +116,7 @@ clients:
     enabled: true
     url: "http://localhost:5055"
     api-key: "MTY3NzU3NzI0NzgzOWFhNWYxMGE4LWNlMWYtNDc1ZS04ODYzLThkMjQyMTQ4M2NiZCe="
-    match-server: false # Enable if you have several Radarr/Sonarr instances set up in Jellyseerr. Janitorr will match them by the host+port supplied in their respective config settings.
+    match-server: false # Enable if you have several Radarr/Sonarr instances set up in Seerr. Janitorr will match them by the host+port supplied in their respective config settings.
 
   jellystat: # Only one, Jellystat or Streamystats can be used
     enabled: true
@@ -124,3 +129,15 @@ clients:
     whole-tv-show: false # Enabling this will make Streamystats consider TV shows as a whole if any episode of any season has been watched
     url: "http://streamystats:3000"
     api-key: "jellystat-key" # Jellyfin API key
+
+  # https://github.com/Schaka/janitorr-stats - companion microservice that records play history against
+  # stable external IDs (IMDB/TMDB/TVDB) instead of mutable Jellyfin item IDs.
+  # Important: it only stores what is watched WHILE it runs. There is no backfill of historical activity.
+  # Behavior when enabled:
+  #   - If Jellystat or Streamystats is also enabled, janitorr-stats is consulted as a fallback only
+  #     when the primary returns no result for an item.
+  #   - If neither Jellystat nor Streamystats is enabled, janitorr-stats becomes the sole source.
+  # New users without an existing stats setup should enable janitorr-stats and leave the others off.
+  janitorr-stats:
+    enabled: false
+    url: "http://janitorr-stats:8080"

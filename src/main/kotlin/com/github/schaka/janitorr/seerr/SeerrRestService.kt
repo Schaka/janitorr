@@ -1,0 +1,158 @@
+package com.github.schaka.janitorr.seerr
+
+import com.github.schaka.janitorr.config.ApplicationProperties
+import com.github.schaka.janitorr.seerr.requests.RequestResponse
+import com.github.schaka.janitorr.seerr.servarr.ServarrSettings
+import com.github.schaka.janitorr.servarr.LibraryItem
+import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
+import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
+import org.apache.http.client.utils.URIBuilder
+import org.slf4j.LoggerFactory
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
+import org.springframework.stereotype.Service
+import org.springframework.web.util.UriComponentsBuilder
+
+@ConditionalOnProperty(name = ["clients.jellyseerr.enabled"], havingValue = "true")
+@Service
+class SeerrRestService(
+
+    val seerrClient: SeerrClient,
+    val seerrProperties: SeerrProperties,
+    val sonarrProperties: SonarrProperties,
+    val radarrProperties: RadarrProperties,
+    val applicationProperties: ApplicationProperties,
+    var sonarrServers: List<ServarrSettings> = listOf(),
+    var radarrServers: List<ServarrSettings> = listOf(),
+
+) : SeerrService {
+
+    companion object {
+        private val log = LoggerFactory.getLogger(this::class.java.enclosingClass)
+    }
+
+    init {
+        if (seerrProperties.enabled && !applicationProperties.trainingRun) {
+            sonarrServers = seerrClient.getSonarrServers()
+            radarrServers = seerrClient.getRadarrServers()
+        }
+    }
+
+    override fun cleanupRequests(items: List<LibraryItem>) {
+        val allRequests = getAllRequests()
+        for (item: LibraryItem in items) {
+            var requests: List<RequestResponse> =
+                    // TV show
+                    if (item.season != null) {
+                        allRequests.filter { req -> mediaMatches(item, req) && req.seasons?.any { it.seasonNumber == item.season } ?: false }
+                    }
+                    // Movie
+                    else {
+                        allRequests.filter { req -> mediaMatches(item, req) }
+                    }
+
+            for (request: RequestResponse in requests) {
+                if (!applicationProperties.dryRun) {
+                    try {
+                        log.info("Deleting request for {} | IMDB: {} - {}", item.filePath, item.imdbId, request)
+                        seerrClient.deleteRequest(request.id)
+                    } catch(e: Exception) {
+                        log.trace("Error deleting Seerr request", e)
+                    }
+                } else {
+                    log.info("Found request for {} | IMDB: {} - {}", item.filePath, item.imdbId, request)
+                }
+            }
+        }
+    }
+
+    private fun mediaMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
+
+        if (!serverMatches(candidate)) {
+            log.debug("Found request in Seerr but server doesn't match!")
+            return false
+        }
+
+        // Check if the media type is the same before checking anything else
+        if (!mediaTypeMatches(item, candidate)) {
+            return false
+        }
+
+        // Match between Radarr ID or Sonarr ID and the ID Seerr stores for Radarr/Sonarr
+        // TODO: Maybe grab the Jellyfin ID here to make deletion in Jellyfin easier down the line?
+        if (item.id == candidate.media.externalServiceId) {
+            return true
+        }
+
+        // Fallback, match by meta data
+        val imdbMatches = candidate.media.imdbId != null && item.imdbId != null && candidate.media.imdbId == item.imdbId
+        val tmdbMatches = candidate.media.tmdbId != null && item.tmdbId != null && candidate.media.tmdbId == item.tmdbId
+        val tvdbMatches = candidate.media.tvdbId != null && item.tvdbId != null && candidate.media.tvdbId == item.tvdbId
+        return imdbMatches || tmdbMatches || tvdbMatches
+    }
+
+    private fun serverMatches(candidate: RequestResponse): Boolean {
+
+        // only validate the server, if the user enabled it
+        if (!seerrProperties.matchServer) {
+            return true
+        }
+
+        // match media server first - some people use several Sonarr/Radarr installations
+        val servarrrSettings = if (candidate.type == "tv") sonarrServers else radarrServers
+        val servarrProperties = if (candidate.type == "tv") sonarrProperties else radarrProperties
+
+        // find server this request is responsible for
+        val serverSetting = servarrrSettings.firstOrNull { it.id == candidate.media.serviceId }
+        if (serverSetting == null) {
+            log.debug("Found a Seerr request [id: {}] not matching any known server: {}", candidate.id, candidate.media)
+            return false
+        }
+
+        // TODO: Maybe do some testing to figure out if matching by serviceUrl is more efficient
+        val targetServerUri = URIBuilder()
+            .setScheme(if (serverSetting.useSsl) "https" else "http")
+            .setHost(serverSetting.hostname)
+            .setPort(serverSetting.port)
+            .setPath("") // force empty path for reliable match
+            .build()
+
+        val settingServerUri = UriComponentsBuilder
+            .fromUriString(servarrProperties.url)
+            .path("") // force empty path for reliable match
+            .build().toUri()
+
+        return targetServerUri.equals(settingServerUri)
+    }
+
+    private fun mediaTypeMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
+
+        // Found TV show, both request and potential media have seasons
+        if (item.season != null && (candidate.type == "tv" || candidate.seasons?.isNotEmpty() == true)) {
+            return true
+        }
+
+        // No seasons? Found a movie
+        if (item.season == null && (candidate.type == "movie" || candidate.seasons.isNullOrEmpty())) {
+            return true
+        }
+
+        return false
+    }
+
+    private fun getAllRequests(): List<RequestResponse> {
+        val allRequests = mutableListOf<RequestResponse>()
+        val pageSize = 1000
+        var page = 0
+        var pages: Int
+
+        do {
+            val pageResult = seerrClient.getRequests(pageSize, page * pageSize)
+            pages = pageResult.pageInfo.pages
+            allRequests.addAll(pageResult.results)
+            page++
+        } while (page < pages)
+
+        return allRequests
+    }
+
+}

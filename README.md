@@ -36,7 +36,7 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - Exclude items from deletion via tags in Sonarr/Radarr
 - Configure expiration times for your media in the *arrs - optionally via Jellystat
 - Season by season removal for TV shows, removing entire shows or only keep a minimum number of episodes for weekly shows
-- Clear requests from Jellyseerr and clean up leftover metadata in Jellyfin so no orphaned files are left
+- Clear requests from Seerr and clean up leftover metadata in Jellyfin so no orphaned files are left
 - Show a collection, containing rule matched media, on the Jellyfin home screen for a specific duration before deletion. Think: "Leaving soon"
 
 <img src="images/leaving_soon_01.png" width=60%>
@@ -47,10 +47,11 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 - **I don't use Emby. I implemented and tested it, but for maintenance I rely on bug reports**
 - Only one of Jellyfin or Emby can be enabled at a time
 - Only one of Jellystat or Streamystats can be enabled at a time
+- [janitorr-stats](https://github.com/Schaka/janitorr-stats) can run alongside either as a fallback, or on its own
 - "Leaving Soon" Collections are *always* created and do not care for dry-run settings
 - Jellyfin and Emby require user access to delete files, an API key is not enough - I recommend creating a user specifically for this task
 - **For media to be picked up, it needs to have been downloaded by the Radarr/Sonarr**
-- Jellyfin/Emby and Jellyseerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
+- Jellyfin/Emby and Seerr are not required, but if you don't supply them, you may end up with orphaned folders,  metadata, etc
 
 ### Logging
 You may check the container logs for Janitorr to observe what the application wants to do.
@@ -78,6 +79,32 @@ Depending on the configuration, files will be deleted if they are older than x d
 history in the *arr apps. By default, it will choose the oldest file in the history.
 If Jellystat or Streamystats is set up, the most recent watch date overwrites the grab history, if it exists.
 
+### Watch history via janitorr-stats
+
+[janitorr-stats](https://github.com/Schaka/janitorr-stats) is an optional companion microservice that stores Jellyfin
+play history keyed by stable external IDs (IMDB/TMDB/TVDB). Unlike Jellystat or Streamystats, the history survives
+library rescans, file moves and server migrations that change Jellyfin's internal item IDs.
+
+Important caveats:
+- **janitorr-stats only records what is watched while it runs.** It does not backfill historical activity,
+  so on day one it knows nothing. The longer it runs, the more useful it becomes.
+- When both Jellystat/Streamystats and janitorr-stats are enabled, Janitorr queries the primary first and only
+  falls back to janitorr-stats when the primary returns no result.
+- If you are setting up Janitorr fresh and don't already have Jellystat or Streamystats running, enable
+  janitorr-stats from the start and skip the others. There is no reason to set up a stats app you're planning
+  to migrate away from.
+
+Enable it by pointing Janitorr at the janitorr-stats container:
+
+```yml
+clients:
+  janitorr-stats:
+    enabled: true
+    url: "http://janitorr-stats:8080"
+```
+
+See the [janitorr-stats README](https://github.com/Schaka/janitorr-stats) for container setup.
+
 To exclude media from being considered from deletion, set the `janitorr_keep` tag in Sonarr/Radarr. The actual tag
 Janitorr looks for can be adjusted in your config file.
 
@@ -85,7 +112,7 @@ Janitorr looks for can be adjusted in your config file.
 
 - follow the mapping for `application.yml` examples below
 - within that host folder, put a copy of [application.yml](https://github.com/Schaka/janitorr/blob/develop/src/main/resources/application-template.yml) from this repository
-- adjust said copy with your own info like *arr, Jellyfin and Jellyseerr API keys and your preferred port
+- adjust said copy with your own info like *arr, Jellyfin and Seerr API keys and your preferred port
 
 If using Jellyfin with **filesystem access**, ensure that Janitorr has access to the exact directory structure for the leaving-soon-dir as Jellyfin.
 Additionally, make sure the *arrs directories are mapped into your container the same way for Janitorr as well.
@@ -156,6 +183,10 @@ My recommendations:
 **Attention: The develop branch is experimental. Logical errors and breaking changes may happen.**
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
 
+
+## Local Development
+
+For instructions on running Janitorr locally with a full stack of real service containers, see [docs/local-development.md](docs/local-development.md).
 
 ## JetBrains
 Thank you to [<img src="images/logos/jetbrains.svg" alt="JetBrains" width="32"> JetBrains](http://www.jetbrains.com/) for providing us with free licenses to their great tools.

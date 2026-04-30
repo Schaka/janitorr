@@ -24,7 +24,11 @@ out/
 .DS_Store
 **/.DS_Store
 
+# AI crap
+.claude
+
 # Local
+local-runtime
 application-local.yml
 application-seedbox.yml
 docker-compose.yml

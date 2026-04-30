@@ -44,7 +44,7 @@ abstract class BaseMediaServerService(
 
     /**
      * Populates the library items with Jellyfin/Emby IDs if available.
-     * This can be used for easier matching by other components like Jellyseerr and Jellystat, which use the same IDs.
+     * This can be used for easier matching by other components like Seerr and Jellystat, which use the same IDs.
      * Population happens per movie, TV show or season - but never per episode.
      */
     override fun populateMediaServerIds(items: List<LibraryItem>, type: LibraryType, bySeason: Boolean) {
@@ -102,9 +102,7 @@ abstract class BaseMediaServerService(
     private fun getMediaServerIdsForTvShowIds(items: List<LibraryItem>, bySeason: Boolean = true): Map<MediaLookup, List<String>> {
 
         // Do we need to aggregate by season or give every episode/season the entire TV show ID?
-        val useSeason = !applicationProperties.wholeTvShow && bySeason
-
-        val mediaServerShows = getTvLibrary(useSeason)
+        val mediaServerShows = getTvLibrary(bySeason)
 
         // it's not worth caching the showId => mediaServerIds lookup directly, it gets called too rarely, and we need to iterate the entire library to fill the cache manually anyway
         return items

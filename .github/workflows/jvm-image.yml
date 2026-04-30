@@ -38,12 +38,9 @@ jobs:
         with:
           java-version: '25'
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          gradle-version: 9.3.1
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Run tests
         run: ./gradlew test
@@ -86,12 +83,9 @@ jobs:
         with:
           java-version: '25'
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          gradle-version: 9.3.1
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build JVM OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/amd64
@@ -118,12 +112,9 @@ jobs:
         with:
           java-version: '25'
           distribution: 'temurin'
-          cache: 'gradle'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v5
-        with:
-          gradle-version: 9.3.1
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Build JVM ARM64 OCI Image
         run: ./gradlew bootBuildImage --publishImage --imagePlatform linux/arm64

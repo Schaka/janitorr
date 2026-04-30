@@ -1,8 +1,11 @@
 package com.github.schaka.janitorr.stats.jellystat
 
-import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Decoder
-import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Encoder
+import com.github.schaka.janitorr.config.DefaultClientProperties
 import feign.Feign
+import feign.Request
+import feign.jackson3.Jackson3Decoder
+import feign.jackson3.Jackson3Encoder
+import feign.slf4j.Slf4jLogger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,8 +21,11 @@ class JellyStatClientConfig {
     }
 
     @Bean
-    fun jellystatClient(properties: JellystatProperties, mapper: JsonMapper): JellystatClient {
+    fun jellystatClient(properties: JellystatProperties, defaults: DefaultClientProperties, mapper: JsonMapper): JellystatClient {
         return Feign.builder()
+            .options(Request.Options(defaults.connectTimeout, defaults.readTimeout, true))
+                .logLevel(defaults.level)
+                .logger(Slf4jLogger())
                 .decoder(Jackson3Decoder(mapper))
                 .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor {

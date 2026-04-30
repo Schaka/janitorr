@@ -1,12 +1,15 @@
 package com.github.schaka.janitorr.mediaserver.jellyfin
 
-import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Decoder
-import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Encoder
+import com.github.schaka.janitorr.config.DefaultClientProperties
 import com.github.schaka.janitorr.mediaserver.MediaServerClient
 import com.github.schaka.janitorr.mediaserver.MediaServerUserClient
 import feign.Feign
+import feign.Request
 import feign.RequestInterceptor
 import feign.RequestTemplate
+import feign.jackson3.Jackson3Decoder
+import feign.jackson3.Jackson3Encoder
+import feign.slf4j.Slf4jLogger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -31,8 +34,11 @@ class JellyfinClientConfig {
 
     @Jellyfin
     @Bean
-    fun jellyfinClient(properties: JellyfinProperties, mapper: JsonMapper): MediaServerClient {
+    fun jellyfinClient(properties: JellyfinProperties, defaults: DefaultClientProperties, mapper: JsonMapper): MediaServerClient {
         return Feign.builder()
+                .options(Request.Options(defaults.connectTimeout, defaults.readTimeout, true))
+                .logger(Slf4jLogger())
+                .logLevel(defaults.level)
                 .decoder(Jackson3Decoder(mapper))
                 .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor {
@@ -44,8 +50,11 @@ class JellyfinClientConfig {
 
     @Jellyfin
     @Bean
-    fun jellyfinUserClient(properties: JellyfinProperties, mapper: JsonMapper): MediaServerUserClient {
+    fun jellyfinUserClient(properties: JellyfinProperties, defaults: DefaultClientProperties, mapper: JsonMapper): MediaServerUserClient {
         return Feign.builder()
+                .options(Request.Options(defaults.connectTimeout, defaults.readTimeout, true))
+                .logger(Slf4jLogger())
+                .logLevel(defaults.level)
                 .decoder(Jackson3Decoder(mapper))
                 .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor(JellyfinUserInterceptor(properties))

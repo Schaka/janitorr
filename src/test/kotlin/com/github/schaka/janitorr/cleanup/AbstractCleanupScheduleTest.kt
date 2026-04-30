@@ -1,7 +1,7 @@
 package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.*
-import com.github.schaka.janitorr.jellyseerr.JellyseerrService
+import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.servarr.LibraryItem
@@ -24,7 +24,7 @@ class AbstractCleanupScheduleTest {
     lateinit var mediaServerService: AbstractMediaServerService
 
     @MockK(relaxed = true)
-    lateinit var jellyseerrService: JellyseerrService
+    lateinit var seerrService: SeerrService
 
     @MockK(relaxed = true)
     lateinit var statsService: StatsService
@@ -78,7 +78,7 @@ class AbstractCleanupScheduleTest {
         }
         verify(exactly = 0) { radarrService.removeEntries(any()) }
         verify(exactly = 0) { mediaServerService.cleanupMovies(any()) }
-        verify(exactly = 0) { jellyseerrService.cleanupRequests(any()) }
+        verify(exactly = 0) { seerrService.cleanupRequests(any()) }
     }
 
     @Test
@@ -119,7 +119,7 @@ class AbstractCleanupScheduleTest {
 
         return TestCleanupSchedule(
             mediaServerService,
-            jellyseerrService,
+            seerrService,
             statsService,
             fileSystemProperties,
             applicationProperties,
@@ -132,7 +132,7 @@ class AbstractCleanupScheduleTest {
 
     private class TestCleanupSchedule(
         mediaServerService: AbstractMediaServerService,
-        jellyseerrService: JellyseerrService,
+        seerrService: SeerrService,
         statsService: StatsService,
         fileSystemProperties: FileSystemProperties,
         applicationProperties: ApplicationProperties,
@@ -143,7 +143,7 @@ class AbstractCleanupScheduleTest {
     ) : AbstractCleanupSchedule(
         CleanupType.MEDIA,
         mediaServerService,
-        jellyseerrService,
+        seerrService,
         statsService,
         fileSystemProperties,
         applicationProperties,

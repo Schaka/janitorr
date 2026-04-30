@@ -11,6 +11,9 @@ spring:
       enabled: true
 
 logging:
+  level:
+    com.github.schaka: INFO
+    feign.Logger: DEBUG
   logback:
     rollingpolicy:
       max-history: 14
@@ -21,6 +24,7 @@ clients:
   default:
     connect-timeout: 60s
     read-timeout: 60s
+    level: NONE
 
   sonarr:
     enabled: false
@@ -50,7 +54,7 @@ clients:
   jellyseerr:
     enabled: false
     url: "http://jellyseerr:5055"
-    api-key: "jellyseerr-key"
+    api-key: "seerr-key"
   jellystat:
     enabled: false
     url: "http://jellystat:3000"
@@ -59,3 +63,6 @@ clients:
     enabled: false
     url: "http://streamystats:3000"
     api-key: "jellystat-key"
+  janitorr-stats:
+    enabled: false
+    url: "http://janitorr-stats:8080"

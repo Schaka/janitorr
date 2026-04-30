@@ -1,14 +1,15 @@
 package com.github.schaka.janitorr.servarr
 
 import com.github.schaka.janitorr.config.DefaultClientProperties
-import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Decoder
-import com.github.schaka.janitorr.config.jackson.compatibility.Jackson3Encoder
 import com.github.schaka.janitorr.servarr.radarr.RadarrClient
 import com.github.schaka.janitorr.servarr.radarr.RadarrProperties
 import com.github.schaka.janitorr.servarr.sonarr.SonarrClient
 import com.github.schaka.janitorr.servarr.sonarr.SonarrProperties
 import feign.Feign
 import feign.Request
+import feign.jackson3.Jackson3Decoder
+import feign.jackson3.Jackson3Encoder
+import feign.slf4j.Slf4jLogger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -27,6 +28,8 @@ class ServarrClientConfig {
     fun radarrClient(defaults: DefaultClientProperties, properties: RadarrProperties, mapper: JsonMapper): RadarrClient {
         return Feign.builder()
                 .options(Request.Options(defaults.connectTimeout, defaults.readTimeout, true))
+                .logLevel(defaults.level)
+                .logger(Slf4jLogger())
                 .decoder(Jackson3Decoder(mapper))
                 .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor {
@@ -40,6 +43,8 @@ class ServarrClientConfig {
     fun sonarrClient(defaults: DefaultClientProperties, properties: SonarrProperties, mapper: JsonMapper): SonarrClient {
         return Feign.builder()
                 .options(Request.Options(defaults.connectTimeout, defaults.readTimeout, true))
+                .logLevel(defaults.level)
+                .logger(Slf4jLogger())
                 .decoder(Jackson3Decoder(mapper))
                 .encoder(Jackson3Encoder(mapper))
                 .requestInterceptor {

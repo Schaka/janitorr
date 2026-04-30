@@ -8,18 +8,17 @@ import org.springframework.boot.gradle.tasks.aot.ProcessAot
 import org.springframework.boot.gradle.tasks.bundling.BootBuildImage
 import org.springframework.boot.gradle.tasks.bundling.BootJar
 import org.springframework.boot.gradle.tasks.run.BootRun
-import org.gradle.api.tasks.bundling.Jar
 
 plugins {
 
     id("idea")
-    id("org.springframework.boot") version "4.0.1"
-    id("org.springframework.boot.aot") version "4.0.1"
-    id("io.spring.dependency-management") version "1.1.7"
-    id("net.nemerosa.versioning") version "3.1.0"
+    id("org.springframework.boot")
+    id("org.springframework.boot.aot")
+    id("io.spring.dependency-management")
+    id("net.nemerosa.versioning")
 
-    kotlin("jvm") version "2.3.0"
-    kotlin("plugin.spring") version "2.3.0"
+    kotlin("jvm")
+    kotlin("plugin.spring")
 
 }
 
@@ -30,6 +29,9 @@ repositories {
     maven("https://repo.spring.io/milestone")
 }
 
+val feignVersion: String by project
+val mockkVersion: String by project
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-cache")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -38,19 +40,22 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-webmvc")
     implementation("com.github.ben-manes.caffeine:caffeine")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
 
-    implementation("io.github.openfeign:feign-core:13.6")
-    implementation("io.github.openfeign:feign-jackson:13.6")
-    implementation("io.github.openfeign:feign-httpclient:13.6")
+    implementation("io.github.openfeign:feign-core:$feignVersion")
+    implementation("io.github.openfeign:feign-jackson3:$feignVersion")
+    implementation("io.github.openfeign:feign-jaxb-jakarta:$feignVersion")
+    implementation("io.github.openfeign:feign-httpclient:$feignVersion")
+    implementation("io.github.openfeign:feign-slf4j:$feignVersion")
 
     implementation("org.slf4j:jcl-over-slf4j")
 
     testImplementation(kotlin("test"))
-    testImplementation("io.mockk:mockk:1.14.7")
+    testImplementation("io.mockk:mockk:$mockkVersion")
     testImplementation("org.springframework.boot:spring-boot-starter-test") {
         exclude(module = "mockito-core")
     }
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:testcontainers")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }

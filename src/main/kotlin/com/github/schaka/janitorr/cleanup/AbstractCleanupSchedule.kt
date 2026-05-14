@@ -2,11 +2,11 @@ package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
-import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.TV_SHOWS
+import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.servarr.LibraryItem
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.stats.StatsService
@@ -47,7 +47,7 @@ abstract class AbstractCleanupSchedule(
         }
 
         if (leavingSoonExpiration != FOREVER.duration) {
-            log.info("Not deleting ${libraryType.collectionType} because minimum disk threshold was not reached, but updating Leaving Soon.")
+            log.info("Not deleting ${libraryType.collectionType} but updating Leaving Soon.")
             if (fileSystemProperties.access) {
                 log.info("Free disk space: ${getFreeSpacePercentage()}%")
             }

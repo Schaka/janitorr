@@ -47,7 +47,11 @@ abstract class AbstractCleanupSchedule(
         }
 
         if (leavingSoonExpiration != FOREVER.duration) {
-            log.info("Not deleting ${libraryType.collectionType} but updating Leaving Soon.")
+            if (shouldDelete) {
+                log.info("Deleting ${libraryType.collectionType} and updating Leaving Soon.")
+            } else {
+                log.info("Not deleting ${libraryType.collectionType} but updating Leaving Soon.")
+            }
             if (fileSystemProperties.access) {
                 log.info("Free disk space: ${getFreeSpacePercentage()}%")
             }

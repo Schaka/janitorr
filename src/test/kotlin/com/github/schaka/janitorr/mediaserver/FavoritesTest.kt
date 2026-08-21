@@ -318,4 +318,30 @@ internal class FavoritesTest {
         assertEquals(1, result.size)
         assertEquals("movie-123", result[0].Id)
     }
+
+    @Test
+    fun `Unknown allow-listed entries don't prevent valid entries from matching`() {
+        every { jellyfinProperties.enabled } returns true
+        every { jellyfinProperties.excludeFavorited } returns true
+        every { jellyfinProperties.excludeFavoritedUsers } returns listOf("GhostUser", "User2")
+
+        val user1 = MediaServerUser("User1", "user-id-1")
+        val user2 = MediaServerUser("User2", "user-id-2")
+        every { mediaServerClient.listUsers() } returns listOf(user1, user2)
+
+        val movie1 = mockk<LibraryContent>(relaxed = true) {
+            every { Id } returns "movie-123"
+        }
+        val movie3 = mockk<LibraryContent>(relaxed = true) {
+            every { Id } returns "movie-789"
+        }
+
+        every { mediaServerClient.getUserFavorites("user-id-1") } returns ItemPage(listOf(movie1), 0, 1)
+        every { mediaServerClient.getUserFavorites("user-id-2") } returns ItemPage(listOf(movie3), 0, 1)
+
+        val result = jellyfinRestService.getAllFavoritedItems()
+
+        assertEquals(1, result.size)
+        assertEquals("movie-789", result[0].Id)
+    }
 }

@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.mediaserver
 import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
+import com.github.schaka.janitorr.mediaserver.api.MediaServerUser
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -266,7 +267,7 @@ abstract class BaseMediaServerService(
             return emptyList()
         }
 
-        val users = mediaServerClient.listUsers()
+        val users = filterAllowedUsers(mediaServerClient.listUsers())
 
         return users.flatMap { user ->
                 try {
@@ -277,6 +278,27 @@ abstract class BaseMediaServerService(
                 }
             }.distinctBy { it.Id }
     }
+
+    /**
+     * If exclude-favorited-users is set, only the favorites of those users (matched by name, case-insensitive, or by ID)
+     * are taken into account. An empty list means favorites from ALL users protect media from deletion.
+     */
+    private fun filterAllowedUsers(users: List<MediaServerUser>): List<MediaServerUser> {
+        val allowedUsers = mediaServerProperties.excludeFavoritedUsers
+
+        if (allowedUsers.isEmpty()) {
+            return users
+        }
+
+        val unmatched = allowedUsers.filterNot { allowed -> users.any { it.matches(allowed) } }
+        if (unmatched.isNotEmpty()) {
+            log.warn("Some entries of exclude-favorited-users don't match any user on the media server: {}", unmatched)
+        }
+
+        return users.filter { user -> allowedUsers.any { user.matches(it) } }
+    }
+
+    private fun MediaServerUser.matches(nameOrId: String) = nameOrId.equals(Name, ignoreCase = true) || nameOrId == Id
 
     override fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem> {
         val favoritedItems = getAllFavoritedItems()

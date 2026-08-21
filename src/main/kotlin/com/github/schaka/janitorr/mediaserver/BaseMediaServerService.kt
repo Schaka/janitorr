@@ -267,9 +267,11 @@ abstract class BaseMediaServerService(
             return emptyList()
         }
 
-        val users = filterAllowedUsers(mediaServerClient.listUsers())
+        val users = mediaServerClient.listUsers()
+        warnAboutUnmatchedAllowlistEntries(users)
 
-        return users.flatMap { user ->
+        return users.filter(::isAllowlistedForFavorites)
+            .flatMap { user ->
                 try {
                     mediaServerClient.getUserFavorites(user.Id).Items
                 } catch (e: Exception) {
@@ -280,22 +282,21 @@ abstract class BaseMediaServerService(
     }
 
     /**
-     * If exclude-favorited-users is set, only the favorites of those users (matched by name, case-insensitive, or by ID)
-     * are taken into account. An empty list means favorites from ALL users protect media from deletion.
+     * If exclude-favorited-allowlist is set, only the favorites of those users (matched by name, case-insensitive, or by ID)
+     * are taken into account. Leaving the allowlist out entirely (or empty) means favorites from ALL users protect media.
      */
-    private fun filterAllowedUsers(users: List<MediaServerUser>): List<MediaServerUser> {
-        val allowedUsers = mediaServerProperties.excludeFavoritedUsers
+    private fun isAllowlistedForFavorites(user: MediaServerUser): Boolean {
+        val allowlist = mediaServerProperties.excludeFavoritedAllowlist
+        return allowlist.isEmpty() || allowlist.any { user.matches(it) }
+    }
 
-        if (allowedUsers.isEmpty()) {
-            return users
-        }
+    private fun warnAboutUnmatchedAllowlistEntries(users: List<MediaServerUser>) {
+        val unmatched = mediaServerProperties.excludeFavoritedAllowlist
+            .filterNot { allowed -> users.any { it.matches(allowed) } }
 
-        val unmatched = allowedUsers.filterNot { allowed -> users.any { it.matches(allowed) } }
         if (unmatched.isNotEmpty()) {
-            log.warn("Some entries of exclude-favorited-users don't match any user on the media server: {}", unmatched)
+            log.warn("Some entries of exclude-favorited-allowlist don't match any user on the media server: {}", unmatched)
         }
-
-        return users.filter { user -> allowedUsers.any { user.matches(it) } }
     }
 
     private fun MediaServerUser.matches(nameOrId: String) = nameOrId.equals(Name, ignoreCase = true) || nameOrId == Id

@@ -60,7 +60,7 @@ internal class FavoritesTest {
     fun `No favorites are returned when media server is disabled`() {
         every { jellyfinProperties.enabled } returns false
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
 
         val result = jellyfinRestService.getAllFavoritedItems()
 
@@ -71,7 +71,7 @@ internal class FavoritesTest {
     fun `Favorites are correctly aggregated across multiple users`() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
 
         val user1 = MediaServerUser("User1", "user-id-1")
         val user2 = MediaServerUser("User2", "user-id-2")
@@ -109,7 +109,7 @@ internal class FavoritesTest {
     fun `Graceful failure per user is guaranteed`() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
 
         val user1 = MediaServerUser("User1", "user-id-1")
         val user2 = MediaServerUser("User2", "user-id-2")
@@ -134,7 +134,7 @@ internal class FavoritesTest {
     fun `No favorites are returned if none are available at the server`() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
         every { mediaServerClient.listUsers() } returns emptyList()
 
         val result = jellyfinRestService.getAllFavoritedItems()
@@ -157,7 +157,7 @@ internal class FavoritesTest {
 
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
 
         val user1 = MediaServerUser("User1", "user-id-1")
         every { mediaServerClient.listUsers() } returns listOf(user1)
@@ -199,7 +199,7 @@ internal class FavoritesTest {
 
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
 
         val user1 = MediaServerUser("User1", "user-id-1")
         every { mediaServerClient.listUsers() } returns listOf(user1)
@@ -241,7 +241,7 @@ internal class FavoritesTest {
 
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns emptyList()
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
 
         val user1 = MediaServerUser("User1", "user-id-1")
         every { mediaServerClient.listUsers() } returns listOf(user1)
@@ -271,7 +271,7 @@ internal class FavoritesTest {
     fun `Only favorites of allow-listed users are considered`() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns listOf("USER2") // matching is case-insensitive
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns listOf("USER2") // matching is case-insensitive
 
         val user1 = MediaServerUser("User1", "user-id-1")
         val user2 = MediaServerUser("User2", "user-id-2")
@@ -297,7 +297,7 @@ internal class FavoritesTest {
     fun `Allow-listed users can also be matched by their ID`() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns listOf("user-id-1")
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns listOf("user-id-1")
 
         val user1 = MediaServerUser("User1", "user-id-1")
         val user2 = MediaServerUser("User2", "user-id-2")
@@ -323,7 +323,7 @@ internal class FavoritesTest {
     fun `Unknown allow-listed entries don't prevent valid entries from matching`() {
         every { jellyfinProperties.enabled } returns true
         every { jellyfinProperties.excludeFavorited } returns true
-        every { jellyfinProperties.excludeFavoritedUsers } returns listOf("GhostUser", "User2")
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns listOf("GhostUser", "User2")
 
         val user1 = MediaServerUser("User1", "user-id-1")
         val user2 = MediaServerUser("User2", "user-id-2")

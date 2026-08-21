@@ -3,6 +3,7 @@ package com.github.schaka.janitorr.mediaserver
 import com.github.schaka.janitorr.cleanup.CleanupType
 import com.github.schaka.janitorr.config.ApplicationProperties
 import com.github.schaka.janitorr.config.FileSystemProperties
+import com.github.schaka.janitorr.mediaserver.api.MediaServerUser
 import com.github.schaka.janitorr.mediaserver.library.LibraryContent
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
 import com.github.schaka.janitorr.mediaserver.library.LibraryType.MOVIES
@@ -267,8 +268,10 @@ abstract class BaseMediaServerService(
         }
 
         val users = mediaServerClient.listUsers()
+        warnAboutUnmatchedAllowlistEntries(users)
 
-        return users.flatMap { user ->
+        return users.filter(::isAllowlistedForFavorites)
+            .flatMap { user ->
                 try {
                     mediaServerClient.getUserFavorites(user.Id).Items
                 } catch (e: Exception) {
@@ -277,6 +280,26 @@ abstract class BaseMediaServerService(
                 }
             }.distinctBy { it.Id }
     }
+
+    /**
+     * If exclude-favorited-allowlist is set, only the favorites of those users (matched by name, case-insensitive, or by ID)
+     * are taken into account. Leaving the allowlist out entirely (or empty) means favorites from ALL users protect media.
+     */
+    private fun isAllowlistedForFavorites(user: MediaServerUser): Boolean {
+        val allowlist = mediaServerProperties.excludeFavoritedAllowlist
+        return allowlist.isEmpty() || allowlist.any { user.matches(it) }
+    }
+
+    private fun warnAboutUnmatchedAllowlistEntries(users: List<MediaServerUser>) {
+        val unmatched = mediaServerProperties.excludeFavoritedAllowlist
+            .filterNot { allowed -> users.any { it.matches(allowed) } }
+
+        if (unmatched.isNotEmpty()) {
+            log.warn("Some entries of exclude-favorited-allowlist don't match any user on the media server: {}", unmatched)
+        }
+    }
+
+    private fun MediaServerUser.matches(nameOrId: String) = nameOrId.equals(Name, ignoreCase = true) || nameOrId == Id
 
     override fun filterOutFavorites(items: List<LibraryItem>, libraryType: LibraryType): List<LibraryItem> {
         val favoritedItems = getAllFavoritedItems()

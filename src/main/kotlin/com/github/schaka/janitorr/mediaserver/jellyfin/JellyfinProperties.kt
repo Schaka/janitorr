@@ -14,6 +14,7 @@ data class JellyfinProperties(
         override val password: String,
         override val delete: Boolean = true,
         override val excludeFavorited: Boolean = false,
+        override val excludeFavoritedAllowlist: List<String> = emptyList(),
         override val leavingSoonTv: String = "Shows (Deleted Soon)",
         override val leavingSoonMovies: String = "Movies (Deleted Soon)",
         override val leavingSoonType: LeavingSoonType = MOVIES_AND_TV

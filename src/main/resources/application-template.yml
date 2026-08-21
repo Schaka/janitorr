@@ -94,6 +94,11 @@ clients:
     password: janitorr
     delete: true # Jellyfin setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Jellyfin API, disable it here
     exclude-favorited: false # When enabled, items favorited by any Jellyfin user will be excluded from deletion and won't appear in Leaving Soon
+    # Optional allowlist for exclude-favorited: when set, only favorites of the listed users protect media from deletion.
+    # Leave the key out entirely (or set an empty list) to honor favorites from ALL users.
+    # exclude-favorited-allowlist:
+    #   - Alice                              # matched by username, case-insensitive
+    #   - 81daa6ec4e8d4a1c91ec073bfa2b6a9e   # or by user ID
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
     leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE
@@ -107,7 +112,12 @@ clients:
     username: Janitorr
     password: janitorr
     delete: true # Emby setup is required for JellyStat. However, if you don't want Janitorr to send delete requests to the Emby API, disable it here
-    exclude-favorited: false # When enabled, items favorited by any Jellyfin user will be excluded from deletion and won't appear in Leaving Soon
+    exclude-favorited: false # When enabled, items favorited by any Emby user will be excluded from deletion and won't appear in Leaving Soon
+    # Optional allowlist for exclude-favorited: when set, only favorites of the listed users protect media from deletion.
+    # Leave the key out entirely (or set an empty list) to honor favorites from ALL users.
+    # exclude-favorited-allowlist:
+    #   - Alice                              # matched by username, case-insensitive
+    #   - 81daa6ec4e8d4a1c91ec073bfa2b6a9e   # or by user ID
     leaving-soon-tv: "Shows (Leaving Soon)"
     leaving-soon-movies: "Movies (Leaving Soon)"
     leaving-soon-type: MOVIES_AND_TV # Other valid values are MOVIES, TV and NONE

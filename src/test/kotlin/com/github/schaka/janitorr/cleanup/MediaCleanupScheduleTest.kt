@@ -1,9 +1,9 @@
 package com.github.schaka.janitorr.cleanup
 
 import com.github.schaka.janitorr.config.*
-import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.mediaserver.AbstractMediaServerService
 import com.github.schaka.janitorr.mediaserver.library.LibraryType
+import com.github.schaka.janitorr.seerr.SeerrService
 import com.github.schaka.janitorr.servarr.ServarrService
 import com.github.schaka.janitorr.stats.StatsService
 import io.mockk.impl.annotations.MockK
@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.io.File
 import java.time.Duration
-import java.time.temporal.ChronoUnit.FOREVER
 import kotlin.math.floor
 import kotlin.math.max
 
@@ -114,7 +113,7 @@ class MediaCleanupScheduleTest {
 
         val duration = schedule.exposeDetermineLeavingSoonDuration(LibraryType.MOVIES)
 
-        assertThat(duration).isEqualTo(FOREVER.duration)
+        assertThat(duration).isEqualTo(Duration.ofDays(120))
     }
 
     @Test

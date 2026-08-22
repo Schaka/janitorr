@@ -113,7 +113,7 @@ abstract class AbstractCleanupSchedule(
         }
     }
 
-    protected fun getFreeSpacePercentage(): Double {
+    protected open fun getFreeSpacePercentage(): Double {
         val filesystem = File(fileSystemProperties.freeSpaceCheckDir)
         return (filesystem.usableSpace.toDouble() / filesystem.totalSpace.toDouble()) * 100
     }

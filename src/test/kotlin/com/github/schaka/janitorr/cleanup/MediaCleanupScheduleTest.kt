@@ -108,7 +108,8 @@ class MediaCleanupScheduleTest {
             fileSystemProperties,
             applicationProperties,
             sonarrService,
-            radarrService
+            radarrService,
+            freeSpacePercentageOverride = 15.0
         )
 
         val duration = schedule.exposeDetermineLeavingSoonDuration(LibraryType.MOVIES)
@@ -161,7 +162,8 @@ class MediaCleanupScheduleTest {
         fileSystemProperties: FileSystemProperties,
         applicationProperties: ApplicationProperties,
         sonarrService: ServarrService,
-        radarrService: ServarrService
+        radarrService: ServarrService,
+        private val freeSpacePercentageOverride: Double? = null
     ) : MediaCleanupSchedule(
         mediaServerService,
         seerrService,
@@ -171,6 +173,10 @@ class MediaCleanupScheduleTest {
         sonarrService,
         radarrService
     ) {
+        override fun getFreeSpacePercentage(): Double {
+            return freeSpacePercentageOverride ?: super.getFreeSpacePercentage()
+        }
+
         fun exposeDetermineLeavingSoonDuration(type: LibraryType): Duration {
 
             val freeSpacePercentage = getFreeSpacePercentage()

@@ -41,6 +41,16 @@ It's THE solution for cleaning up your server and freeing up space before you ru
 
 <img src="images/leaving_soon_01.png" width=60%>
 
+### Stance on AI usage
+
+I am not against the use of GenAI as a whole. However, all code needs to be reviewed, understood (and adjusted) by humans.
+Any PR opened by an AI agent or user without any manual oversight will be automaticaly closed without further comment.
+
+PRs may also not be summarized by an AI. The entire text explaining what they intend to do needs to be written by a human. The only exception is using a translation tool for submitters who don't feel confident in their English skills.
+
+The general guideline should be to only use LLMs as a rubber duck and discuss more architectural solutions and prototyping.
+The code it generates is generally not good enough to pass review unless explicitly guided by a knowledgeable developer and contained to a few classes at most.
+
 ### Important notes
 
 - Janitorr does **not** delete items after they were watched. Look into [Jellyfin Media Cleaner](https://github.com/shemanaev/jellyfin-plugin-media-cleaner) for that.
@@ -182,6 +192,10 @@ My recommendations:
 
 **Attention: The develop branch is experimental. Logical errors and breaking changes may happen.**
 To get the latest build as found in the development branch, grab the following image: `ghcr.io/schaka/janitorr:jvm-develop`.
+
+### Contributing
+
+Besides adhering to the AI policy above, all PRs must target the develop branch. Do not ever target main directly unless a hotfix needs to be released immediately.
 
 
 ## Local Development

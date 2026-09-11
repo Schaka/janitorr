@@ -126,6 +126,10 @@ class SeerrRestService(
 
     private fun mediaTypeMatches(item: LibraryItem, candidate: RequestResponse): Boolean {
 
+        if (candidate.type != null && candidate.type != "tv" && candidate.type != "movie") {
+            return false
+        }
+
         // Found TV show, both request and potential media have seasons
         if (item.season != null && (candidate.type == "tv" || candidate.seasons?.isNotEmpty() == true)) {
             return true

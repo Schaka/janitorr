@@ -5,7 +5,7 @@ data class ModifiedBy(
         val createdAt: String,
         val email: String,
         val id: Int,
-        val permissions: Int,
+        val permissions: Long,
         val requestCount: Int,
         val updatedAt: String,
         val userType: Int,

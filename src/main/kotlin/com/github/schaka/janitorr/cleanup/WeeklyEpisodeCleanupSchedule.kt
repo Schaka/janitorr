@@ -70,7 +70,11 @@ class WeeklyEpisodeCleanupSchedule(
 
             // Delete by age
             for (episodeHistory in episodesHistory) {
-                val episode = episodes.first{ it.seriesId == episodeHistory.seriesId && it.id == episodeHistory.episodeId }
+                val episode = episodes.firstOrNull { it.seriesId == episodeHistory.seriesId && it.id == episodeHistory.episodeId }
+                if (episode == null) {
+                    log.debug("No matching episode found for history entry of ${show.title} - episode ID: ${episodeHistory.episodeId}")
+                    continue
+                }
                 val grabDate = parseDate(episodeHistory.date)
                 if (grabDate + applicationProperties.episodeDeletion.maxAge <= today) {
                     log.trace("Deleting episode ${episode.episodeNumber} of ${show.title} S${latestSeason.seasonNumber} because of its age")

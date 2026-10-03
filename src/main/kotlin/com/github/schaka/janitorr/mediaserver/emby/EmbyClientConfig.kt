@@ -87,7 +87,7 @@ class EmbyClientConfig {
                 val userInfo = getUserInfo(properties)
                 accessToken = userInfo.body?.get("AccessToken").toString()
                 lastUpdate = LocalDateTime.now()
-                log.info("Logged in to Emby as {} {}", properties.username, accessToken)
+                log.debug("Logged in to Emby as {} {}", properties.username, accessToken.takeLast(6))
             }
 
             headerMap.map { e ->

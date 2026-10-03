@@ -74,7 +74,7 @@ class JellyfinClientConfig {
                 val userInfo = getUserInfo(properties)
                 accessToken = userInfo.body?.get("AccessToken").toString()
                 lastUpdate = LocalDateTime.now()
-                log.info("Logged in to Jellyfin as {} {}", properties.username, accessToken)
+                log.debug("Logged in to Jellyfin as {} {}", properties.username, accessToken.takeLast(6))
             }
 
             template.header(AUTHORIZATION, "MediaBrowser Token=\"${accessToken}\", $janitorrClientString}")

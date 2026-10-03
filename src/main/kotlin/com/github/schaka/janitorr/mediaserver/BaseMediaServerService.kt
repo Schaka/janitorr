@@ -270,15 +270,18 @@ abstract class BaseMediaServerService(
         val users = mediaServerClient.listUsers()
         warnAboutUnmatchedAllowlistEntries(users)
 
-        return users.filter(::isAllowlistedForFavorites)
-            .flatMap { user ->
-                try {
-                    mediaServerClient.getUserFavorites(user.Id).Items
-                } catch (e: Exception) {
-                    log.warn("Failed to fetch favorites for user {}", user.Name, e)
-                    emptyList()
-                }
-            }.distinctBy { it.Id }
+        val results = users.filter(::isAllowlistedForFavorites)
+            .map { user ->
+                runCatching { mediaServerClient.getUserFavorites(user.Id).Items }
+                .onFailure { log.warn("Failed to fetch favorites for user {}", user.Name, it) }
+        }
+
+        // If every single user failed, the media server is likely unreachable - abort instead of deleting favorites
+        if (results.isNotEmpty() && results.all { it.isFailure }) {
+            throw IllegalStateException("Fetching favorites failed for every user, aborting cleanup", results.first().exceptionOrNull())
+        }
+
+        return results.flatMap { it.getOrDefault(emptyList()) }.distinctBy { it.Id }
     }
 
     /**

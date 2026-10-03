@@ -22,6 +22,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import java.time.LocalDateTime
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 
 @ExtendWith(MockKExtension::class)
 internal class FavoritesTest {
@@ -128,6 +129,24 @@ internal class FavoritesTest {
 
         assertEquals(1, result.size)
         assertEquals("movie-789", result[0].Id)
+    }
+
+    @Test
+    fun `Cleanup aborts if favorites fail for every user`() {
+        every { jellyfinProperties.enabled } returns true
+        every { jellyfinProperties.excludeFavorited } returns true
+        every { jellyfinProperties.excludeFavoritedAllowlist } returns emptyList()
+
+        val user1 = MediaServerUser("User1", "user-id-1")
+        val user2 = MediaServerUser("User2", "user-id-2")
+        every { mediaServerClient.listUsers() } returns listOf(user1, user2)
+
+        every { mediaServerClient.getUserFavorites("user-id-1") } throws RuntimeException("API Error")
+        every { mediaServerClient.getUserFavorites("user-id-2") } throws RuntimeException("API Error")
+
+        assertFailsWith<IllegalStateException> {
+            jellyfinRestService.getAllFavoritedItems()
+        }
     }
 
     @Test
